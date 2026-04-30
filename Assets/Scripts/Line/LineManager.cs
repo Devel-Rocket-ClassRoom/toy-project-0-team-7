@@ -7,7 +7,7 @@ public class LineManager : MonoBehaviour
     private Line line_onMaking;
     public bool IsValidLine => line_onMaking.stations.Count > 1;
 
-    private LineRenderer lineRenderer;
+    private LineRenderer lr;
 
     private List<Line> lines = new();
 
@@ -16,8 +16,8 @@ public class LineManager : MonoBehaviour
         line_onMaking = Instantiate(linePrefab, transform);
         line_onMaking.AddStationEnd(hit.collider.gameObject.GetComponent<Station>());
 
-        lineRenderer = line_onMaking.GetComponent<LineRenderer>();
-        lineRenderer.SetPosition(0, pos);
+        lr = line_onMaking.GetComponent<LineRenderer>();
+        lr.SetPosition(0, pos);
     }
 
     public void FixLine()
@@ -25,6 +25,7 @@ public class LineManager : MonoBehaviour
         line_onMaking.Init();
         AddLine(line_onMaking);
         line_onMaking = null;
+        lr = null;
     }
 
     public void CancelLine()
@@ -35,7 +36,7 @@ public class LineManager : MonoBehaviour
 
     public void UpdatePreviewPoint(Vector3 previewPoint)
     {
-        lineRenderer.SetPosition(line_onMaking.stations.Count, previewPoint);
+        lr.SetPosition(line_onMaking.stations.Count, previewPoint);
     }
 
     public void AddStationInMakingLine(Station station)
