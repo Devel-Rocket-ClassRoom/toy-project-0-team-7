@@ -10,10 +10,15 @@ public class LineManager : MonoBehaviour
     private LineRenderer lr;
 
     private List<Line> lines = new();
+    private int capacity = 7;
+    public bool IsLinesFull => lines.Count == capacity;
+
+    private Color color;
 
     public void StartLine(RaycastHit2D hit, Vector3 pos)
     {
         line_onMaking = Instantiate(linePrefab, transform);
+        line_onMaking.SetColor(Colors.colors[lines.Count]);
         line_onMaking.AddStationEnd(hit.collider.gameObject.GetComponent<Station>());
 
         lr = line_onMaking.GetComponent<LineRenderer>();

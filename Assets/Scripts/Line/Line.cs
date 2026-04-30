@@ -6,7 +6,6 @@ public class Line : MonoBehaviour
     public bool isOnMaking = true;
 
     public int lineId;
-    public Color color;
     public List<Station> stations = new();  // 순서 중요
     public List<Train> trains = new();
     //public bool isCircular = false;
@@ -41,5 +40,11 @@ public class Line : MonoBehaviour
         }
 
         isOnMaking = false;
+    }
+
+    public void SetColor(Color color)
+    {
+        lr.startColor = color;
+        lr.endColor = color;
     }
 }
