@@ -1,0 +1,104 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+// --- Station Prefab을 랜덤하게 생성하는 스포너 역할 클래스 ---
+public class StationManager : MonoBehaviour
+{
+    public Station[] prefabs;
+    [SerializeField] private float minRandomTime = 5f;
+    [SerializeField] private float maxRandomTime = 15f;
+
+    private float minRadius;
+    private float timer = 0f;
+    private float offset = 0.5f;
+    private List<Station> exisitingStations;
+    public List<Station> ExisitingStations => exisitingStations;
+    private Camera cam;
+
+    private void Awake()
+    {
+        cam = Camera.main;
+        exisitingStations = new List<Station>();
+
+        float screenHeight = cam.orthographicSize * 2f;
+        minRadius = screenHeight * 0.15f;
+    } 
+    private void Start()
+    {
+        RandomSpawn();
+        timer = Random.Range(minRandomTime, maxRandomTime);
+    }
+
+    private void Update()
+    {
+
+        // 게임 초반에는 더 빨리 생성되도록 함 (존재하는 역이 3개 미만일 때만)
+        float t = Mathf.Clamp01(exisitingStations.Count / 3f);
+        float speedOffset = Mathf.Lerp(10f, 1f, t);
+
+        timer -= Time.deltaTime * speedOffset;
+
+        if (timer <= 0f)
+        {
+            Debug.Log("[시간 초과] 역 생성됨");
+            RandomSpawn();
+            timer = Random.Range(minRandomTime, maxRandomTime);
+        }
+    }
+
+    // --- 한 번 실행될 때 승강장 하나만 랜덤 생성 ---
+    private void RandomSpawn()
+    {
+        if (prefabs == null || prefabs.Length == 0) 
+        {
+            Debug.Log("[Null] 프리팹 없음");
+            return;
+        }
+
+        int range = prefabs.Length;
+        var station = Instantiate(prefabs[Random.Range(0, range)]);
+
+        Vector3 stationPos = GetRandomScreenPos();
+        while (!IsValidPosition(stationPos))
+        {
+            stationPos = GetRandomScreenPos();
+        }
+
+        station.transform.position = stationPos;
+        exisitingStations.Add(station);
+    }
+
+    // --- 승강장 위치 랜덤하게 생성 ---
+    private Vector3 GetRandomScreenPos()
+    {
+        Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, cam.nearClipPlane));
+        float x = Random.Range(bottomLeft.x + offset, topRight.x - offset);
+        float y = Random.Range(bottomLeft.y + offset, topRight.y - offset);
+
+        return new Vector3(x, y, 0f);
+    }
+
+    // --- 이미 생성된 역 리스트를 순회하면서 최소 및 최대 거리 검사 메서드 ---
+    private bool IsValidPosition(Vector3 stationPos)
+    {
+        if (ExisitingStations == null || ExisitingStations.Count == 0)
+        {
+            return true;
+        }
+
+        foreach (var station in exisitingStations)
+        {
+            Debug.Log($"[포지션 검사] {stationPos}가 유효한 포지션인지 검사");
+            float dist = Vector2.Distance(stationPos, station.transform.position);
+            if (dist < minRadius)
+            {
+                Debug.Log($"[포지션 검사] {dist}가 생성 거리의 범위를 충족하지 못했습니다.");
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+}
