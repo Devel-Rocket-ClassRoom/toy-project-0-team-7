@@ -137,7 +137,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.9014549, y: 0.9037743}
+  m_Size: {x: 4.2, y: 4.2}
   m_EdgeRadius: 0
 --- !u!114 &-2462493466157804166
 MonoBehaviour:
@@ -153,3 +153,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Station
   capacity: 8
   overflowTimer: 180
+  lines: []
