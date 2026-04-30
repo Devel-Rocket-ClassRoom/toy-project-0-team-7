@@ -1,11 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-public enum StationType   //하늘님 스크립트와 합친 후 삭제 예정
-{
-    Circle,
-    Triangle,
-    Square,
-}
+
 //테스트 스크립트로 나중에 삭제예정
 public class TestStation : MonoBehaviour
 {

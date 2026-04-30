@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3151374741431427661}
   - component: {fileID: 7718142374982583259}
-  - component: {fileID: 1008864366135530892}
+  - component: {fileID: -1290821818456711322}
   m_Layer: 0
   m_Name: TrianglePassenger
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &1008864366135530892
+--- !u!114 &-1290821818456711322
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

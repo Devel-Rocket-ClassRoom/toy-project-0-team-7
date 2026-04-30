@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5109124423441971537}
   - component: {fileID: 2156174990422114431}
-  - component: {fileID: 2712980414465591748}
+  - component: {fileID: -7658189095329641249}
   m_Layer: 0
   m_Name: SquarePassenger
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &2712980414465591748
+--- !u!114 &-7658189095329641249
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

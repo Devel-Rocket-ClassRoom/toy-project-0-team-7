@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6390761930947198754}
   - component: {fileID: 7263897752706962648}
-  - component: {fileID: 7951077629365145469}
+  - component: {fileID: -1103932369405613974}
   m_Layer: 0
   m_Name: CirclePassenger
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &7951077629365145469
+--- !u!114 &-1103932369405613974
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

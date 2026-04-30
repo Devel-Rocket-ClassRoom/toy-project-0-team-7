@@ -1,12 +1,6 @@
 using UnityEngine;
 
-public enum PassengerState
-{
-    Waiting,
-    OnTrain,
-    Arrived,
-}
-public class Passenger
+public class Passenger : MonoBehaviour
 {
     //가고싶은 역
     public StationType destination { get; private set; }
