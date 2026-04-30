@@ -732,7 +732,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MouseInput
   lineManager: {fileID: 1349927380}
-  linePrefab: {fileID: 7766694683131865861, guid: 7f7956eefe1b79649967d49431d93a79, type: 3}
 --- !u!1 &1218963141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,6 +1084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df0d24eb18b500e4fbd5b1a010dac19a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LineManager
+  linePrefab: {fileID: 7766694683131865861, guid: 7f7956eefe1b79649967d49431d93a79, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

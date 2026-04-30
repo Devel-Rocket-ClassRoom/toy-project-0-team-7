@@ -5,11 +5,11 @@ public class LineManager : MonoBehaviour
 {
     public Line linePrefab;
     private Line line_onMaking;
-    public bool IsValidLine => line_onMaking.stations.Count < 2;
+    public bool IsValidLine => line_onMaking.stations.Count > 1;
 
     private LineRenderer lineRenderer;
 
-    private List<Line> lines;
+    private List<Line> lines = new();
 
     public void StartLine(RaycastHit2D hit, Vector3 pos)
     {
