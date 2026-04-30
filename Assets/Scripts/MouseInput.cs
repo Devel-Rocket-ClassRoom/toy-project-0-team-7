@@ -23,7 +23,7 @@ public class MouseInput : MonoBehaviour
         {
             if (hit.collider != null)   // 해당 위치에 충돌한 오브젝트가 존재하는 경우
             {
-                if (hit.collider.CompareTag("Station"))
+                if (hit.collider.CompareTag("Station") && !lineManager.IsLinesFull)
                 {
                     var pos = hit.collider.gameObject.transform.position;
                     pos.z = 0f;
