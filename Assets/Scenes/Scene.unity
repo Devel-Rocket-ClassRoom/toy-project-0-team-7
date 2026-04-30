@@ -383,58 +383,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &449851438
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 449851439}
-  - component: {fileID: 449851440}
-  m_Layer: 0
-  m_Name: StationSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &449851439
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 449851438}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1792723204}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &449851440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 449851438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 691a349141e1fa643a6a83d903d53d40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StationManager
-  prefabs:
-  - {fileID: 3884574927351861881, guid: 91627fccdbd184d439d5cbbe43168a9a, type: 3}
-  - {fileID: -2462493466157804166, guid: 176864bae2e247c4c8dbc65966543d68, type: 3}
-  - {fileID: 8609546053547811419, guid: b655a4c734003734ea3707390295740a, type: 3}
-  minRandomTime: 60
-  maxRandomTime: 180
-  minRadius: 0
-  maxRadius: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -581,8 +529,7 @@ Transform:
   m_LocalPosition: {x: -0.1549, y: 0.9455, z: 1}
   m_LocalScale: {x: 2.5170105, y: 2.660471, z: 10}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 449851439}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
