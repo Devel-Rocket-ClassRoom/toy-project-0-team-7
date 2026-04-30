@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
-
+using System.Collections.Generic;
 // --- Station Prefab을 랜덤하게 생성하는 스포너 역할 클래스 ---
 public class StationManager : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class StationManager : MonoBehaviour
 
     private float minRadius;
     private float timer = 0f;
+    private float gameTime = 0f;
     private float offset = 0.5f;
     private List<Station> exisitingStations;
     public List<Station> ExisitingStations => exisitingStations;
@@ -31,7 +31,8 @@ public class StationManager : MonoBehaviour
 
     private void Update()
     {
-
+        gameTime += Time.deltaTime;
+        
         // 게임 초반에는 더 빨리 생성되도록 함 (존재하는 역이 3개 미만일 때만)
         float t = Mathf.Clamp01(exisitingStations.Count / 3f);
         float speedOffset = Mathf.Lerp(10f, 1f, t);
