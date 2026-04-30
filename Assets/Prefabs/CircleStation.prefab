@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8968364468888777695}
   - component: {fileID: 6610734870726254885}
   - component: {fileID: 3884574927351861881}
-  - component: {fileID: 235638078879943377}
+  - component: {fileID: 2084255948194456047}
   m_Layer: 0
   m_Name: CircleStation
   m_TagString: Station
@@ -107,8 +107,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Station
   capacity: 8
   overflowTimer: 180
---- !u!58 &235638078879943377
-CircleCollider2D:
+  lines: []
+--- !u!70 &2084255948194456047
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -137,9 +138,10 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.00000003130042, y: 0}
-  m_Radius: 0.4372078
+  m_Offset: {x: -0.015276766, y: -0.027158037}
+  m_Size: {x: 3.3583946, y: 3.293892}
+  m_Direction: 1
