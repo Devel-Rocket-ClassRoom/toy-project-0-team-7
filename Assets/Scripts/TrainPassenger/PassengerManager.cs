@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PassengerManager : MonoBehaviour
 {
-    public float spawnInterval = 3f;
+    public float spawnInterval = 5f;
 
     //[수정 예정] 승객이 스폰될 역들의 리스트 > Station쪽에서 참조해야함
     public List<TestStation> allStations;
@@ -31,9 +31,6 @@ public class PassengerManager : MonoBehaviour
 
         //승객 객체 생성
         Passenger p = new Passenger(randomDest);
-        //테스트 로그
-        Debug.Log($"<color=cyan>[데이터 생성]</color> 새로운 승객 발생! " +
-            $"출발지: {startStation.name}, 목적지: {randomDest}");
         startStation.AddPassenger(p);
     }
 
@@ -57,6 +54,9 @@ public class PassengerManager : MonoBehaviour
     //일정 시간마다 승객 생성하는 코루틴
     public IEnumerator CoSpawnPassenger()
     {
+        //처음 시작할때만 5초 뒤에 생성
+        yield return new WaitForSeconds(5f);
+
         while (true)
         {
             SpawnPassenger();
