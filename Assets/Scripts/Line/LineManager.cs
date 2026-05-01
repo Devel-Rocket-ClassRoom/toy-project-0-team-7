@@ -41,7 +41,15 @@ public class LineManager : MonoBehaviour
 
     public void UpdatePreviewPoint(Vector3 previewPoint)
     {
-        lr.SetPosition(line_onMaking.stations.Count, previewPoint);
+        previewPoint.z = 0f;
+        var lastStation = line_onMaking.stations[^1].transform.position;    // 마지막 역 위치
+
+        Vector3 bend = line_onMaking.GetBendPoint(lastStation, previewPoint);
+        bend.z = 0f;
+
+        lr.positionCount = line_onMaking.waypoints.Count + 2;
+        lr.SetPosition(line_onMaking.waypoints.Count, bend);
+        lr.SetPosition(line_onMaking.waypoints.Count + 1, previewPoint);
     }
 
     public void AddStationInMakingLine(Station station)
