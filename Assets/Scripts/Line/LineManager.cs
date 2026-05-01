@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LineManager : MonoBehaviour
 {
@@ -9,16 +11,46 @@ public class LineManager : MonoBehaviour
 
     private LineRenderer lr;
 
-    private List<Line> lines = new();
-    private int capacity = 7;
-    public bool IsLinesFull => lines.Count == capacity;
+    private Line[] lines = new Line[MAX_LINES];
+    private const int MAX_LINES = 7;
+    private int availableLines = 3;
+    private int lineCount = 0;
 
-    private Color color;
+    public bool IsLinesFull => lineCount == availableLines;
+
+    private List<bool> isUsedColor = new();
+    private List<bool> isUsedLine = new();
+
+    public Button[] lineButtons = new Button[MAX_LINES];
+
+    private void Awake()
+    {
+        for (int i = 0; i < MAX_LINES; i++)
+        {
+            isUsedColor.Add(false);
+            isUsedLine.Add(false);
+
+            int index = i;
+            lineButtons[i].onClick.AddListener(() => ClearLine(index));
+        }
+    }
 
     public void StartLine(RaycastHit2D hit, Vector3 pos)
     {
         line_onMaking = Instantiate(linePrefab, transform);
-        line_onMaking.SetColor(Colors.colors[lines.Count]);
+
+        UnityEngine.Color color = new();
+        for (int i = 0; i < MAX_LINES; i++)
+        {
+            if (!isUsedColor[i])
+            {
+                color = Colors.colors[i];
+                isUsedColor[i] = true;
+                break;
+            }
+        }
+        line_onMaking.SetColor(color);
+
         line_onMaking.AddStationEnd(hit.collider.gameObject.GetComponent<Station>());
 
         lr = line_onMaking.GetComponent<LineRenderer>();
@@ -27,7 +59,19 @@ public class LineManager : MonoBehaviour
 
     public void FixLine()
     {
-        line_onMaking.Init();
+        int lineId = -1;
+
+        for (int i = 0; i < MAX_LINES; i++)
+        {
+            if (!isUsedLine[i])
+            {
+                lineId = i;
+                isUsedLine[i] = true;
+                break;
+            }
+        }
+        line_onMaking.Init(lineId);
+
         AddLine(line_onMaking);
         line_onMaking = null;
         lr = null;
@@ -62,6 +106,26 @@ public class LineManager : MonoBehaviour
 
     public void AddLine(Line line)
     {
-        lines.Add(line);
+        lines[line.lineId] = line;
+        lineCount++;
+        lineButtons[line.lineId].interactable = true;
+    }
+
+    public void ClearLine(int index)
+    {
+        if (lines[index] == null) return;   // 방어 코드
+
+        Destroy(lines[index].gameObject);       
+        lines[index] = null;
+        isUsedColor[index] = false;
+        isUsedLine[index] = false;
+        lineCount--;
+        lineButtons[index].interactable = false;
+    }
+
+    public void UnlockNextLine()
+    {
+        availableLines++;
+        lineButtons[availableLines - 1].interactable = true;
     }
 }
