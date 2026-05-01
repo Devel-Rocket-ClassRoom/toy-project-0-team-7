@@ -46,8 +46,9 @@ public class Line : MonoBehaviour
         lr.SetPosition(waypoints.Count + 1, stationPos);
     }
 
-    public void Init()
+    public void Init(int id)
     {
+        lineId = id;
         lr.positionCount = waypoints.Count;
 
         for (int i = 0; i < waypoints.Count; i++)
