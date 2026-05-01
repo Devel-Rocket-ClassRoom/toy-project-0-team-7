@@ -10,6 +10,7 @@ public class Line : MonoBehaviour
     public List<Train> trains = new();
     //public bool isCircular = false;
 
+    public List<Vector3> waypoints = new();
     private LineRenderer lr;
 
     private void Awake()
@@ -19,24 +20,39 @@ public class Line : MonoBehaviour
 
     public void AddStationEnd(Station station)
     {
-        if (lr == null) lr = GetComponent<LineRenderer>(); // 방어 코드
-        
-        stations.Add(station);
-        lr.positionCount = stations.Count + 1;
+        if (stations.Count > 0)
+        {
+            // 이전 역과 새 역 사이의 꺾임점 계산해서 추가
+            Vector3 bend = GetBendPoint(stations[^1].transform.position, station.transform.position);
+            bend.z = 0f;
+            waypoints.Add(bend);
+        }
 
-        var pos = station.transform.position;
-        pos.z = 0f;
-        lr.SetPosition(stations.Count - 1, pos);
-        lr.SetPosition(stations.Count, pos);
+        var stationPos = station.transform.position;
+        stationPos.z = 0f;
+
+        waypoints.Add(stationPos);
+        stations.Add(station);
+
+        if (lr == null) lr = GetComponent<LineRenderer>(); // 방어 코드
+        lr.positionCount = waypoints.Count + 2;
+
+        for (int i = 0; i < waypoints.Count; i++)
+        {
+            lr.SetPosition(i, waypoints[i]);
+        }
+
+        lr.SetPosition(waypoints.Count, stationPos);
+        lr.SetPosition(waypoints.Count + 1, stationPos);
     }
 
     public void Init()
     {
-        lr.positionCount = stations.Count;
+        lr.positionCount = waypoints.Count;
 
-        for (int i = 0; i < stations.Count; i++)
+        for (int i = 0; i < waypoints.Count; i++)
         {
-            lr.SetPosition(i, stations[i].transform.position);
+            lr.SetPosition(i, waypoints[i]);
         }
 
         isOnMaking = false;
@@ -46,5 +62,17 @@ public class Line : MonoBehaviour
     {
         lr.startColor = color;
         lr.endColor = color;
+    }
+
+    public Vector3 GetBendPoint(Vector3 from, Vector3 to)
+    {
+        Vector3 diff = to - from;   // 방향
+        float ax = Mathf.Abs(diff.x);
+        float ay = Mathf.Abs(diff.y);
+
+        if (ax > ay)
+            return new Vector3(to.x - Mathf.Sign(diff.x) * ay, from.y, 0);
+        else
+            return new Vector3(from.x, to.y - Mathf.Sign(diff.y) * ax, 0);
     }
 }
