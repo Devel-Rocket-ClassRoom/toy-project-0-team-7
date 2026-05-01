@@ -107,25 +107,25 @@ public class LineManager : MonoBehaviour
 
     public void FinishExtendLine()
     {
+        if (line_onMouse == null) return;
+
         line_onMouse.UpdateWaypoints();
         line_onMouse.UpdateHandles();
         lines[line_onMouse.lineId] = line_onMouse;
         line_onMouse = null;
 
         touchingHandle.SetActive(true);
+        touchingHandle = null;
     }
 
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-
-
-
-
 
     public void StartEditLine(RaycastHit2D lineHit, Vector3 pos)
     {
         line_onMouse = lineHit.collider.GetComponent<Line>();
     }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     public void AddStationInMakingLine(Station station)
     {
@@ -133,6 +133,24 @@ public class LineManager : MonoBehaviour
         {
             line_onMouse.AddStation(station);
         }
+    }
+
+    public void RemoveStationFromLine(Station station, bool isStartHandle)
+    {
+        if (isStartHandle && station == line_onMouse.stations[0])
+            line_onMouse.stations.RemoveAt(0);
+        
+        else if (!isStartHandle && station == line_onMouse.stations[^1])
+            line_onMouse.stations.RemoveAt(line_onMouse.stations.Count - 1);
+
+        if (line_onMouse.stations.Count < 2)
+        {
+            ClearLine(line_onMouse.lineId);
+            line_onMouse = null;
+            return;
+        }
+
+        line_onMouse.UpdateWaypoints();
     }
 
     public void AddLine(Line line)

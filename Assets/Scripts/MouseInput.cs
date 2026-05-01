@@ -36,26 +36,25 @@ public class MouseInput : MonoBehaviour
         {
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
-                Debug.Log("역");
+                mode = Mode.NewLine;
                 var pos = stationHit.collider.gameObject.transform.position;
                 pos.z = 0f;
 
                 lineManager.StartNewLine(stationHit, pos);
-                mode = Mode.NewLine;
                 return;                    
             }
 
             else if (handleHit.collider != null) // 기존 선 연장하기
             {
-                Debug.Log("손잡이");
+                mode = Mode.ExtendLine;
                 var pos = handleHit.collider.gameObject.transform.position;
                 pos.z = 0f;
 
                 lineManager.StartExtendLine(handleHit, pos);
-                mode = Mode.ExtendLine;
 
                 if (handleHit.collider.GetComponent<Handle>().isStartHandle)
                     isStartHandle = true;
+
                 else
                     isStartHandle = false;
 
@@ -88,14 +87,8 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.ExtendLine:
-                        if (isStartHandle)
-                        {
-                            lineManager.UpdateStartPreviewPoint(previewPoint);
-                        }
-                        else
-                        {
-                            lineManager.UpdateEndPreviewPoint(previewPoint);
-                        }
+                        if (isStartHandle)  lineManager.UpdateStartPreviewPoint(previewPoint);
+                        else                lineManager.UpdateEndPreviewPoint(previewPoint);
                         break;
 
                     case Mode.EditLine:
@@ -119,13 +112,17 @@ public class MouseInput : MonoBehaviour
                 switch (mode)
                 {
                     case Mode.NewLine:
-                        if (lineManager.IsValidLine)    // 유효한 선이면 확정
-                            lineManager.FixNewLine();
-                        else
-                            lineManager.CancelNewLine();
+                        if (lineManager.IsValidLine)    lineManager.FixNewLine();
+                        else                            lineManager.CancelNewLine();
                         break;
 
                     case Mode.ExtendLine:
+                        if (stationHit.collider != null)
+                        {
+                            var station = stationHit.collider.GetComponent<Station>();
+                            lineManager.RemoveStationFromLine(station, isStartHandle);
+                        }
+
                         lineManager.FinishExtendLine();
                         break;
 
