@@ -16,7 +16,7 @@ public class Passenger : MonoBehaviour
         }
     }
   
-    public Passenger(StationType dest)
+    public void Init(StationType dest)
     {
         this.destination = dest;
         this.state = PassengerState.Waiting;

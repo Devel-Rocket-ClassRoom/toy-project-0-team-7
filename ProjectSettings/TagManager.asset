@@ -8,6 +8,7 @@ TagManager:
   - Map
   - Line
   - Handle
+  - PassengerManager
   layers:
   - Default
   - TransparentFX
