@@ -86,6 +86,7 @@ public class Train : MonoBehaviour
         {
             Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>");
             //내릴 승객 처리
+            HandleAlighting(currentStation);
 
             //탈 승객 처리
             HandleBoarding(currentStation);
@@ -129,6 +130,19 @@ public class Train : MonoBehaviour
 
         }
     }
+    public void HandleAlighting(TestStation station)
+    {
+        for (int i = passengers.Count - 1; i >= 0; i--)
+        {
+            if (passengers[i].destination == station.shapeType)
+            {
+                passengers[i].State = PassengerState.Arrived;
+                Score.score++;
+                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.shapeType} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
+                passengers.RemoveAt(i);
+            }
+        }
+    }
     //노선에 목적지 역이 포함되는지 검사
     public bool CanBoard(Passenger p)
     {
@@ -155,7 +169,4 @@ public class Train : MonoBehaviour
         }
         return false;
     }
-
-
-
 }
