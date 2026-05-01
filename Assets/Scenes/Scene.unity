@@ -396,6 +396,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1792723204}
     m_Modifications:
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: maxScaleTime
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: maxRandomTime
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: minRandomTime
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8686567831944256591, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_Name
       value: StationSpawner
