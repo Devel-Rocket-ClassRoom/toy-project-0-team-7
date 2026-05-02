@@ -36,6 +36,7 @@ public class MouseInput : MonoBehaviour
         {
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
+                Debug.Log("승강장");
                 mode = Mode.NewLine;
                 var pos = stationHit.collider.gameObject.transform.position;
                 pos.z = 0f;
@@ -46,6 +47,7 @@ public class MouseInput : MonoBehaviour
 
             else if (handleHit.collider != null) // 기존 선 연장하기
             {
+                Debug.Log("손잡이");
                 mode = Mode.ExtendLine;
                 var pos = handleHit.collider.gameObject.transform.position;
                 pos.z = 0f;
@@ -63,13 +65,13 @@ public class MouseInput : MonoBehaviour
 
             else if (lineHit.collider != null)  // 기존 선 편집하기 (중간 선택)
             {
-                //Debug.Log("선");
-                //var pos = lineHit.collider.gameObject.transform.position;
-                //pos.z = 0f;
+                Debug.Log("선");
+                mode = Mode.EditLine;
+                var pos = point;
+                pos.z = 0f;
 
-                //lineManager.StartEditLine(lineHit, pos);
-                //holding = Movable.Line;
-                //return;
+                lineManager.StartEditLine(lineHit, pos);
+                return;
             }
         }
 
@@ -84,26 +86,45 @@ public class MouseInput : MonoBehaviour
                 {
                     case Mode.NewLine:
                         lineManager.UpdateEndPreviewPoint(previewPoint);
+                        if (stationHit.collider != null)
+                        {
+                            var station = stationHit.collider.GetComponent<Station>();
+                            lineManager.AddStationInMakingLine(station);
+                        }
                         break;
 
                     case Mode.ExtendLine:
                         if (isStartHandle)  lineManager.UpdateStartPreviewPoint(previewPoint);
                         else                lineManager.UpdateEndPreviewPoint(previewPoint);
+                        if (stationHit.collider != null)
+                        {
+                            var station = stationHit.collider.GetComponent<Station>();
+                            lineManager.ToggleStationInExtendLine(station, isStartHandle);
+                        }
+                        else
+                        {
+                            lineManager.stationUnderMouse = null; // 역에서 벗어나면 초기화
+                        }
                         break;
 
                     case Mode.EditLine:
-
+                        lineManager.UpdateEditPreviewPoint(previewPoint); 
+                        if (stationHit.collider != null)
+                        {
+                            bool goExtend = lineManager.ToggleStationInEditLine(stationHit.collider.GetComponent<Station>());
+                            if (goExtend)
+                            {
+                                mode = Mode.ExtendLine;
+                                isStartHandle = lineManager.isStartHandle;
+                                lineManager.HideHandle(isStartHandle); // 핸들 숨기기
+                            }
+                        }
+                        else
+                            lineManager.stationUnderMouse = null;
                         break;
 
                     case Mode.MoveTrain:
-
                         break;
-                }
-
-                if (stationHit.collider != null)
-                {
-                    var station = stationHit.collider.GetComponent<Station>();
-                    lineManager.AddStationInMakingLine(station);
                 }
             }
 
@@ -117,17 +138,11 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.ExtendLine:
-                        if (stationHit.collider != null)
-                        {
-                            var station = stationHit.collider.GetComponent<Station>();
-                            lineManager.RemoveStationFromLine(station, isStartHandle);
-                        }
-
                         lineManager.FinishExtendLine();
                         break;
 
                     case Mode.EditLine:
-
+                        lineManager.FinishEditLine();
                         break;
 
                     case Mode.MoveTrain:
