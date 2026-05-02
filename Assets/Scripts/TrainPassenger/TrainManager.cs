@@ -6,10 +6,11 @@ public class TrainManager : MonoBehaviour
     public List<Train> activeTrains = new List<Train>();
     //public Train train;
     public GameObject trainPrefab;
+    
 
     // [수정 예정] 나중에 LineManager가 완성되면 testStations 대신 
     // 실제 Line이 보유한 Station 리스트를 가져와야 함
-    public List<GameObject> testStations;
+    public List<TestStation> testStations;
 
     private void Start()
     {
