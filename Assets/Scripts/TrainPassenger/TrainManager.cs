@@ -6,37 +6,35 @@ public class TrainManager : MonoBehaviour
     public List<Train> activeTrains = new List<Train>();
     //public Train train;
     public GameObject trainPrefab;
+    
 
+    // [수정 예정] 나중에 LineManager가 완성되면 testStations 대신 
+    // 실제 Line이 보유한 Station 리스트를 가져와야 함
+    public List<Station> testStations = new();
 
+    private void Start()
+    {
+        //SpawnTrain();
+    }
     private void Update()
     {
         //[체크] 일시정지 기능 추가시 여기서 체크
-        foreach (var train in activeTrains)
-        {
-            if (train != null)
-            {
+        if (activeTrains.Count != 0)
+            foreach (var train in activeTrains)
                 train.Move();
-            }
-        }
+        
     }
-    //Line 데이터 받아서 열차 생성
-    public void SpawnTrain(Line targetLine)
+    public Train SpawnTrain(int lineId)
     {
-        if (targetLine == null || targetLine.stations == null || targetLine.stations.Count == 0)
-        {
-            Debug.LogWarning("노선 데이터가 비어있어 열차를 생성할 수 없습니다.");
-            return;
-        }
-
-        GameObject trainObject = Instantiate(trainPrefab, targetLine.stations[0].transform.position, Quaternion.identity);
+        //[수정 예정] 실제 게임에선 0번 역이 아니라 사용자가 클릭한 노선의 시작점에 스폰
+        GameObject trainObject = Instantiate(trainPrefab, testStations[0].transform.position, Quaternion.identity);
         Train train = trainObject.GetComponent<Train>();
 
-        if (train != null)
-        {
-            //Line에서 가지고 있는 노선
-            train.SetPath(targetLine.stations);
-            activeTrains.Add(train);
-            targetLine.trains.Add(train);
-        }
+        //[수정 예정] 실제 데이터로 변경
+        train.SetPath(testStations);
+        train.lineId = lineId;
+        activeTrains.Add(train);
+
+        return train;
     }
 }

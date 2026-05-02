@@ -53,3 +53,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  stationUnderMouse: {fileID: 0}
+  isStartHandle: 0
+  trainManager: {fileID: 0}
