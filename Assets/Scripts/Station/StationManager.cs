@@ -4,9 +4,13 @@ using System.Collections.Generic;
 public class StationManager : MonoBehaviour
 {
     public Station[] prefabs;
+
+    [Header("스폰 시간 조정")] // To Do: 추후 실제 게임에 맞게 느리게 조정해야함
     [SerializeField] private float minRandomTime = 5f;
     [SerializeField] private float maxRandomTime = 15f;
-
+    [SerializeField] private float maxScaleTime = 300f; // 스폰 시간이 빨라질 게임 시간 기준 (5분)
+    [SerializeField] private float minIntervalAtPeak = 2f; // 5분 지났을 때 최소 스폰 간격
+    [SerializeField] private float maxIntervalAtPeak = 5f; // 5분 지났을 때 최대 스폰 간격
     private float minRadius;
     private float timer = 0f;
     private float gameTime = 0f;
@@ -41,9 +45,13 @@ public class StationManager : MonoBehaviour
 
         if (timer <= 0f)
         {
-            Debug.Log("[시간 초과] 역 생성됨");
+            //Debug.Log("[시간 초과] 역 생성됨");
             RandomSpawn();
-            timer = Random.Range(minRandomTime, maxRandomTime);
+            float difficultyT = Mathf.Clamp01(gameTime / maxScaleTime);
+            float scaleMin = Mathf.Lerp(minRandomTime, minIntervalAtPeak, difficultyT);
+            float scaleMax = Mathf.Lerp(maxRandomTime, maxIntervalAtPeak, difficultyT);
+            timer = Random.Range(scaleMin, scaleMax);
+            //Debug.Log($"[스폰] gameTime = {gameTime:F1}s | diffucultyT = {difficultyT:F2} | 다음 간격 = {timer:F2}");
         }
     }
 
@@ -52,7 +60,7 @@ public class StationManager : MonoBehaviour
     {
         if (prefabs == null || prefabs.Length == 0) 
         {
-            Debug.Log("[Null] 프리팹 없음");
+            //Debug.Log("[Null] 프리팹 없음");
             return;
         }
 
@@ -90,11 +98,11 @@ public class StationManager : MonoBehaviour
 
         foreach (var station in exisitingStations)
         {
-            Debug.Log($"[포지션 검사] {stationPos}가 유효한 포지션인지 검사");
+            //Debug.Log($"[포지션 검사] {stationPos}가 유효한 포지션인지 검사");
             float dist = Vector2.Distance(stationPos, station.transform.position);
             if (dist < minRadius)
             {
-                Debug.Log($"[포지션 검사] {dist}가 생성 거리의 범위를 충족하지 못했습니다.");
+                //Debug.Log($"[포지션 검사] {dist}가 생성 거리의 범위를 충족하지 못했습니다.");
                 return false;
             }
         }

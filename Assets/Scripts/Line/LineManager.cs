@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 public class LineManager : MonoBehaviour
 {
     public Line linePrefab;
-    private Line line_onMaking;
-    public bool IsValidLine => line_onMaking.stations.Count > 1;
+    private Line line_onMouse;
+    public bool IsValidLine => line_onMouse.stations.Count > 1;
 
     private LineRenderer lr;
 
@@ -18,90 +19,138 @@ public class LineManager : MonoBehaviour
 
     public bool IsLinesFull => lineCount == availableLines;
 
-    private List<bool> isUsedColor = new();
-    private List<bool> isUsedLine = new();
-
     public Button[] lineButtons = new Button[MAX_LINES];
+
+    private GameObject touchingHandle;
 
     private void Awake()
     {
         for (int i = 0; i < MAX_LINES; i++)
         {
-            isUsedColor.Add(false);
-            isUsedLine.Add(false);
-
             int index = i;
             lineButtons[i].onClick.AddListener(() => ClearLine(index));
         }
     }
 
-    public void StartLine(RaycastHit2D hit, Vector3 pos)
+    public void StartNewLine(RaycastHit2D hit, Vector3 pos)
     {
-        line_onMaking = Instantiate(linePrefab, transform);
+        line_onMouse = Instantiate(linePrefab, transform);
 
         UnityEngine.Color color = new();
         for (int i = 0; i < MAX_LINES; i++)
         {
-            if (!isUsedColor[i])
+            if (lines[i] == null)
             {
                 color = Colors.colors[i];
-                isUsedColor[i] = true;
                 break;
             }
         }
-        line_onMaking.SetColor(color);
+        line_onMouse.SetColor(color);
 
-        line_onMaking.AddStationEnd(hit.collider.gameObject.GetComponent<Station>());
+        line_onMouse.AddStation(hit.collider.gameObject.GetComponent<Station>());
 
-        lr = line_onMaking.GetComponent<LineRenderer>();
+        lr = line_onMouse.GetComponent<LineRenderer>();
         lr.SetPosition(0, pos);
     }
 
-    public void FixLine()
+    public void FixNewLine()   // 선 확정
     {
         int lineId = -1;
 
         for (int i = 0; i < MAX_LINES; i++)
         {
-            if (!isUsedLine[i])
+            if (lines[i] == null)
             {
                 lineId = i;
-                isUsedLine[i] = true;
                 break;
             }
         }
-        line_onMaking.Init(lineId);
+        line_onMouse.Init(lineId);
 
-        AddLine(line_onMaking);
-        line_onMaking = null;
+        AddLine(line_onMouse);
+        line_onMouse = null;
         lr = null;
     }
 
-    public void CancelLine()
+    public void CancelNewLine()    // 선 만들기 취소
     {
-        Destroy(line_onMaking.gameObject);
-        line_onMaking = null;
+        Destroy(line_onMouse.gameObject);
+        line_onMouse = null;
     }
 
-    public void UpdatePreviewPoint(Vector3 previewPoint)
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    public void StartExtendLine(RaycastHit2D handleHit, Vector3 pos)
     {
-        previewPoint.z = 0f;
-        var lastStation = line_onMaking.stations[^1].transform.position;    // 마지막 역 위치
+        line_onMouse = handleHit.collider.GetComponent<Handle>().line;
+        lr = line_onMouse.GetComponent<LineRenderer>();
 
-        Vector3 bend = line_onMaking.GetBendPoint(lastStation, previewPoint);
-        bend.z = 0f;
-
-        lr.positionCount = line_onMaking.waypoints.Count + 2;
-        lr.SetPosition(line_onMaking.waypoints.Count, bend);
-        lr.SetPosition(line_onMaking.waypoints.Count + 1, previewPoint);
+        touchingHandle = handleHit.collider.gameObject;
+        touchingHandle.SetActive(false);
     }
+
+    public void ExtendLineStart(Station station)
+    {
+        line_onMouse.InsertStation(station, 0);
+        line_onMouse.UpdateHandles();
+        line_onMouse = null;
+        lr = null;
+    }
+
+    public void ExtendLineEnd(Station station)
+    {
+        line_onMouse.AddStation(station);
+        line_onMouse.UpdateHandles();
+        line_onMouse = null;
+        lr = null;
+    }
+
+    public void FinishExtendLine()
+    {
+        if (line_onMouse == null) return;
+
+        line_onMouse.UpdateWaypoints();
+        line_onMouse.UpdateHandles();
+        lines[line_onMouse.lineId] = line_onMouse;
+        line_onMouse = null;
+
+        touchingHandle.SetActive(true);
+        touchingHandle = null;
+    }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    public void StartEditLine(RaycastHit2D lineHit, Vector3 pos)
+    {
+        line_onMouse = lineHit.collider.GetComponent<Line>();
+    }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     public void AddStationInMakingLine(Station station)
     {
-        if (!line_onMaking.stations.Contains(station))
+        if (!line_onMouse.stations.Contains(station))
         {
-            line_onMaking.AddStationEnd(station);
+            line_onMouse.AddStation(station);
         }
+    }
+
+    public void RemoveStationFromLine(Station station, bool isStartHandle)
+    {
+        if (isStartHandle && station == line_onMouse.stations[0])
+            line_onMouse.stations.RemoveAt(0);
+        
+        else if (!isStartHandle && station == line_onMouse.stations[^1])
+            line_onMouse.stations.RemoveAt(line_onMouse.stations.Count - 1);
+
+        if (line_onMouse.stations.Count < 2)
+        {
+            ClearLine(line_onMouse.lineId);
+            line_onMouse = null;
+            return;
+        }
+
+        line_onMouse.UpdateWaypoints();
     }
 
     public void AddLine(Line line)
@@ -117,8 +166,6 @@ public class LineManager : MonoBehaviour
 
         Destroy(lines[index].gameObject);       
         lines[index] = null;
-        isUsedColor[index] = false;
-        isUsedLine[index] = false;
         lineCount--;
         lineButtons[index].interactable = false;
     }
@@ -127,5 +174,34 @@ public class LineManager : MonoBehaviour
     {
         availableLines++;
         lineButtons[availableLines - 1].interactable = true;
+    }
+
+    public void UpdateStartPreviewPoint(Vector3 previewPoint)
+    {
+        previewPoint.z = 0f;
+        var firstStation = line_onMouse.stations[0].transform.position;
+
+        Vector3 bend = line_onMouse.GetBendPoint(firstStation, previewPoint);
+        bend.z = 0f;
+
+        lr.positionCount = line_onMouse.waypoints.Count + 2;
+        lr.SetPosition(0, previewPoint);
+        lr.SetPosition(1, bend);
+
+        for (int i = 0; i < line_onMouse.waypoints.Count; i++)
+            lr.SetPosition(i + 2, line_onMouse.waypoints[i]);
+    }
+
+    public void UpdateEndPreviewPoint(Vector3 previewPoint)
+    {
+        previewPoint.z = 0f;
+        var lastStation = line_onMouse.stations[^1].transform.position;    // 마지막 역 위치
+
+        Vector3 bend = line_onMouse.GetBendPoint(lastStation, previewPoint);
+        bend.z = 0f;
+
+        lr.positionCount = line_onMouse.waypoints.Count + 2;
+        lr.SetPosition(line_onMouse.waypoints.Count, bend);
+        lr.SetPosition(line_onMouse.waypoints.Count + 1, previewPoint);
     }
 }

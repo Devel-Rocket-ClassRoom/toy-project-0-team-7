@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class MouseInput : MonoBehaviour
 {
-    public enum Movable { None, Line, Train }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, MoveTrain }
 
     private Camera cam;
     public LineManager lineManager;
 
-    private Movable holding;
+    private Mode mode;
+
+    private bool isStartHandle;
 
     void Start()
     {
@@ -17,63 +19,123 @@ public class MouseInput : MonoBehaviour
     void Update()
     {
         var point = cam.ScreenToWorldPoint(Input.mousePosition);
-        var hit = Physics2D.Raycast(point, Vector2.zero);
+        var hits = Physics2D.RaycastAll(point, Vector2.zero);
+
+        RaycastHit2D stationHit = default;
+        RaycastHit2D handleHit = default;
+        RaycastHit2D lineHit = default;
+
+        foreach (var h in hits)
+        {
+            if (h.collider.CompareTag("Station")) stationHit = h;
+            else if (h.collider.CompareTag("Handle")) handleHit = h;
+            else if (h.collider.CompareTag("Line")) lineHit = h;
+        }
 
         if (Input.GetMouseButtonDown(0))    // 클릭
         {
-            if (hit.collider != null)   // 해당 위치에 충돌한 오브젝트가 존재하는 경우
+            if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
-                if (hit.collider.CompareTag("Station") && !lineManager.IsLinesFull)
-                {
-                    var pos = hit.collider.gameObject.transform.position;
-                    pos.z = 0f;
+                mode = Mode.NewLine;
+                var pos = stationHit.collider.gameObject.transform.position;
+                pos.z = 0f;
 
-                    lineManager.StartLine(hit, pos);
-                    holding = Movable.Line;
-                    return;
-                }
+                lineManager.StartNewLine(stationHit, pos);
+                return;                    
+            }
+
+            else if (handleHit.collider != null) // 기존 선 연장하기
+            {
+                mode = Mode.ExtendLine;
+                var pos = handleHit.collider.gameObject.transform.position;
+                pos.z = 0f;
+
+                lineManager.StartExtendLine(handleHit, pos);
+
+                if (handleHit.collider.GetComponent<Handle>().isStartHandle)
+                    isStartHandle = true;
+
+                else
+                    isStartHandle = false;
+
+                return;
+            }
+
+            else if (lineHit.collider != null)  // 기존 선 편집하기 (중간 선택)
+            {
+                //Debug.Log("선");
+                //var pos = lineHit.collider.gameObject.transform.position;
+                //pos.z = 0f;
+
+                //lineManager.StartEditLine(lineHit, pos);
+                //holding = Movable.Line;
+                //return;
             }
         }
 
-        if (holding != Movable.None)
+        if (mode != Mode.None)
         {
             if (Input.GetMouseButton(0))    // 드래그
             {
                 var previewPoint = point;
                 previewPoint.z = 0f;
 
-                switch (holding)
+                switch (mode)
                 {
-                    case Movable.Line:
-                        lineManager.UpdatePreviewPoint(previewPoint);
+                    case Mode.NewLine:
+                        lineManager.UpdateEndPreviewPoint(previewPoint);
                         break;
-                    case Movable.Train:
+
+                    case Mode.ExtendLine:
+                        if (isStartHandle)  lineManager.UpdateStartPreviewPoint(previewPoint);
+                        else                lineManager.UpdateEndPreviewPoint(previewPoint);
+                        break;
+
+                    case Mode.EditLine:
+
+                        break;
+
+                    case Mode.MoveTrain:
+
                         break;
                 }
 
-                if (hit.collider != null)   // 해당 위치에 충돌한 오브젝트가 존재하는 경우
+                if (stationHit.collider != null)
                 {
-                    if (hit.collider.CompareTag("Station"))
-                    {
-                        var station = hit.collider.GetComponent<Station>();
-                        lineManager.AddStationInMakingLine(station);
-                    }
+                    var station = stationHit.collider.GetComponent<Station>();
+                    lineManager.AddStationInMakingLine(station);
                 }
             }
 
             if (Input.GetMouseButtonUp(0))  // 릴리즈
             {
-                if (lineManager.IsValidLine)    // 유효한 선이면 확정
+                switch (mode)
                 {
-                    lineManager.FixLine();
+                    case Mode.NewLine:
+                        if (lineManager.IsValidLine)    lineManager.FixNewLine();
+                        else                            lineManager.CancelNewLine();
+                        break;
+
+                    case Mode.ExtendLine:
+                        if (stationHit.collider != null)
+                        {
+                            var station = stationHit.collider.GetComponent<Station>();
+                            lineManager.RemoveStationFromLine(station, isStartHandle);
+                        }
+
+                        lineManager.FinishExtendLine();
+                        break;
+
+                    case Mode.EditLine:
+
+                        break;
+
+                    case Mode.MoveTrain:
+
+                        break;
                 }
 
-                else
-                {
-                    lineManager.CancelLine();
-                }
-
-                holding = Movable.None;                
+                mode = Mode.None;
             }
         }
     }
