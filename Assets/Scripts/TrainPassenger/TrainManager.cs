@@ -4,10 +4,10 @@ using UnityEngine;
 public class TrainManager : MonoBehaviour
 {
     public List<Train> activeTrains = new List<Train>();
-    //public Train train;
+    public int availableTrainCount = 3;
+    
     public GameObject trainPrefab;
     
-
     // [수정 예정] 나중에 LineManager가 완성되면 testStations 대신 
     // 실제 Line이 보유한 Station 리스트를 가져와야 함
     public List<Station> testStations = new();
@@ -36,5 +36,19 @@ public class TrainManager : MonoBehaviour
         activeTrains.Add(train);
 
         return train;
+    }
+
+    public void AddAvailableTrain()
+    {
+        availableTrainCount++;
+        Debug.Log($"availableTrainCount: {availableTrainCount}");
+
+        // 열차 버튼 생성 (화면 왼쪽 UI)
+    }
+
+    public void RemoveTrain(Train train)
+    {
+        Destroy(train.gameObject);
+        activeTrains.Remove(train);
     }
 }
