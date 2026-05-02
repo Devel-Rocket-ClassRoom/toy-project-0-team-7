@@ -40,7 +40,7 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseTrain()
     {
-        Debug.Log("열차 수 증가"); // trainManager.-----
+        trainManager.AddAvailableTrain();
     }
 
     public void IncreaseCarriage()

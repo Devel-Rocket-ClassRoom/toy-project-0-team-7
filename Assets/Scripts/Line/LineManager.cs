@@ -84,12 +84,12 @@ public class LineManager : MonoBehaviour
         }
         line_onMouse.Init(lineId);
 
-        //if () : 생성 가능한 열차 자원이 있다면
-        // {
-        trainManager.testStations = line_onMouse.stations;
-        //trainManager.waypoints = line_onMouse.waypoints;
-        line_onMouse.trains.Add(trainManager.SpawnTrain(lineId));
-        // }
+        if (trainManager.activeTrains.Count < trainManager.availableTrainCount)
+        {
+            trainManager.testStations = line_onMouse.stations;
+            //trainManager.waypoints = line_onMouse.waypoints;
+            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId));
+        }
 
         AddLine(line_onMouse);
         line_onMouse = null;
@@ -248,6 +248,11 @@ public class LineManager : MonoBehaviour
     public void ClearLine(int index)
     {
         if (lines[index] == null) return;   // 방어 코드
+
+        foreach(var train in lines[index].trains)
+        {
+            trainManager.RemoveTrain(train);
+        }
 
         Destroy(lines[index].gameObject);       
         lines[index] = null;
