@@ -25,11 +25,11 @@ public class Train : MonoBehaviour
     public Vector3 startPos; //출발 위치 기록용
 
     //열차 테스트 경로(승강장 리스트)
-    private List<TestStation> path;
+    private List<Station> path;
 
 
     //열차 경로 설정 및 열차 생성위치 초기화
-    public void SetPath(List<TestStation> stations)
+    public void SetPath(List<Station> stations)
     {
         path = stations;
         targetStationIndex = 0;
@@ -106,7 +106,7 @@ public class Train : MonoBehaviour
         isStopping = true;
 
         //[수정 예정]현재 열차가 멈춘 역의 정보를 가져옴
-        TestStation currentStation = path[targetStationIndex];
+        Station currentStation = path[targetStationIndex];
 
         if (currentStation != null)
         {
@@ -124,7 +124,7 @@ public class Train : MonoBehaviour
         isStopping = false;
     }
 
-    public void HandleBoarding(TestStation station)
+    public void HandleBoarding(Station station)
     {
         int i = 0;
         while (i < station.waitingPassengers.Count)
@@ -139,11 +139,6 @@ public class Train : MonoBehaviour
                 //[수정 예정] station에서 remove 메서드 생성 후 여기서 호출하는 쪽으로
                 station.waitingPassengers.RemoveAt(i);
 
-                //테스트 오브젝트 삭제 
-                GameObject pObj = station.passengerObjects[i];
-                station.passengerObjects.RemoveAt(i);
-                Destroy(pObj);
-
                 //열차 승객 리스트 추가
                 p.State = PassengerState.OnTrain;
                 passengers.Add(p);
@@ -156,15 +151,15 @@ public class Train : MonoBehaviour
 
         }
     }
-    public void HandleAlighting(TestStation station)
+    public void HandleAlighting(Station station)
     {
         for (int i = passengers.Count - 1; i >= 0; i--)
         {
-            if (passengers[i].destination == station.shapeType)
+            if (passengers[i].destination == station.Shape)
             {
                 passengers[i].State = PassengerState.Arrived;
                 Score.score++;
-                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.shapeType} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
+                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
                 passengers.RemoveAt(i);
             }
         }
@@ -177,7 +172,7 @@ public class Train : MonoBehaviour
             //정차한 역의 다음역 부터 검사
             for (int i = targetStationIndex + 1; i < path.Count; i++)
             {
-                if (path[i].shapeType == p.destination && path[i] != null)
+                if (path[i].Shape == p.destination && path[i] != null)
                 {
                     return true;
                 }
@@ -187,7 +182,7 @@ public class Train : MonoBehaviour
         {
             for (int i = targetStationIndex - 1; i >= 0; i--)
             {
-                if (path[i].shapeType == p.destination && path[i] != null)
+                if (path[i].Shape == p.destination && path[i] != null)
                 {
                     return true;
                 }
