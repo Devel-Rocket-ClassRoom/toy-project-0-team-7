@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using System.Linq;
 
 public class LineManager : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class LineManager : MonoBehaviour
     private int segmentIndex;
 
     public bool isStartHandle;
+
+    public TrainManager trainManager;
 
     private void Awake()
     {
@@ -81,6 +84,13 @@ public class LineManager : MonoBehaviour
         }
         line_onMouse.Init(lineId);
 
+        //if () : 생성 가능한 열차 자원이 있다면
+        // {
+        trainManager.testStations = line_onMouse.stations;
+        //trainManager.waypoints = line_onMouse.waypoints;
+        line_onMouse.trains.Add(trainManager.SpawnTrain(lineId));
+        // }
+
         AddLine(line_onMouse);
         line_onMouse = null;
         lr = null;
@@ -110,15 +120,10 @@ public class LineManager : MonoBehaviour
 
         // 있던 역 제외
         if (isStart && station == line_onMouse.stations[0] && line_onMouse.stations.Count > 1)
-        {
             line_onMouse.stations.RemoveAt(0);
-            Debug.Log(line_onMouse.stations.Count);
-        }
         else if (!isStart && station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
-        {
             line_onMouse.stations.RemoveAt(line_onMouse.stations.Count - 1);
-            Debug.Log(line_onMouse.stations.Count);
-        }
+        
         // 없던 역 추가
         else if (isStart && !line_onMouse.stations.Contains(station))   // 시작 핸들
             line_onMouse.InsertStation(station, 0);
@@ -141,6 +146,11 @@ public class LineManager : MonoBehaviour
             line_onMouse.UpdateHandles();
         }
 
+        foreach (var train in trainManager.activeTrains)
+        {
+            if (train.lineId == line_onMouse.lineId)
+                train.SetPath(line_onMouse.stations);
+        }
         line_onMouse = null;
 
         if (touchingHandle != null)
@@ -203,8 +213,13 @@ public class LineManager : MonoBehaviour
         {
             line_onMouse.UpdateWaypoints();
             line_onMouse.UpdateHandles();
-        }      
+        }
 
+        foreach (var train in trainManager.activeTrains)
+        {
+            if (train.lineId == line_onMouse.lineId)
+                train.SetPath(line_onMouse.stations);
+        }
         line_onMouse = null;
         stationUnderMouse = null;
         lr = null;
