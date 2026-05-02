@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7378241029827242525
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7150361133312655134}
+  m_Layer: 0
+  m_Name: WaitingArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7150361133312655134
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7378241029827242525}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5496126388146387992}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8115750434630196098
 GameObject:
   m_ObjectHideFlags: 0
@@ -28,10 +59,11 @@ Transform:
   m_GameObject: {fileID: 8115750434630196098}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
   m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7150361133312655134}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8739891512247551846
@@ -151,6 +183,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec5e284a240eb64bba4b69e4c697671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Station
-  capacity: 8
+  shape: 1
+  passengerPrefabs:
+  - {fileID: -1103932369405613974, guid: c93d05014daa2814da5af6e8831e9646, type: 3}
+  - {fileID: -7658189095329641249, guid: b947369a028bc93419047d251f3a52ad, type: 3}
+  - {fileID: -1290821818456711322, guid: e805a42cdc198aa4491fef2a3420af8e, type: 3}
+  waitingArea: {fileID: 7150361133312655134}
+  capacity: 6
   overflowTimer: 180
+  waitingPassengers: []
   lines: []

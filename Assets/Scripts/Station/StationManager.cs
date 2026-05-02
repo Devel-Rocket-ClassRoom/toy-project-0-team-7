@@ -11,18 +11,22 @@ public class StationManager : MonoBehaviour
     [SerializeField] private float maxScaleTime = 300f; // 스폰 시간이 빨라질 게임 시간 기준 (5분)
     [SerializeField] private float minIntervalAtPeak = 2f; // 5분 지났을 때 최소 스폰 간격
     [SerializeField] private float maxIntervalAtPeak = 5f; // 5분 지났을 때 최대 스폰 간격
+    [Header("역 오른쪽 공간 offset")]
+    private float rightOffset = 2.2f;
     private float minRadius;
     private float timer = 0f;
     private float gameTime = 0f;
     private float offset = 0.5f;
     private List<Station> exisitingStations;
     public List<Station> ExisitingStations => exisitingStations;
+    public PassengerManager pm;
     private Camera cam;
 
     private void Awake()
     {
         cam = Camera.main;
         exisitingStations = new List<Station>();
+        pm = GameObject.FindWithTag("PassengerManager").GetComponent<PassengerManager>();
 
         float screenHeight = cam.orthographicSize * 2f;
         minRadius = screenHeight * 0.15f;
@@ -68,13 +72,20 @@ public class StationManager : MonoBehaviour
         var station = Instantiate(prefabs[Random.Range(0, range)]);
 
         Vector3 stationPos = GetRandomScreenPos();
-        while (!IsValidPosition(stationPos))
+
+        int attempts = 0;
+        while (!IsValidPosition(stationPos) && attempts < 100)
         {
             stationPos = GetRandomScreenPos();
+            attempts++;
         }
+
+        if (attempts >= 100) return;
 
         station.transform.position = stationPos;
         exisitingStations.Add(station);
+        pm.allStations.Add(station);
+
     }
 
     // --- 승강장 위치 랜덤하게 생성 ---
@@ -82,7 +93,7 @@ public class StationManager : MonoBehaviour
     {
         Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
         Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, cam.nearClipPlane));
-        float x = Random.Range(bottomLeft.x + offset, topRight.x - offset);
+        float x = Random.Range(bottomLeft.x + offset, topRight.x - rightOffset);
         float y = Random.Range(bottomLeft.y + offset, topRight.y - offset);
 
         return new Vector3(x, y, 0f);
