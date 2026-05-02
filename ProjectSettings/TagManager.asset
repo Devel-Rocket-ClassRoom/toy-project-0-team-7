@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Station
   - Map
+  - Line
+  - Handle
+  - PassengerManager
   layers:
   - Default
   - TransparentFX

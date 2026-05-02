@@ -110,7 +110,7 @@ public class Train : MonoBehaviour
             //노선에 목적이 역이 포함 되면 탑승
             if (CanBoard(p))
             {
-                //역의 대기 승객리스트에서 제거
+                //[수정 예정] station에서 remove 메서드 생성 후 여기서 호출하는 쪽으로
                 station.waitingPassengers.RemoveAt(i);
 
                 //테스트 오브젝트 삭제 

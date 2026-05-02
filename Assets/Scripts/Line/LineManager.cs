@@ -1,13 +1,12 @@
 using System.Collections.Generic;
-using System.Drawing;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class LineManager : MonoBehaviour
 {
     public Line linePrefab;
-    private Line line_onMaking;
-    public bool IsValidLine => line_onMaking.stations.Count > 1;
+    private Line line_onMouse;
+    public bool IsValidLine => line_onMouse.stations.Count > 1;
 
     private LineRenderer lr;
 
@@ -18,89 +17,194 @@ public class LineManager : MonoBehaviour
 
     public bool IsLinesFull => lineCount == availableLines;
 
-    private List<bool> isUsedColor = new();
-    private List<bool> isUsedLine = new();
-
     public Button[] lineButtons = new Button[MAX_LINES];
+
+    private GameObject touchingHandle;
+    public Station stationUnderMouse;
+    private int segmentIndex;
+
+    public bool isStartHandle;
 
     private void Awake()
     {
         for (int i = 0; i < MAX_LINES; i++)
         {
-            isUsedColor.Add(false);
-            isUsedLine.Add(false);
-
             int index = i;
             lineButtons[i].onClick.AddListener(() => ClearLine(index));
         }
     }
 
-    public void StartLine(RaycastHit2D hit, Vector3 pos)
+    public void StartNewLine(RaycastHit2D hit, Vector3 pos)
     {
-        line_onMaking = Instantiate(linePrefab, transform);
+        line_onMouse = Instantiate(linePrefab, transform);
 
         UnityEngine.Color color = new();
         for (int i = 0; i < MAX_LINES; i++)
         {
-            if (!isUsedColor[i])
+            if (lines[i] == null)
             {
                 color = Colors.colors[i];
-                isUsedColor[i] = true;
                 break;
             }
         }
-        line_onMaking.SetColor(color);
+        line_onMouse.SetColor(color);
 
-        line_onMaking.AddStationEnd(hit.collider.gameObject.GetComponent<Station>());
+        line_onMouse.AddStation(hit.collider.gameObject.GetComponent<Station>());
 
-        lr = line_onMaking.GetComponent<LineRenderer>();
+        lr = line_onMouse.GetComponent<LineRenderer>();
         lr.SetPosition(0, pos);
     }
 
-    public void FixLine()
+    public void FixNewLine()   // 선 확정
     {
         int lineId = -1;
 
         for (int i = 0; i < MAX_LINES; i++)
         {
-            if (!isUsedLine[i])
+            if (lines[i] == null)
             {
                 lineId = i;
-                isUsedLine[i] = true;
                 break;
             }
         }
-        line_onMaking.Init(lineId);
+        line_onMouse.Init(lineId);
 
-        AddLine(line_onMaking);
-        line_onMaking = null;
+        AddLine(line_onMouse);
+        line_onMouse = null;
         lr = null;
     }
 
-    public void CancelLine()
+    public void CancelNewLine()    // 선 만들기 취소
     {
-        Destroy(line_onMaking.gameObject);
-        line_onMaking = null;
+        Destroy(line_onMouse.gameObject);
+        line_onMouse = null;
     }
 
-    public void UpdatePreviewPoint(Vector3 previewPoint)
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    public void StartExtendLine(RaycastHit2D handleHit, Vector3 pos)
     {
-        previewPoint.z = 0f;
-        var lastStation = line_onMaking.stations[^1].transform.position;    // 마지막 역 위치
+        line_onMouse = handleHit.collider.GetComponent<Handle>().line;
+        lr = line_onMouse.GetComponent<LineRenderer>();
 
-        Vector3 bend = line_onMaking.GetBendPoint(lastStation, previewPoint);
-        bend.z = 0f;
-
-        lr.positionCount = line_onMaking.waypoints.Count + 2;
-        lr.SetPosition(line_onMaking.waypoints.Count, bend);
-        lr.SetPosition(line_onMaking.waypoints.Count + 1, previewPoint);
+        touchingHandle = handleHit.collider.gameObject;
+        touchingHandle.SetActive(false);
     }
+
+    public void ToggleStationInExtendLine(Station station, bool isStart)
+    {
+        if (station == stationUnderMouse) return;
+        stationUnderMouse = station;
+
+        // 있던 역 제외
+        if (isStart && station == line_onMouse.stations[0] && line_onMouse.stations.Count > 1)
+        {
+            line_onMouse.stations.RemoveAt(0);
+            Debug.Log(line_onMouse.stations.Count);
+        }
+        else if (!isStart && station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
+        {
+            line_onMouse.stations.RemoveAt(line_onMouse.stations.Count - 1);
+            Debug.Log(line_onMouse.stations.Count);
+        }
+        // 없던 역 추가
+        else if (isStart && !line_onMouse.stations.Contains(station))   // 시작 핸들
+            line_onMouse.InsertStation(station, 0);
+        else if (!isStart && !line_onMouse.stations.Contains(station))   // 끝 핸들
+            line_onMouse.AddStation(station);
+
+        line_onMouse.UpdateWaypoints();
+        line_onMouse.UpdateHandles();
+    }
+
+    public void FinishExtendLine()
+    {
+        if (line_onMouse == null) return;
+
+        if (line_onMouse.stations.Count < 2)
+            ClearLine(line_onMouse.lineId);
+        else
+        {
+            line_onMouse.UpdateWaypoints();
+            line_onMouse.UpdateHandles();
+        }
+
+        line_onMouse = null;
+
+        if (touchingHandle != null)
+        {
+            touchingHandle.SetActive(true);
+            touchingHandle = null;
+        }
+
+        stationUnderMouse = null;
+        lr = null;
+    }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+    public void StartEditLine(RaycastHit2D lineHit, Vector3 pos)
+    {
+        line_onMouse = lineHit.collider.GetComponent<Line>();
+        lr = line_onMouse.GetComponent<LineRenderer>();
+        segmentIndex = line_onMouse.GetSegmentIndex(pos);
+    }
+
+    public bool ToggleStationInEditLine(Station station)
+    {
+        if (station == stationUnderMouse) return false;
+        stationUnderMouse = station;
+
+        if (line_onMouse.stations.Contains(station) && line_onMouse.stations.Count > 1)    // 포함된 역
+        {
+            int index = line_onMouse.stations.IndexOf(station);
+            bool isEndStation = (index == 0 || index == line_onMouse.stations.Count - 1);
+
+            line_onMouse.stations.RemoveAt(index);
+            line_onMouse.UpdateWaypoints();
+
+            if (index <= segmentIndex) segmentIndex--;
+            segmentIndex = Mathf.Clamp(segmentIndex, 0, line_onMouse.stations.Count - 2);
+
+            if (isEndStation)
+            {
+                isStartHandle = (index == 0); // LineManager 멤버 변수
+                return true; // ExtendLine으로 전환 신호
+            }
+        }
+        else if (!line_onMouse.stations.Contains(station))
+        {
+            line_onMouse.InsertStation(station, segmentIndex + 1);
+            segmentIndex++;
+        }
+
+        return false;
+    }
+
+    public void FinishEditLine()
+    {
+        if (line_onMouse == null) return;
+
+        if (line_onMouse.stations.Count < 2)
+            ClearLine(line_onMouse.lineId);
+        else
+        {
+            line_onMouse.UpdateWaypoints();
+            line_onMouse.UpdateHandles();
+        }      
+
+        line_onMouse = null;
+        stationUnderMouse = null;
+        lr = null;
+    }
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     public void AddStationInMakingLine(Station station)
     {
-        if (!line_onMaking.stations.Contains(station))
+        if (!line_onMouse.stations.Contains(station))
         {
-            line_onMaking.AddStationEnd(station);
+            line_onMouse.AddStation(station);
         }
     }
 
@@ -117,8 +221,6 @@ public class LineManager : MonoBehaviour
 
         Destroy(lines[index].gameObject);       
         lines[index] = null;
-        isUsedColor[index] = false;
-        isUsedLine[index] = false;
         lineCount--;
         lineButtons[index].interactable = false;
     }
@@ -127,5 +229,85 @@ public class LineManager : MonoBehaviour
     {
         availableLines++;
         lineButtons[availableLines - 1].interactable = true;
+    }
+
+    public void HideHandle(bool isStart)
+    {
+        var handle = isStart ? line_onMouse.handleStart.gameObject : line_onMouse.handleEnd.gameObject;
+        touchingHandle = handle;
+        touchingHandle.SetActive(false);
+    }
+
+    public void UpdateStartPreviewPoint(Vector3 previewPoint)
+    {
+        previewPoint.z = 0f;
+        var firstStation = line_onMouse.stations[0].transform.position;
+
+        Vector3 bend = line_onMouse.GetBendPoint(firstStation, previewPoint);
+        bend.z = 0f;
+
+        lr.positionCount = line_onMouse.waypoints.Count + 2;
+        lr.SetPosition(0, previewPoint);
+        lr.SetPosition(1, bend);
+
+        for (int i = 0; i < line_onMouse.waypoints.Count; i++)
+            lr.SetPosition(i + 2, line_onMouse.waypoints[i]);
+    }
+
+    public void UpdateEndPreviewPoint(Vector3 previewPoint)
+    {
+        previewPoint.z = 0f;
+        var lastStation = line_onMouse.stations[^1].transform.position;    // 마지막 역 위치
+
+        Vector3 bend = line_onMouse.GetBendPoint(lastStation, previewPoint);
+        bend.z = 0f;
+
+        lr.positionCount = line_onMouse.waypoints.Count + 2;
+        lr.SetPosition(line_onMouse.waypoints.Count, bend);
+        lr.SetPosition(line_onMouse.waypoints.Count + 1, previewPoint);
+    }
+
+    public void UpdateEditPreviewPoint(Vector3 previewPoint)
+    {
+        previewPoint.z = 0f;
+
+        var from = line_onMouse.stations[segmentIndex].transform.position;
+        var to = line_onMouse.stations[segmentIndex + 1].transform.position;
+
+        Vector3 bend1 = line_onMouse.GetBendPoint(from, previewPoint);
+        Vector3 bend2 = line_onMouse.GetBendPoint(previewPoint, to);
+        bend1.z = 0f;
+        bend2.z = 0f;
+
+        var tempWaypoints = new List<Vector3>();
+        for (int i = 0; i < line_onMouse.stations.Count; i++)
+        {
+            if (i > 0)
+            {
+                if (i == segmentIndex + 1)  // 추가 변곡점(3점)이 필요한 구간
+                {
+                    tempWaypoints.Add(bend1);
+                    tempWaypoints.Add(previewPoint);
+                    tempWaypoints.Add(bend2);
+                }
+
+                else    // 일반 waypoints 구할 때처럼
+                {
+                    var a = line_onMouse.stations[i - 1].transform.position;
+                    var b = line_onMouse.stations[i].transform.position;
+                    tempWaypoints.Add(line_onMouse.GetBendPoint(a, b));
+                }
+            }
+
+            // 승강장 위치 추가
+            var pos = line_onMouse.stations[i].transform.position;
+            pos.z = 0f;
+            tempWaypoints.Add(pos);
+        }
+
+        // 실제 선에 적용
+        lr.positionCount = tempWaypoints.Count;
+        for (int i = 0; i < tempWaypoints.Count; i++)
+            lr.SetPosition(i, tempWaypoints[i]);
     }
 }
