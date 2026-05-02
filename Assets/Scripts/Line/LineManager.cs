@@ -10,14 +10,13 @@ public class LineManager : MonoBehaviour
 
     private LineRenderer lr;
 
-    private Line[] lines = new Line[MAX_LINES];
-    private const int MAX_LINES = 7;
-    private int availableLines = 3;
+    private Line[] lines = new Line[AssetManager.MAX_LINE_COUNT];
     private int lineCount = 0;
+    private int availableLineCount = 3;
 
-    public bool IsLinesFull => lineCount == availableLines;
+    public bool IsLinesFull => lineCount == availableLineCount;
 
-    public Button[] lineButtons = new Button[MAX_LINES];
+    public Button[] lineButtons = new Button[AssetManager.MAX_LINE_COUNT];
 
     private GameObject touchingHandle;
     public Station stationUnderMouse;
@@ -27,10 +26,23 @@ public class LineManager : MonoBehaviour
 
     private void Awake()
     {
-        for (int i = 0; i < MAX_LINES; i++)
+        for (int i = 0; i < AssetManager.MAX_LINE_COUNT; i++)
         {
             int index = i;
             lineButtons[i].onClick.AddListener(() => ClearLine(index));
+
+            var colors = lineButtons[i].colors;
+            colors.normalColor = new Color(0f, 0f, 0f, 0.5f);
+            colors.disabledColor = colors.normalColor;
+            lineButtons[i].colors = colors;
+        }
+
+        for (int i = 0; i < availableLineCount; i++)
+        {
+            var colors = lineButtons[i].colors;
+            colors.normalColor = new Color(1, 1, 1);
+            colors.disabledColor = colors.normalColor;
+            lineButtons[i].colors = colors;
         }
     }
 
@@ -39,7 +51,7 @@ public class LineManager : MonoBehaviour
         line_onMouse = Instantiate(linePrefab, transform);
 
         UnityEngine.Color color = new();
-        for (int i = 0; i < MAX_LINES; i++)
+        for (int i = 0; i < AssetManager.MAX_LINE_COUNT; i++)
         {
             if (lines[i] == null)
             {
@@ -59,7 +71,7 @@ public class LineManager : MonoBehaviour
     {
         int lineId = -1;
 
-        for (int i = 0; i < MAX_LINES; i++)
+        for (int i = 0; i < AssetManager.MAX_LINE_COUNT; i++)
         {
             if (lines[i] == null)
             {
@@ -213,6 +225,9 @@ public class LineManager : MonoBehaviour
         lines[line.lineId] = line;
         lineCount++;
         lineButtons[line.lineId].interactable = true;
+        
+        var rt = lineButtons[line.lineId].GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(30, 30);
     }
 
     public void ClearLine(int index)
@@ -223,12 +238,19 @@ public class LineManager : MonoBehaviour
         lines[index] = null;
         lineCount--;
         lineButtons[index].interactable = false;
+
+        var rt = lineButtons[index].GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(10, 10);
     }
 
-    public void UnlockNextLine()
+    public void AddAvailableLine()
     {
-        availableLines++;
-        lineButtons[availableLines - 1].interactable = true;
+        availableLineCount++;
+
+        var colors = lineButtons[availableLineCount - 1].colors;
+        colors.normalColor = new Color(1, 1, 1);
+        colors.disabledColor = colors.normalColor;
+        lineButtons[availableLineCount - 1].colors = colors;  
     }
 
     public void HideHandle(bool isStart)
