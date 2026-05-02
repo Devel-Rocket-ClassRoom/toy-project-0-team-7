@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum TrainDirection
 {
@@ -13,9 +14,15 @@ public class Train : MonoBehaviour
     public TrainDirection direction = TrainDirection.Forward;
     public List<Passenger> passengers = new List<Passenger>();
     public int capacity = 6;
-    public float speed = 5f;
     private bool isStopping = false;
 
+    [Header("Movement Settings")]
+    public float maxSpeed = 5f;
+    public float minSpeed = 0.5f;
+    public float accelerationDist = 2f; // 가속 구간 거리
+    public float decelerationDist = 2f; // 감속 구간 거리
+
+    public Vector3 startPos; //출발 위치 기록용
 
     //열차 테스트 경로(승강장 리스트)
     private List<TestStation> path;
@@ -36,10 +43,28 @@ public class Train : MonoBehaviour
 
         Vector3 targetPos = path[targetStationIndex].transform.position;
 
-        //[수정 예정] 승객 유무에 따라 감속할때 lerp로
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-        if (Vector3.Distance(transform.position, targetPos) < 0.01f)
+        //거리 계산
+        float totalDistance = Vector3.Distance(startPos, targetPos);
+        float remainingDistance = Vector3.Distance(transform.position, targetPos); //남은거리
+        float traveledDistance = Vector3.Distance(startPos, transform.position); //달린거리
+
+        float currentSpeed = maxSpeed;
+        //속도 조절 로직. 느리게 출발해서 중간부분은 최고속도 유지하고 도착할때쯤에는 다시 느리게 이동
+        if (remainingDistance < decelerationDist)
         {
+            float t = remainingDistance / decelerationDist;
+            currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
+        }
+        else if (traveledDistance < accelerationDist) 
+        {
+            float t = traveledDistance / accelerationDist;
+            currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
+        }
+        //실제 이동
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, currentSpeed * Time.deltaTime);
+        if (remainingDistance < 0.05f)
+        {
+            transform.position = targetPos;
             //정차 및 승하차 프로세스 시작
             StartCoroutine(CoStationProcessRoutine());
         }
@@ -47,6 +72,7 @@ public class Train : MonoBehaviour
     // 열차가 다음 역으로 이동할 때 타겟 역 인덱스 결정
     public void DetermineNextTarget()
     {
+        startPos = transform.position;
         // 방향에 따라 다음 타겟 역 인덱스 결정 
         if (direction == TrainDirection.Forward)
         {

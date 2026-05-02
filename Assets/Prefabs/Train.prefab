@@ -106,5 +106,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Train
   targetStationIndex: 0
   direction: 0
+  passengers: []
   capacity: 6
-  speed: 3
+  maxSpeed: 3
+  minSpeed: 0.5
+  accelerationDist: 1.7
+  decelerationDist: 1.7
+  startPos: {x: 0, y: 0, z: 0}
