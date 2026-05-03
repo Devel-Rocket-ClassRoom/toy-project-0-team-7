@@ -792,7 +792,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5744754315399224529, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2009200504}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2509398050068076928, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2081422721}
   m_SourcePrefab: {fileID: 100100000, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
 --- !u!114 &18189104 stripped
 MonoBehaviour:
@@ -1761,6 +1764,24 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8350215912737540428, guid: fe1bb56ad4bb848929584223b9cd2f29, type: 3}
   m_PrefabInstance: {fileID: 2009200503}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2081422720 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2509398050068076928, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
+  m_PrefabInstance: {fileID: 18189103}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2081422721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2081422720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78db91b1a9c8ac545bd531526625ac40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrainDragButton
+  mouseInput: {fileID: 327881186}
 --- !u!224 &2114193959 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5744754315399224529, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
