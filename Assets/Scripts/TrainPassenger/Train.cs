@@ -9,7 +9,10 @@ public enum TrainDirection
 }
 public class Train : MonoBehaviour
 {
+    private List<Station> path;
+    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
     public int targetStationIndex = 0;
+    private int waypointTargetIndex  = 0;
     public TrainDirection direction = TrainDirection.Forward;
     public List<Passenger> passengers = new List<Passenger>();
     public int capacity = 6;
@@ -26,34 +29,37 @@ public class Train : MonoBehaviour
 
     public Vector3 startPos; //출발 위치 기록용
 
-    //열차 테스트 경로(승강장 리스트)
-    private List<Station> path;
 
 
     //열차 경로 설정 및 열차 생성위치 초기화
-    public void SetPath(List<Station> stations)
+    public void SetPath(List<Station> stations, List<Vector3> waypoints)
     {
         path = stations;
+        routeWaypoints = new List<Vector3>(waypoints);
+
+        transform.position = routeWaypoints[0];
+        waypointTargetIndex = 1;
         targetStationIndex = 0;
-        transform.position = path[0].transform.position;
     }
 
 
     public void Move()
     {
-        if (isStopping || path == null || path.Count == 0) return;
+        if (isStopping || routeWaypoints.Count == 0) return;
 
-        Station currentStation = path[targetStationIndex];
-        Vector3 targetPos = path[targetStationIndex].transform.position;
+        Vector3 targetPos = routeWaypoints[waypointTargetIndex];
+        //Station currentStation = path[targetStationIndex];
 
         float remainingDistance = Vector3.Distance(transform.position, targetPos); //남은거리
         float traveledDistance = Vector3.Distance(startPos, transform.position); //달린거리
 
-        float currentSpeed = maxSpeed;
+        bool isNextAStation = isStationWaypoint(waypointTargetIndex);
+        Station nextStation = isNextAStation ? GetStationAtWaypoint(waypointTargetIndex) : null;
         //감속 판정 - 이번 역이 종점 이거나 정차해야 하는 역이면 감속 준비
-        bool shouldStopHere = (targetStationIndex == 0 || targetStationIndex == path.Count - 1 ||
-            ShouldStopAtStation(currentStation));
+        bool shouldStopHere = isNextAStation && nextStation != null &&
+            (IsTerminalStation(nextStation) || ShouldStopAtStation(nextStation));
 
+        float currentSpeed = maxSpeed;
         //속도 조절 로직. 느리게 출발해서 중간부분은 최고속도 유지하고 도착할때쯤에는 다시 느리게 이동
         if (shouldStopHere && remainingDistance < decelerationDist)
         {
@@ -66,7 +72,6 @@ public class Train : MonoBehaviour
         {
             float t = traveledDistance / accelerationDist;
             currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
-
             if (traveledDistance >= accelerationDist) departedFromStop = false;
         }
         //실제 이동
@@ -78,43 +83,43 @@ public class Train : MonoBehaviour
             if (shouldStopHere)
             {
                 //정차 및 승하차 프로세스 시작
+                targetStationIndex = GetStationIndex(nextStation);
                 StartCoroutine(CoStationProcessRoutine());
             }
             else
             {
-                DetermineNextTarget();
+                AdvanceWaypoint();
             }
 
         }
     }
-    // 열차가 다음 역으로 이동할 때 타겟 역 인덱스 결정
-    public void DetermineNextTarget()
+    // waypoint 인덱스 진행 (방향 포함)
+    public void AdvanceWaypoint()
     {
         startPos = transform.position;
-        // 방향에 따라 다음 타겟 역 인덱스 결정 
+        // 방향에 따라 다음 타겟 waypoint 결정 
         if (direction == TrainDirection.Forward)
         {
-            // Forward일때 다음역이 있으면 index 증가
-            if (targetStationIndex < path.Count - 1)
+            if (waypointTargetIndex < routeWaypoints.Count - 1)
             {
-                targetStationIndex++;
+                waypointTargetIndex++;
             }
             else // 다음역 없으면 방향 전환
             {
                 direction = TrainDirection.Backward;
-                targetStationIndex--;
+                waypointTargetIndex--;
             }
         }
         else
         {
-            if (targetStationIndex > 0)
+            if (waypointTargetIndex > 0)
             {
-                targetStationIndex--;
+                waypointTargetIndex--;
             }
             else
             {
                 direction = TrainDirection.Forward;
-                targetStationIndex++;
+                waypointTargetIndex++;
             }
         }
     }
@@ -127,7 +132,7 @@ public class Train : MonoBehaviour
 
         if (currentStation != null)
         {
-            bool isTerminal = (targetStationIndex == 0 || targetStationIndex == path.Count - 1);
+            bool isTerminal = IsTerminalStation(currentStation);
             if (isTerminal)
             {
                 UpdateDirection();
@@ -143,7 +148,7 @@ public class Train : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        DetermineNextTarget();
+        AdvanceWaypoint();
         departedFromStop = true;
         isStopping = false;
     }
@@ -234,5 +239,27 @@ public class Train : MonoBehaviour
             direction = TrainDirection.Backward;
         else if (targetStationIndex == 0)
             direction = TrainDirection.Forward;
+    }
+
+    //역 판별 헬퍼 함수들
+    private bool isStationWaypoint(int index)
+    {
+        return index % 2 == 0;
+    }
+
+    private Station GetStationAtWaypoint(int wpindex)
+    {
+        int stationIndex = wpindex / 2;
+        if (stationIndex < path.Count) return path[stationIndex];
+        return null;
+    }
+    private int GetStationIndex(Station station)
+    {
+        return path.IndexOf(station);
+    }
+    private bool IsTerminalStation(Station station)
+    {
+        int idx = path.IndexOf(station);
+        return idx == 0 || idx == path.Count - 1;
     }
 }
