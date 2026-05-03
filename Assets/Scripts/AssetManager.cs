@@ -32,6 +32,8 @@ public class AssetManager : MonoBehaviour
 
     private int rewardRemain = 0;
 
+    private float savedTimeScale;
+
     private void Awake()
     {
         newTrainButton.onClick.AddListener(OnClickNewTrain);
@@ -40,21 +42,6 @@ public class AssetManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isWeekend)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))    // 시간 토글
-            {
-                if (Time.timeScale != 0)
-                {
-                    Time.timeScale = 0f; // 정지
-                }
-                else
-                {
-                    Time.timeScale = 1f; // 재개
-                }
-            }
-        }
-
         if (Time.timeScale != 0)
         {
             if (weeklyTimer > weekInterval) // 1주일 지나면
@@ -90,6 +77,7 @@ public class AssetManager : MonoBehaviour
     {
         if (rewardRemain <= 0) return;
 
+        savedTimeScale = Time.timeScale; // 현재 속도 저장
         Time.timeScale = 0f;
         isWeekend = true;
         gameUIGroup.interactable = false;
@@ -140,7 +128,7 @@ public class AssetManager : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 1f;
+            Time.timeScale = savedTimeScale; // 1f 대신 복구
             isWeekend = false;
             gameUIGroup.interactable = true;
         }
