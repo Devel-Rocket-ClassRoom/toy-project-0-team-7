@@ -18,6 +18,8 @@ public class Train : MonoBehaviour
     public int capacity = 6;
     private bool isStopping = false;
     private bool departedFromStop = false; // 정차 후 출발했는지 여부
+    private Vector3 lastDirection = Vector3.right;
+    public float rotationSpeed = 180f;
 
     public int lineId;
 
@@ -75,6 +77,14 @@ public class Train : MonoBehaviour
             if (traveledDistance >= accelerationDist) departedFromStop = false;
         }
         //실제 이동
+        Vector3 dir = (targetPos - transform.position).normalized;
+        if (dir != Vector3.zero)
+            lastDirection = dir;
+    
+        float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         transform.position = Vector3.MoveTowards(transform.position, targetPos, currentSpeed * Time.deltaTime);
         if (remainingDistance < 0.05f)
         {
@@ -136,6 +146,11 @@ public class Train : MonoBehaviour
             if (isTerminal)
             {
                 UpdateDirection();
+
+                //정차 중에 미리 반대 방향으로 lastDirection 설정
+                lastDirection = -lastDirection;
+                float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
 
             Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>");
