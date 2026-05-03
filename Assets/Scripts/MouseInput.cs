@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class MouseInput : MonoBehaviour
 {
-    public enum Mode { None, NewLine, ExtendLine, EditLine, MoveTrain }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, AddTrain, MoveTrain }
+    private Mode mode;
 
     private Camera cam;
     public LineManager lineManager;
-
-    private Mode mode;
 
     private bool isStartHandle;
 
@@ -36,7 +35,6 @@ public class MouseInput : MonoBehaviour
         {
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
-                Debug.Log("승강장");
                 mode = Mode.NewLine;
                 var pos = stationHit.collider.gameObject.transform.position;
                 pos.z = 0f;
@@ -47,7 +45,6 @@ public class MouseInput : MonoBehaviour
 
             else if (handleHit.collider != null) // 기존 선 연장하기
             {
-                Debug.Log("손잡이");
                 mode = Mode.ExtendLine;
                 var pos = handleHit.collider.gameObject.transform.position;
                 pos.z = 0f;
@@ -65,7 +62,6 @@ public class MouseInput : MonoBehaviour
 
             else if (lineHit.collider != null)  // 기존 선 편집하기 (중간 선택)
             {
-                Debug.Log("선");
                 mode = Mode.EditLine;
                 var pos = point;
                 pos.z = 0f;

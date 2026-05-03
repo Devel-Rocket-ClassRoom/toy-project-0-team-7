@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VectorGraphics;
+using Unity.VisualScripting;
 // --- Station Prefab을 랜덤하게 생성하는 스포너 역할 클래스 ---
 public class StationManager : MonoBehaviour
 {
@@ -17,6 +19,7 @@ public class StationManager : MonoBehaviour
     private float timer = 0f;
     private float gameTime = 0f;
     private float offset = 0.5f;
+    private int initialCount = 3;
     private List<Station> exisitingStations;
     public List<Station> ExisitingStations => exisitingStations;
     public PassengerManager pm;
@@ -27,13 +30,12 @@ public class StationManager : MonoBehaviour
         cam = Camera.main;
         exisitingStations = new List<Station>();
         pm = GameObject.FindWithTag("PassengerManager").GetComponent<PassengerManager>();
-
         float screenHeight = cam.orthographicSize * 2f;
         minRadius = screenHeight * 0.15f;
     } 
     private void Start()
     {
-        RandomSpawn();
+        InitialRandomSpawn(initialCount);
         timer = Random.Range(minRandomTime, maxRandomTime);
     }
 
@@ -42,7 +44,7 @@ public class StationManager : MonoBehaviour
         gameTime += Time.deltaTime;
         
         // 게임 초반에는 더 빨리 생성되도록 함 (존재하는 역이 3개 미만일 때만)
-        float t = Mathf.Clamp01(exisitingStations.Count / 3f);
+        float t = Mathf.Clamp01(exisitingStations.Count / (float)initialCount);
         float speedOffset = Mathf.Lerp(10f, 1f, t);
 
         timer -= Time.deltaTime * speedOffset;
@@ -59,18 +61,43 @@ public class StationManager : MonoBehaviour
         }
     }
 
+    // --- 처음 시작할 때 각각 다른 모양으로 3개의 역 랜덤 스폰하는 메서드 ---
+    private void InitialRandomSpawn(int count)
+    {
+        if (prefabs == null || prefabs.Length == 0) return;
+
+        var shuffeld = new List<Station>(prefabs);
+        for (int i = shuffeld.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (shuffeld[i], shuffeld[j]) = (shuffeld[j], shuffeld[i]);
+        }
+
+        for (int i = 0; i < Mathf.Min(count, shuffeld.Count); i++)
+        {
+            var station = Instantiate(shuffeld[i]);
+            Vector3 stationPos = GetRandomScreenPos();
+
+            int attempts = 0;
+            while (!IsValidPosition(stationPos) && attempts < 100)
+            {
+                stationPos = GetRandomScreenPos();
+                attempts++;
+            }
+
+            station.transform.position = stationPos;
+            exisitingStations.Add(station);
+            pm.allStations.Add(station);
+        }
+    }
+
     // --- 한 번 실행될 때 승강장 하나만 랜덤 생성 ---
     private void RandomSpawn()
     {
-        if (prefabs == null || prefabs.Length == 0) 
-        {
-            //Debug.Log("[Null] 프리팹 없음");
-            return;
-        }
+        if (prefabs == null || prefabs.Length == 0) return;
 
         int range = prefabs.Length;
         var station = Instantiate(prefabs[Random.Range(0, range)]);
-
         Vector3 stationPos = GetRandomScreenPos();
 
         int attempts = 0;
@@ -79,9 +106,6 @@ public class StationManager : MonoBehaviour
             stationPos = GetRandomScreenPos();
             attempts++;
         }
-
-        if (attempts >= 100) return;
-
         station.transform.position = stationPos;
         exisitingStations.Add(station);
         pm.allStations.Add(station);
