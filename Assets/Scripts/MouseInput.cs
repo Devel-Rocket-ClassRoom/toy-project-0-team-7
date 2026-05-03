@@ -3,12 +3,14 @@ using UnityEngine;
 public class MouseInput : MonoBehaviour
 {
     public enum Mode { None, NewLine, ExtendLine, EditLine, AddTrain, MoveTrain }
-    private Mode mode;
+    public Mode mode;
 
     private Camera cam;
     public LineManager lineManager;
 
     private bool isStartHandle;
+
+    public AssetManager assetManager;
 
     void Start()
     {
@@ -33,6 +35,8 @@ public class MouseInput : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))    // 클릭
         {
+            if (assetManager.isWeekend) return;
+
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
                 mode = Mode.NewLine;
@@ -147,6 +151,7 @@ public class MouseInput : MonoBehaviour
                 }
 
                 mode = Mode.None;
+                assetManager.OnInputReleased();
             }
         }
     }
