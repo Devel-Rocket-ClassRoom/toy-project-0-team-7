@@ -105,6 +105,8 @@ public class AssetManager : MonoBehaviour
 
         message.text = $"지하철에 어떤 자산을 고르시겠습니까?";
 
+        newAssetButton1.onClick.RemoveAllListeners();
+        newAssetButton2.onClick.RemoveAllListeners();
         newAssetButton1.onClick.AddListener(() => OnClickNewAsset());
         newAssetButton2.onClick.AddListener(() => OnClickNewAsset());
         newAssetButton1.gameObject.SetActive(true);
