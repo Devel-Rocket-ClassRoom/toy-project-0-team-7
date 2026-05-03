@@ -408,6 +408,18 @@ PrefabInstance:
       propertyPath: minRandomTime
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: prefabs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: 'prefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: -2462493466157804166, guid: 176864bae2e247c4c8dbc65966543d68, type: 3}
+    - target: {fileID: 8141106248940032907, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: 'prefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8609546053547811419, guid: b655a4c734003734ea3707390295740a, type: 3}
     - target: {fileID: 8686567831944256591, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_Name
       value: StationSpawner
