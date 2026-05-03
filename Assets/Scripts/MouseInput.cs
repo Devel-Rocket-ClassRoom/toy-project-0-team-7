@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MouseInput : MonoBehaviour
 {
-    public enum Mode { None, NewLine, ExtendLine, EditLine, AddTrain, MoveTrain }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain }
     public Mode mode;
 
     private Camera cam;
@@ -11,6 +11,7 @@ public class MouseInput : MonoBehaviour
     private bool isStartHandle;
 
     public AssetManager assetManager;
+    public CameraController cameraDirector;
 
     void Start()
     {
@@ -35,7 +36,7 @@ public class MouseInput : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))    // 클릭
         {
-            if (assetManager.isWeekend) return;
+            if (assetManager.isWeekend || cameraDirector.isGameOver) return;
 
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
@@ -79,6 +80,12 @@ public class MouseInput : MonoBehaviour
         {
             if (Input.GetMouseButton(0))    // 드래그
             {
+                if (cameraDirector.isGameOver)
+                {
+                    StopDragging();
+                    return;
+                }
+
                 var previewPoint = point;
                 previewPoint.z = 0f;
 
@@ -123,6 +130,10 @@ public class MouseInput : MonoBehaviour
                             lineManager.stationUnderMouse = null;
                         break;
 
+                    case Mode.NewTrain:
+                        Debug.Log("Mode.NewTrain");
+                        break;
+
                     case Mode.MoveTrain:
                         break;
                 }
@@ -130,29 +141,42 @@ public class MouseInput : MonoBehaviour
 
             if (Input.GetMouseButtonUp(0))  // 릴리즈
             {
-                switch (mode)
-                {
-                    case Mode.NewLine:
-                        if (lineManager.IsValidLine)    lineManager.FixNewLine();
-                        else                            lineManager.CancelNewLine();
-                        break;
-
-                    case Mode.ExtendLine:
-                        lineManager.FinishExtendLine();
-                        break;
-
-                    case Mode.EditLine:
-                        lineManager.FinishEditLine();
-                        break;
-
-                    case Mode.MoveTrain:
-
-                        break;
-                }
-
-                mode = Mode.None;
-                assetManager.OnInputReleased();
+                StopDragging();
             }
         }
+    }
+
+    public void ChangeToNewTrainMode()
+    {
+        mode = Mode.NewTrain;
+    }
+
+    public void StopDragging()
+    {
+        switch (mode)
+        {
+            case Mode.NewLine:
+                if (lineManager.IsValidLine) lineManager.FixNewLine();
+                else lineManager.CancelNewLine();
+                break;
+
+            case Mode.ExtendLine:
+                lineManager.FinishExtendLine();
+                break;
+
+            case Mode.EditLine:
+                lineManager.FinishEditLine();
+                break;
+
+            case Mode.NewTrain:
+                Debug.Log("Mode.NewTrain End");
+                break;
+
+            case Mode.MoveTrain:
+                break;
+        }
+
+        mode = Mode.None;
+        assetManager.OnInputReleased();
     }
 }

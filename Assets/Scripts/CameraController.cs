@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour
     private Camera cam;
     private Vector3 positionVelocity;
     private float zoomVelocity;
-    private bool isGameOver = false;
+    public bool isGameOver = false;
     private Vector3 targetStation;
 
     private void Awake()
