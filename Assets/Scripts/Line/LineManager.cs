@@ -242,7 +242,7 @@ public class LineManager : MonoBehaviour
         lineButtons[line.lineId].interactable = true;
         
         var rt = lineButtons[line.lineId].GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(30, 30);
+        rt.sizeDelta = new Vector2(60, 60);
     }
 
     public void ClearLine(int index)
@@ -260,7 +260,7 @@ public class LineManager : MonoBehaviour
         lineButtons[index].interactable = false;
 
         var rt = lineButtons[index].GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(10, 10);
+        rt.sizeDelta = new Vector2(30, 30);
     }
 
     public void AddAvailableLine()
