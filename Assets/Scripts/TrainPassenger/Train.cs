@@ -42,8 +42,14 @@ public class Train : MonoBehaviour
         transform.position = routeWaypoints[0];
         waypointTargetIndex = 1;
         targetStationIndex = 0;
-    }
 
+        if (routeWaypoints.Count > 1)
+        {
+            lastDirection = (routeWaypoints[1] - routeWaypoints[0]).normalized;
+            float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
+    }
 
     public void Move()
     {
