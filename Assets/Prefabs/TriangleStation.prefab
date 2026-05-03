@@ -114,7 +114,7 @@ MonoBehaviour:
   - {fileID: -1290821818456711322, guid: e805a42cdc198aa4491fef2a3420af8e, type: 3}
   waitingArea: {fileID: 9008300916516942601}
   timerUI: {fileID: 1669241095385505682}
-  capacity: 6
+  capacity: 2
   overflowTimer: 10
   waitingPassengers: []
   lines: []
@@ -321,7 +321,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &8151325307863290981
 MonoBehaviour:
