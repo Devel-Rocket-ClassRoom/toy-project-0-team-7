@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class AssetManager : MonoBehaviour
 {
+    public MouseInput inputManager;
+    public CanvasGroup gameUIGroup;
+
     public LineManager lineManager;
     public const int MAX_LINE_COUNT = 7;
 
@@ -20,11 +23,14 @@ public class AssetManager : MonoBehaviour
     public Button newAssetButton2;
 
     private float weeklyTimer = 0f;
-    private const float weekInterval = 70f;
+    private const float weekInterval = 140f;
 
-    private bool isWeekend = false;
+    public bool isWeekend = false;
 
     private int weekCount = 1;
+    private int displayWeek = 2;
+
+    private int rewardRemain = 0;
 
     private void Awake()
     {
@@ -53,14 +59,12 @@ public class AssetManager : MonoBehaviour
         {
             if (weeklyTimer > weekInterval) // 1주일 지나면
             {
-                Time.timeScale = 0f;
+                rewardRemain++;
                 weekCount++;
-
-                // 자산 선택 화면 수정 및 활성화
-                ActivePanel();
-
-                isWeekend = true;
                 weeklyTimer = 0f;
+
+                if (inputManager.mode == MouseInput.Mode.None)
+                    ShowNextReward();
             }
 
             weeklyTimer += Time.deltaTime;
@@ -82,9 +86,19 @@ public class AssetManager : MonoBehaviour
         Debug.Log("객차 수 증가"); // CarriageManager.-----
     }
 
+    public void ShowNextReward()
+    {
+        if (rewardRemain <= 0) return;
+
+        Time.timeScale = 0f;
+        isWeekend = true;
+        gameUIGroup.interactable = false;
+        ActivePanel();
+    }
+
     public void ActivePanel()
     {
-        week.text = $"{weekCount}번째 주";
+        week.text = $"{displayWeek}번째 주";
         message.text = $"당신의 지하철을 위한 새로운 기관차가 있습니다.";
 
         newTrainButton.gameObject.SetActive(true);
@@ -117,7 +131,24 @@ public class AssetManager : MonoBehaviour
     {
         IncreaseLine(); // 테스트 가능한 자산이 하나뿐이라 일단 두 버튼 다 노선으로 통일함.
         InactivePanel();
-        Time.timeScale = 1f;
-        isWeekend = false;
+        rewardRemain--;
+        displayWeek++;
+
+        if (rewardRemain > 0 && inputManager.mode == MouseInput.Mode.None)
+        {            
+            ActivePanel(); // 다음 리워드 표시
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            isWeekend = false;
+            gameUIGroup.interactable = true;
+        }
+    }
+
+    public void OnInputReleased()
+    {
+        if (rewardRemain > 0 && !isWeekend)
+            ShowNextReward();
     }
 }
