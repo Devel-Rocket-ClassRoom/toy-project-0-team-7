@@ -9,4 +9,9 @@ public class StationTimerUI : MonoBehaviour
     {
         fillImage.fillAmount = 1f - (current / max);
     }
+
+    public void SetFull()
+    {
+        fillImage.fillAmount = 1f;
+    }
 }
