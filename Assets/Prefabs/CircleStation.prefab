@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 8968364468888777695}
   - component: {fileID: 6610734870726254885}
   - component: {fileID: 3884574927351861881}
-  - component: {fileID: 2084255948194456047}
+  - component: {fileID: 5528633032045821837}
   m_Layer: 0
   m_Name: CircleStation
   m_TagString: Station
@@ -220,12 +220,12 @@ MonoBehaviour:
   - {fileID: -1290821818456711322, guid: e805a42cdc198aa4491fef2a3420af8e, type: 3}
   waitingArea: {fileID: 4136765381118712196}
   timerUI: {fileID: 8942026590692930791}
-  capacity: 1
+  capacity: 6
   overflowTimer: 10
   waitingPassengers: []
   lines: []
---- !u!70 &2084255948194456047
-CapsuleCollider2D:
+--- !u!61 &5528633032045821837
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -254,13 +254,22 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.015276766, y: -0.027158037}
-  m_Size: {x: 3.3583946, y: 3.293892}
-  m_Direction: 1
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 5.12, y: 5.12}
+    newSize: {x: 1.28, y: 1.28}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 4, y: 4}
+  m_EdgeRadius: 0
 --- !u!1 &6103749394012968117
 GameObject:
   m_ObjectHideFlags: 0
