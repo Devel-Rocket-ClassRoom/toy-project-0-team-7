@@ -108,7 +108,9 @@ MonoBehaviour:
   direction: 0
   passengers: []
   capacity: 6
-  maxSpeed: 3
+  rotationSpeed: 180
+  lineId: 0
+  maxSpeed: 2.5
   minSpeed: 0.5
   accelerationDist: 1.7
   decelerationDist: 1.7

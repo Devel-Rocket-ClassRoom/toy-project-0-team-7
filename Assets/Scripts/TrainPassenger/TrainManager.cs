@@ -27,6 +27,7 @@ public class TrainManager : MonoBehaviour
         //[수정 예정] 실제 데이터로 변경
         train.SetPath(testStations, waypoints);
         train.lineId = lineId;
+        train.GetComponent<SpriteRenderer>().color = Colors.colors[lineId];
         activeTrains.Add(train);
 
         return train;
