@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 8968364468888777695}
   - component: {fileID: 6610734870726254885}
   - component: {fileID: 3884574927351861881}
-  - component: {fileID: 5528633032045821837}
+  - component: {fileID: 353364709268781369}
   m_Layer: 0
   m_Name: CircleStation
   m_TagString: Station
@@ -224,8 +224,8 @@ MonoBehaviour:
   overflowTimer: 10
   waitingPassengers: []
   lines: []
---- !u!61 &5528633032045821837
-BoxCollider2D:
+--- !u!58 &353364709268781369
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -259,17 +259,7 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
-    newSize: {x: 1.28, y: 1.28}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 4, y: 4}
-  m_EdgeRadius: 0
+  m_Radius: 1.7
 --- !u!1 &6103749394012968117
 GameObject:
   m_ObjectHideFlags: 0

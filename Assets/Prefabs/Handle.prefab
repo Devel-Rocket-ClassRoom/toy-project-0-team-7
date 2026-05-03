@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3047398217513133214}
-  - component: {fileID: 6853025194604272553}
   - component: {fileID: 8628998933268198717}
+  - component: {fileID: 1968224703897492086}
   m_Layer: 0
   m_Name: Handle
   m_TagString: Handle
@@ -35,7 +35,23 @@ Transform:
   - {fileID: 6270757148282542580}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &6853025194604272553
+--- !u!114 &8628998933268198717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1740203717147980539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b40a0a14b98742b49a7f4994f3a91af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Handle
+  line: {fileID: 0}
+  isStartHandle: 0
+  sero: {fileID: 3535121461330013798}
+  garo: {fileID: 3460521467183484725}
+--- !u!61 &1968224703897492086
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -81,22 +97,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8628998933268198717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1740203717147980539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b40a0a14b98742b49a7f4994f3a91af9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Handle
-  line: {fileID: 0}
-  isStartHandle: 0
-  sero: {fileID: 3535121461330013798}
-  garo: {fileID: 3460521467183484725}
 --- !u!1 &3460521467183484725
 GameObject:
   m_ObjectHideFlags: 0
