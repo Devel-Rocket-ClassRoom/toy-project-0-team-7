@@ -18,15 +18,14 @@ public class TrainManager : MonoBehaviour
                 train.Move();
         
     }
-    public Train SpawnTrain(int lineId)
+    public Train SpawnTrain(int lineId, List<Vector3> waypoints)
     {
-        if (testStations.Count == 0) return null;
         //[수정 예정] 실제 게임에선 0번 역이 아니라 사용자가 클릭한 노선의 시작점에 스폰
         GameObject trainObject = Instantiate(trainPrefab, testStations[0].transform.position, Quaternion.identity);
         Train train = trainObject.GetComponent<Train>();
 
         //[수정 예정] 실제 데이터로 변경
-        train.SetPath(new List<Station>(testStations));
+        train.SetPath(testStations, waypoints);
         train.lineId = lineId;
         activeTrains.Add(train);
 

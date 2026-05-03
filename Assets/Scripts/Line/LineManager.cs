@@ -88,7 +88,7 @@ public class LineManager : MonoBehaviour
         {
             trainManager.testStations = line_onMouse.stations;
             //trainManager.waypoints = line_onMouse.waypoints;
-            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId));
+            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints));
         }
 
         AddLine(line_onMouse);
@@ -149,7 +149,7 @@ public class LineManager : MonoBehaviour
         foreach (var train in trainManager.activeTrains)
         {
             if (train.lineId == line_onMouse.lineId)
-                train.SetPath(line_onMouse.stations);
+                train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
         line_onMouse = null;
 
@@ -218,7 +218,7 @@ public class LineManager : MonoBehaviour
         foreach (var train in trainManager.activeTrains)
         {
             if (train.lineId == line_onMouse.lineId)
-                train.SetPath(line_onMouse.stations);
+                train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
         line_onMouse = null;
         stationUnderMouse = null;
