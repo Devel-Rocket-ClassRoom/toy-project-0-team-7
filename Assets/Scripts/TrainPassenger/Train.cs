@@ -13,10 +13,18 @@ public class Train : MonoBehaviour
     public TrainDirection direction = TrainDirection.Forward;
     public List<Passenger> passengers = new List<Passenger>();
     public int capacity = 6;
-    public float speed = 5f;
     private bool isStopping = false;
+    private bool departedFromStop = false; // 정차 후 출발했는지 여부
 
     public int lineId;
+
+    [Header("Movement Settings")]
+    public float maxSpeed = 2.5f;
+    public float minSpeed = 0.5f;
+    public float accelerationDist = 1.7f; // 가속 구간 거리
+    public float decelerationDist = 1.7f; // 감속 구간 거리
+
+    public Vector3 startPos; //출발 위치 기록용
 
     //열차 테스트 경로(승강장 리스트)
     private List<Station> path;
@@ -35,19 +43,54 @@ public class Train : MonoBehaviour
     {
         if (isStopping || path == null || path.Count == 0) return;
 
+        Station currentStation = path[targetStationIndex];
         Vector3 targetPos = path[targetStationIndex].transform.position;
 
-        //[수정 예정] 승객 유무에 따라 감속할때 lerp로
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-        if (Vector3.Distance(transform.position, targetPos) < 0.01f)
+        float remainingDistance = Vector3.Distance(transform.position, targetPos); //남은거리
+        float traveledDistance = Vector3.Distance(startPos, transform.position); //달린거리
+
+        float currentSpeed = maxSpeed;
+        //감속 판정 - 이번 역이 종점 이거나 정차해야 하는 역이면 감속 준비
+        bool shouldStopHere = (targetStationIndex == 0 || targetStationIndex == path.Count - 1 ||
+            ShouldStopAtStation(currentStation));
+
+        //속도 조절 로직. 느리게 출발해서 중간부분은 최고속도 유지하고 도착할때쯤에는 다시 느리게 이동
+        if (shouldStopHere && remainingDistance < decelerationDist)
         {
-            //정차 및 승하차 프로세스 시작
-            StartCoroutine(CoStationProcessRoutine());
+            //도착할 역에 멈출 예정일 때만 감속 로직 실행
+            float t = remainingDistance / decelerationDist;
+            currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
+        }
+        //이전 역에서 정차 후 출발이면 가속 실행
+        else if (departedFromStop && traveledDistance < accelerationDist)
+        {
+            float t = traveledDistance / accelerationDist;
+            currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
+
+            if (traveledDistance >= accelerationDist) departedFromStop = false;
+        }
+        //실제 이동
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, currentSpeed * Time.deltaTime);
+        if (remainingDistance < 0.05f)
+        {
+            transform.position = targetPos;
+
+            if (shouldStopHere)
+            {
+                //정차 및 승하차 프로세스 시작
+                StartCoroutine(CoStationProcessRoutine());
+            }
+            else
+            {
+                DetermineNextTarget();
+            }
+
         }
     }
     // 열차가 다음 역으로 이동할 때 타겟 역 인덱스 결정
     public void DetermineNextTarget()
     {
+        startPos = transform.position;
         // 방향에 따라 다음 타겟 역 인덱스 결정 
         if (direction == TrainDirection.Forward)
         {
@@ -80,11 +123,16 @@ public class Train : MonoBehaviour
     {
         isStopping = true;
 
-        //[수정 예정]현재 열차가 멈춘 역의 정보를 가져옴
         Station currentStation = path[targetStationIndex];
 
         if (currentStation != null)
         {
+            bool isTerminal = (targetStationIndex == 0 || targetStationIndex == path.Count - 1);
+            if (isTerminal)
+            {
+                UpdateDirection();
+            }
+
             Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>");
             //내릴 승객 처리
             HandleAlighting(currentStation);
@@ -96,6 +144,7 @@ public class Train : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         DetermineNextTarget();
+        departedFromStop = true;
         isStopping = false;
     }
 
@@ -113,11 +162,7 @@ public class Train : MonoBehaviour
             {
                 //[수정 예정] station에서 remove 메서드 생성 후 여기서 호출하는 쪽으로
                 station.waitingPassengers.RemoveAt(i);
-
-                //테스트 오브젝트 삭제 
-                //GameObject pObj = station.waitingPassengers[i].gameObject;
-                //station.waitingPassengers.RemoveAt(i);
-                Destroy(p.gameObject);
+                if (p.gameObject != null) Destroy(p.gameObject);
 
                 //열차 승객 리스트 추가
                 p.State = PassengerState.OnTrain;
@@ -139,8 +184,8 @@ public class Train : MonoBehaviour
             {
                 passengers[i].State = PassengerState.Arrived;
                 Score.score++;
-                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
                 passengers.RemoveAt(i);
+                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
             }
         }
     }
@@ -169,5 +214,25 @@ public class Train : MonoBehaviour
             }
         }
         return false;
+    }
+    // 현재 역에 정차 해야하는지 검사
+    private bool ShouldStopAtStation(Station station)
+    {
+        foreach (var p in passengers)
+        {
+            if (p.destination == station.Shape) return true;
+        }
+        foreach (var p in station.waitingPassengers)
+        {
+            if (CanBoard(p)) return true;
+        }
+        return false;
+    }
+    private void UpdateDirection()
+    {
+        if (targetStationIndex == path.Count - 1)
+            direction = TrainDirection.Backward;
+        else if (targetStationIndex == 0)
+            direction = TrainDirection.Forward;
     }
 }
