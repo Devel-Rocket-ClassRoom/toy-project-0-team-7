@@ -15,7 +15,11 @@ public class Train : MonoBehaviour
     private int waypointTargetIndex  = 0;
     public TrainDirection direction = TrainDirection.Forward;
     public List<Passenger> passengers = new List<Passenger>();
+    public Transform[] passengerSlots;
+    public GameObject passengerIconPrefab;
+    public Sprite[] passengerIconSprites; 
     public int capacity = 6;
+    private List<GameObject> passengerIcons = new List<GameObject>();
     private bool isStopping = false;
     private bool departedFromStop = false; // 정차 후 출발했는지 여부
     private Vector3 lastDirection = Vector3.right;
@@ -31,8 +35,32 @@ public class Train : MonoBehaviour
 
     public Vector3 startPos; //출발 위치 기록용
 
+    //열차 승객 시각화. 초기 6개 슬릇 생성후 Active로 관리
+    public void Init()
+    {
+        for(int i = 0; i < capacity; i++)
+        {
+            GameObject icon = Instantiate(passengerIconPrefab, passengerSlots[i]);
+            icon.SetActive(false);
+            passengerIcons.Add(icon);
+        }
+    }
+    
+    private void RefreshPassengerIcons()
+    {
+        for (int i = 0; i < capacity; i++)
+        {
+            if (i < passengers.Count)
+            {
 
-
+                passengerIcons[i].GetComponent<SpriteRenderer>().sprite =
+                    passengerIconSprites[(int)passengers[i].destination];
+                passengerIcons[i].SetActive(true);
+            }
+            else
+                passengerIcons[i].SetActive(false);
+        }
+    }
     //열차 경로 설정 및 열차 생성위치 초기화
     public void SetPath(List<Station> stations, List<Vector3> waypoints)
     {
@@ -201,6 +229,7 @@ public class Train : MonoBehaviour
             }
 
         }
+        RefreshPassengerIcons();
     }
     public void HandleAlighting(Station station)
     {
@@ -214,6 +243,7 @@ public class Train : MonoBehaviour
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
             }
         }
+        RefreshPassengerIcons();
     }
     //노선에 목적지 역이 포함되는지 검사
     public bool CanBoard(Passenger p)
