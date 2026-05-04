@@ -188,7 +188,8 @@ public class Train : MonoBehaviour
             if (CanBoard(p))
             {
                 //[수정 예정] station에서 remove 메서드 생성 후 여기서 호출하는 쪽으로
-                station.waitingPassengers.RemoveAt(i);
+                station.RemovePassenger(p);
+                if (p.gameObject != null) Destroy(p.gameObject);
 
                 //열차 승객 리스트 추가
                 p.State = PassengerState.OnTrain;
