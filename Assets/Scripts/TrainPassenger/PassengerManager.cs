@@ -7,8 +7,6 @@ public class PassengerManager : MonoBehaviour
     //[수정 예정] 승객이 스폰될 역들의 리스트 > Station쪽에서 참조해야함
     public List<Station> allStations = new List<Station>();
 
-
-    // --- 보존 ---
     public StationType GetRandomDestExcluding(StationType type)
     {
         //현재 역들 중 모양 하나 랜덤 선정

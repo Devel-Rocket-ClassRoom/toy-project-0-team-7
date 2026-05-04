@@ -15,7 +15,6 @@ public class StationManager : MonoBehaviour
     private float rightOffset = 2.2f;
     private float minRadius;
     private float timer = 0f;
-    //private float gameTime = 0f;
     private float offset = 0.5f;
     private int initialCount = 3; // 처음 시작할 때 생성할 역의 수 (각각 다른 모양으로 3개) 
     private int spawnedCount = 0;   // 처음 역이 세 개 생성된 후, 랜덤 스폰되는 횟수

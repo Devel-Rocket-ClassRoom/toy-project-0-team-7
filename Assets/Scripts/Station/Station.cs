@@ -68,10 +68,15 @@ public class Station : MonoBehaviour
         
         while (true)
         {
-            StationType dest = pm.GetRandomDestExcluding(this.shape);
-            AddPasssenger(dest);    
+            int spawnCount = UnityEngine.Random.value < 0.7f ? 1 : 2;
+            for (int i = 0; i < spawnCount; i++)
+            {
+                StationType dest = pm.GetRandomDestExcluding(this.shape);
+                AddPasssenger(dest);  
+                //Debug.Log($"[승객 스폰] {shape} 역에서 {spawnCount}명 승객 스폰");
+            }
+              
             float spawnInterval = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
-            //Debug.Log($"[역 승객 스폰] {shape} 역에서 다음 승객 생성까지: {spawnInterval:F2}초");
             yield return new WaitForSeconds(spawnInterval);
         }
     }
@@ -81,7 +86,6 @@ public class Station : MonoBehaviour
     {
         if (waitingPassengers.Count > capacity)
         {
-            //Debug.Log($"[역 수용인원 초과] {waitingPassengers.Count} 더 이상 수용할 수 없습니다. 게임오버 타이머 스타트");
             return;
         }
 
@@ -102,7 +106,6 @@ public class Station : MonoBehaviour
 
             if (timerUI != null) timerUI.gameObject.SetActive(true);
 
-            //Debug.Log("[수용인원 초과] 타이머 시작]");
         }
     }
 
@@ -117,7 +120,6 @@ public class Station : MonoBehaviour
             currentTimer = overflowTimer;
             
             timerUI.gameObject.SetActive(false);
-            //Debug.Log("[수용인원 정상] 타이머 리셋");
         }
     }
 
