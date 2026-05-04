@@ -1019,6 +1019,7 @@ MonoBehaviour:
   mode: 0
   lineManager: {fileID: 1349927380}
   assetManager: {fileID: 348619415}
+  cameraDirector: {fileID: 1197552938}
 --- !u!1 &348619413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1408,6 +1409,7 @@ MonoBehaviour:
   gameOverSize: 3
   gameOverSmoothTime: 0.6
   transitionDelay: 1.5
+  isGameOver: 0
 --- !u!114 &1199314975 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7215544171435627099, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}

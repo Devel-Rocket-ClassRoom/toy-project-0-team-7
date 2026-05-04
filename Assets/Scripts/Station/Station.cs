@@ -41,7 +41,7 @@ public class Station : MonoBehaviour
 
     public void AddPasssenger(StationType destination)
     {
-        if (waitingPassengers.Count >= capacity)
+        if (waitingPassengers.Count > capacity)
         {
             Debug.Log($"[역 수용인원 초과] {waitingPassengers.Count} 더 이상 수용할 수 없습니다. 게임오버 타이머 스타트");
             return;
@@ -57,7 +57,7 @@ public class Station : MonoBehaviour
 
         waitingPassengers.Add(passenger);
 
-        if (waitingPassengers.Count >= capacity && !isOverflow)
+        if (waitingPassengers.Count > capacity && !isOverflow)
         {
             isOverflow = true;
             currentTimer = overflowTimer;
