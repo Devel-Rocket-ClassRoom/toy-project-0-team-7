@@ -16,7 +16,7 @@ public class Station : MonoBehaviour
     
     [Header("역 수용인원 및 초과 타이머 설정")] 
     [SerializeField] private int capacity = 6; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
-    [SerializeField] private float overflowTimer = 5f; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
+    [SerializeField] private float overflowTimer = 30f; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
 
     [Header("승객 스폰 시간 가격")]
     [SerializeField] private float minSpawnTime = 5f;
@@ -111,10 +111,13 @@ public class Station : MonoBehaviour
     {
         waitingPassengers.Remove(passenger);
 
-        if (waitingPassengers.Count <= capacity)
+        if (waitingPassengers.Count <= capacity && isOverflow)
         {
             isOverflow = false;
             currentTimer = overflowTimer;
+            
+            timerUI.gameObject.SetActive(false);
+            Debug.Log("[수용인원 정상] 타이머 리셋");
         }
     }
 
