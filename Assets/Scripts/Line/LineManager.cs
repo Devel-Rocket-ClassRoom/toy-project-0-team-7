@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
-using System.Linq;
 
 public class LineManager : MonoBehaviour
 {
@@ -161,7 +160,6 @@ public class LineManager : MonoBehaviour
         foreach (var train in trainManager.activeTrains)
         {
             if (train.lineId == line_onMouse.lineId)
-            if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
         line_onMouse = null;
@@ -202,7 +200,7 @@ public class LineManager : MonoBehaviour
 
             if (isEndStation)
             {
-                isStartHandle = (index == 0); // LineManager 멤버 변수
+                isStartHandle = index == 0; // LineManager 멤버 변수
                 return true; // ExtendLine으로 전환 신호
             }
         }

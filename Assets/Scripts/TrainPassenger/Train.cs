@@ -10,6 +10,8 @@ public enum TrainDirection
 }
 public class Train : MonoBehaviour
 {
+    private GameManager gm;
+
     private List<Station> path;
     private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
     public int targetStationIndex = 0;
@@ -35,6 +37,11 @@ public class Train : MonoBehaviour
     public float decelerationDist = 1.7f; // 감속 구간 거리
 
     public Vector3 startPos; //출발 위치 기록용
+
+    private void Awake()
+    {
+        gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+    }
 
     //열차 승객 시각화. 초기 6개 슬릇 생성후 Active로 관리
     public void Init()
@@ -196,7 +203,7 @@ public class Train : MonoBehaviour
             HandleBoarding(currentStation);
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.2f);
 
         AdvanceWaypoint();
         departedFromStop = true;
@@ -244,6 +251,7 @@ public class Train : MonoBehaviour
             {
                 p.State = PassengerState.Arrived;
                 Score.score++;
+                gm.UpdateUIText();
                 Destroy(p.gameObject);
                 passengers.RemoveAt(i);
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
@@ -252,7 +260,9 @@ public class Train : MonoBehaviour
             else if (NeedsTransfer(p, station))
             {
                 p.State = PassengerState.Waiting;
-                station.waitingPassengers.Add(p);
+                //station.waitingPassengers.Add(p);
+                station.AddPasssenger(p.destination);
+                Destroy(p.gameObject);
                 passengers.RemoveAt(i);
             }
         }
@@ -262,9 +272,9 @@ public class Train : MonoBehaviour
     //노선에 목적지 역이 포함되는지 검사
     public bool CanBoard(Passenger p)
     {
-        Debug.Log($"path 수: {path?.Count}, targetStationIndex: {targetStationIndex}, 목적지: {p.destination}");
-        foreach (var s in path)
-            Debug.Log($"역: {s.name}, 모양: {s.Shape}");
+        //Debug.Log($"path 수: {path?.Count}, targetStationIndex: {targetStationIndex}, 목적지: {p.destination}");
+        //foreach (var s in path)
+        //    Debug.Log($"역: {s.name}, 모양: {s.Shape}");
 
         var dir = direction == TrainDirection.Forward ? 1 : -1;
         return BFS(p.destination, targetStationIndex + dir, dir);
@@ -299,6 +309,7 @@ public class Train : MonoBehaviour
 
             foreach (var line in current.lines) // 이곳을 지나는 모든 노선
             {
+                if (line.lineId == lineId) continue;
                 foreach (var station in line.stations)  // 노선에 속하는 모든 역
                 {
                     if (!visitedStations.Contains(station))

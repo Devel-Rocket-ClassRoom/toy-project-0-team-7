@@ -169,6 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b539de0795913e4fa04d97ccc953a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
+  gm: {fileID: 5762644595033891365, guid: 014546e2eba2557438f19950dd4e0b64, type: 3}
   targetStationIndex: 0
   direction: 0
   passengers: []
@@ -185,7 +186,7 @@ MonoBehaviour:
   - {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   - {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
   capacity: 6
-  rotationSpeed: 180
+  rotationSpeed: 360
   lineId: 0
   maxSpeed: 2.5
   minSpeed: 0.5

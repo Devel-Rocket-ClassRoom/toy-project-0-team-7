@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class AssetManager : MonoBehaviour
 {
+    public GameManager gm;
+
     public MouseInput inputManager;
     public CanvasGroup gameUIGroup;
 
@@ -50,6 +52,7 @@ public class AssetManager : MonoBehaviour
             if (dailyTimer > dayInterval)   // 1일 지나면
             {
                 dayCount++;
+                gm.UpdateUIText();
                 dailyTimer = 0f;
             }
 
