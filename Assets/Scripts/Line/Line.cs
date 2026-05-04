@@ -13,8 +13,6 @@ public class Line : MonoBehaviour
     public List<Vector3> waypoints = new();
     private LineRenderer lr;
 
-    private EdgeCollider2D collider;
-
     public GameObject handlePrefab;
     public Handle handleStart;
     public Handle handleEnd;
@@ -23,8 +21,7 @@ public class Line : MonoBehaviour
     private void Awake()
     {
         lr = GetComponent<LineRenderer>();
-        collider = GetComponent<EdgeCollider2D>();
-        collider.edgeRadius = 0.2f;
+        GetComponent<EdgeCollider2D>().edgeRadius = 0.2f;
     }
 
     public void InsertStation(Station station, int index)
@@ -36,6 +33,12 @@ public class Line : MonoBehaviour
     public void AddStation(Station station)
     {
         stations.Add(station);
+        UpdateWaypoints();
+    }
+
+    public void RemoveStation(int index)
+    {
+        stations.RemoveAt(index);
         UpdateWaypoints();
     }
 
@@ -133,7 +136,7 @@ public class Line : MonoBehaviour
             points[i] = waypoints[i];
         }
 
-        collider.points = points;
+        GetComponent<EdgeCollider2D>().points = points;
     }
 
     public Vector3 GetBendPoint(Vector3 from, Vector3 to)
@@ -150,10 +153,6 @@ public class Line : MonoBehaviour
 
     public int GetSegmentIndex(Vector3 clickPos)   // 클릭 지점으로 구간 인덱스 찾기
     {
-        Debug.Log($"clickPos: {clickPos}");
-        for (int i = 0; i < waypoints.Count; i++)
-            Debug.Log($"waypoints[{i}]: {waypoints[i]}");
-
         float minDist = float.MaxValue;
         int waypointSegmentIndex = 0;
 
@@ -161,7 +160,6 @@ public class Line : MonoBehaviour
         {
             float dist = DistancePointToSegment(
                 clickPos, waypoints[i], waypoints[i + 1]);
-            Debug.Log($"구간 {i}: {dist}");
 
             if (dist < minDist)
             {

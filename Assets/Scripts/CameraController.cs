@@ -1,9 +1,11 @@
+using TMPro;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
     public StationManager sm;
     public GameObject gameOverWindow;
+    public TextMeshProUGUI gameResultText;
     
     // --- 역 스폰에 따라 카메라 조정하기 위한 필드들 ---
     [SerializeField] private float padding = 3f;
@@ -90,6 +92,7 @@ public class CameraController : MonoBehaviour
     private void LoadGameOverWindow()
     {
         Debug.Log("[게임 오버] 게임 오버 UI 띄움");
+        gameResultText.text = $"본 역은 너무 혼잡해 지하철이 폐쇄조치 되었습니다.\n당신의 철도에서 {AssetManager.dayCount}일 동안 {Score.score}명의 승객이 여행했습니다.";
         gameOverWindow.SetActive(true);
         Time.timeScale = 0f;
     }

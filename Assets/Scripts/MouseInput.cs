@@ -135,6 +135,7 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.MoveTrain:
+                        Debug.Log("Mode.MoveTrain");
                         break;
                 }
             }
@@ -173,6 +174,7 @@ public class MouseInput : MonoBehaviour
                 break;
 
             case Mode.MoveTrain:
+                Debug.Log("Mode.MoveTrain End");
                 break;
         }
 

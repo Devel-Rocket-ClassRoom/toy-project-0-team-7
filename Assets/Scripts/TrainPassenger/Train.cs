@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum TrainDirection
@@ -193,54 +194,92 @@ public class Train : MonoBehaviour
                 //열차 승객 리스트 추가
                 p.State = PassengerState.OnTrain;
                 passengers.Add(p);
+
+                p.gameObject.SetActive(false);  // 대기 중인 승객 비활성화
                 Debug.Log($"승객 탑승! 목적지: {p.destination} (열차 잔여석: {capacity - passengers.Count})");
             }
             else
             {
                 i++;
             }
-
         }
     }
     public void HandleAlighting(Station station)
     {
         for (int i = passengers.Count - 1; i >= 0; i--)
         {
-            if (passengers[i].destination == station.Shape)
+            var p = passengers[i];
+            //if (p == null) { passengers.RemoveAt(i); continue; } // 방어 코드
+
+            if (p.destination == station.Shape)
             {
-                passengers[i].State = PassengerState.Arrived;
+                p.State = PassengerState.Arrived;
                 Score.score++;
+                Destroy(p.gameObject);
                 passengers.RemoveAt(i);
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
             }
+
+            else if (NeedsTransfer(p, station))
+            {
+                p.State = PassengerState.Waiting;
+                station.waitingPassengers.Add(p);
+                passengers.RemoveAt(i);
+            }
         }
     }
+
     //노선에 목적지 역이 포함되는지 검사
     public bool CanBoard(Passenger p)
     {
-        if (direction == TrainDirection.Forward) //정방향
-        {
-            //정차한 역의 다음역 부터 검사
-            for (int i = targetStationIndex + 1; i < path.Count; i++)
-            {
-                if (path[i].Shape == p.destination && path[i] != null)
-                {
-                    return true;
-                }
-            }
-        }
-        else //역방향
-        {
-            for (int i = targetStationIndex - 1; i >= 0; i--)
-            {
-                if (path[i].Shape == p.destination && path[i] != null)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        Debug.Log($"path 수: {path?.Count}, targetStationIndex: {targetStationIndex}, 목적지: {p.destination}");
+        foreach (var s in path)
+            Debug.Log($"역: {s.name}, 모양: {s.Shape}");
+
+        var dir = direction == TrainDirection.Forward ? 1 : -1;
+        return BFS(p.destination, targetStationIndex, dir);
     }
+
+    public bool NeedsTransfer(Passenger p, Station station)
+    {
+        bool notOnCurrentLine = !path.Any(s => s.Shape == p.destination);   // 현재 노선에 목적지 없음
+        bool canReachViaTransfer = BFS(p.destination, path.IndexOf(station), 1)
+                                || BFS(p.destination, path.IndexOf(station), -1);   // 이 역에 내리면 목적지에 갈 수 있음
+
+        return notOnCurrentLine && canReachViaTransfer;
+    }
+
+    public bool BFS(StationType dest, int currentIndex, int dir)
+    {
+        HashSet<Station> visitedStations = new();
+        Queue<Station> queue = new();
+
+        for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
+        {
+            queue.Enqueue(path[i]);
+        }
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            if (visitedStations.Contains(current)) continue;
+            visitedStations.Add(current);
+
+            if (current.Shape == dest) return true;
+
+            foreach (var line in current.lines) // 이곳을 지나는 모든 노선
+            {
+                foreach (var station in line.stations)  // 노선에 속하는 모든 역
+                {
+                    if (!visitedStations.Contains(station))
+                        queue.Enqueue(station); // 환승 가능한 역 추가
+                }
+            }
+        }
+
+        return false; // 경로 못 찾음
+    }
+
     // 현재 역에 정차 해야하는지 검사
     private bool ShouldStopAtStation(Station station)
     {

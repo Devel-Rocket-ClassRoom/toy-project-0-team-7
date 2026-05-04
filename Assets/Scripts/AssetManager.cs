@@ -24,9 +24,12 @@ public class AssetManager : MonoBehaviour
 
     private float weeklyTimer = 0f;
     private const float weekInterval = 140f;
+    private float dailyTimer = 0f;
+    private const float dayInterval = 20f;
 
     public bool isWeekend = false;
 
+    public static int dayCount = 1;
     private int weekCount = 1;
     private int displayWeek = 2;
 
@@ -44,6 +47,12 @@ public class AssetManager : MonoBehaviour
     {
         if (Time.timeScale != 0)
         {
+            if (dailyTimer > dayInterval)   // 1일 지나면
+            {
+                dayCount++;
+                dailyTimer = 0f;
+            }
+
             if (weeklyTimer > weekInterval) // 1주일 지나면
             {
                 rewardRemain++;
@@ -55,6 +64,7 @@ public class AssetManager : MonoBehaviour
             }
 
             weeklyTimer += Time.deltaTime;
+            dailyTimer += Time.deltaTime;
         }
     }
 
