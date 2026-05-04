@@ -1833,7 +1833,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 716479ff21709a64fa96b49aaae95660, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PassengerManager
-  spawnInterval: 3
   allStations: []
 --- !u!1001 &1451237481728470673
 PrefabInstance:
