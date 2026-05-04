@@ -37,7 +37,7 @@ public class StationManager : MonoBehaviour
     {
         InitialRandomSpawn(initialCount);
         timer = initialSpawnTime;
-        Debug.Log($"[시작] 초기 스폰 완료 | 다음 스폰 시간 타이머: {timer:F2}");
+        //Debug.Log($"[시작] 초기 스폰 완료 | 다음 스폰 시간 타이머: {timer:F2}");
         spawnedCount++;    
     }
 
@@ -47,11 +47,11 @@ public class StationManager : MonoBehaviour
 
         if (timer <= 0f)
         {
-            Debug.Log("[시간 초과] 역 생성됨");
+            //Debug.Log("[시간 초과] 역 생성됨");
             RandomSpawn();
             timer = GetNextInterval();
             spawnedCount++;
-            Debug.Log($"[스폰] {spawnedCount}번째 스폰 | 다음 스폰 시간 타이머: {timer:F2}");
+            //Debug.Log($"[스폰] {spawnedCount}번째 스폰 | 다음 스폰 시간 타이머: {timer:F2}");
         }
     }
 
