@@ -90,6 +90,11 @@ public class LineManager : MonoBehaviour
             line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints));
         }
 
+        foreach (var station in line_onMouse.stations)
+        {
+            station.lines.Add(line_onMouse); // 역에 노선 참조 추가
+        }
+
         AddLine(line_onMouse);
         line_onMouse = null;
         lr = null;
@@ -119,10 +124,10 @@ public class LineManager : MonoBehaviour
 
         // 있던 역 제외
         if (isStart && station == line_onMouse.stations[0] && line_onMouse.stations.Count > 1)
-            line_onMouse.stations.RemoveAt(0);
+            line_onMouse.RemoveStation(0);
         else if (!isStart && station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
-            line_onMouse.stations.RemoveAt(line_onMouse.stations.Count - 1);
-        
+            line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
+
         // 없던 역 추가
         else if (isStart && !line_onMouse.stations.Contains(station))   // 시작 핸들
             line_onMouse.InsertStation(station, 0);
@@ -145,8 +150,17 @@ public class LineManager : MonoBehaviour
             line_onMouse.UpdateHandles();
         }
 
+        // 기존 연결 전부 제거
+        foreach (var station in line_onMouse.stations)
+            station.lines.Remove(line_onMouse);
+
+        // 현재 stations 기준으로 다시 연결
+        foreach (var station in line_onMouse.stations)
+            station.lines.Add(line_onMouse);
+
         foreach (var train in trainManager.activeTrains)
         {
+            if (train.lineId == line_onMouse.lineId)
             if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
@@ -181,8 +195,7 @@ public class LineManager : MonoBehaviour
             int index = line_onMouse.stations.IndexOf(station);
             bool isEndStation = (index == 0 || index == line_onMouse.stations.Count - 1);
 
-            line_onMouse.stations.RemoveAt(index);
-            line_onMouse.UpdateWaypoints();
+            line_onMouse.RemoveStation(index);
 
             if (index <= segmentIndex) segmentIndex--;
             segmentIndex = Mathf.Clamp(segmentIndex, 0, line_onMouse.stations.Count - 2);
@@ -214,11 +227,20 @@ public class LineManager : MonoBehaviour
             line_onMouse.UpdateHandles();
         }
 
+        // 기존 연결 전부 제거
+        foreach (var station in line_onMouse.stations)
+            station.lines.Remove(line_onMouse);
+
+        // 현재 stations 기준으로 다시 연결
+        foreach (var station in line_onMouse.stations)
+            station.lines.Add(line_onMouse);
+
         foreach (var train in trainManager.activeTrains)
         {
             if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
-        }
+        } 
+
         line_onMouse = null;
         stationUnderMouse = null;
         lr = null;
@@ -248,10 +270,12 @@ public class LineManager : MonoBehaviour
     {
         if (lines[index] == null) return;   // 방어 코드
 
-        foreach(var train in lines[index].trains)
-        {
+        foreach (var station in lines[index].stations)
+            station.lines.Remove(lines[index]);
+
+        foreach (var train in lines[index].trains)
             trainManager.RemoveTrain(train);
-        }
+        
 
         Destroy(lines[index].gameObject);       
         lines[index] = null;
