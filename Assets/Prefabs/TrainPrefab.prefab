@@ -266,6 +266,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Train
       objectReference: {fileID: 0}
+    - target: {fileID: 6892629033733031979, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6

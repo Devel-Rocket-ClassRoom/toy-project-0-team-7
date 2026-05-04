@@ -217,7 +217,7 @@ public class Train : MonoBehaviour
             {
                 //[수정 예정] station에서 remove 메서드 생성 후 여기서 호출하는 쪽으로
                 station.RemovePassenger(p);
-                if (p.gameObject != null) Destroy(p.gameObject);
+                //if (p.gameObject != null) Destroy(p.gameObject);
 
                 //열차 승객 리스트 추가
                 p.State = PassengerState.OnTrain;
@@ -248,7 +248,7 @@ public class Train : MonoBehaviour
                 passengers.RemoveAt(i);
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
             }
-
+            //환승하는경우
             else if (NeedsTransfer(p, station))
             {
                 p.State = PassengerState.Waiting;
@@ -267,7 +267,7 @@ public class Train : MonoBehaviour
             Debug.Log($"역: {s.name}, 모양: {s.Shape}");
 
         var dir = direction == TrainDirection.Forward ? 1 : -1;
-        return BFS(p.destination, targetStationIndex, dir);
+        return BFS(p.destination, targetStationIndex + dir, dir);
     }
 
     public bool NeedsTransfer(Passenger p, Station station)
