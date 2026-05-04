@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class MouseInput : MonoBehaviour
 {
+    public GameManager gm;
+    
     public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain }
     public Mode mode;
 
@@ -36,7 +38,7 @@ public class MouseInput : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))    // 클릭
         {
-            if (assetManager.isWeekend || cameraDirector.isGameOver) return;
+            if (assetManager.isWeekend || gm.isGameOver) return;
 
             if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
             {
@@ -80,7 +82,7 @@ public class MouseInput : MonoBehaviour
         {
             if (Input.GetMouseButton(0))    // 드래그
             {
-                if (cameraDirector.isGameOver)
+                if (gm.isGameOver)
                 {
                     StopDragging();
                     return;
