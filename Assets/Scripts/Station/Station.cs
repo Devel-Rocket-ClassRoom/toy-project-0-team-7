@@ -84,7 +84,7 @@ public class Station : MonoBehaviour
 
     public void AddPasssenger(StationType destination)
     {
-        if (waitingPassengers.Count > capacity)
+        if (waitingPassengers.Count >= capacity)
         {
             return;
         }
@@ -99,7 +99,7 @@ public class Station : MonoBehaviour
 
         waitingPassengers.Add(passenger);
 
-        if (waitingPassengers.Count > capacity && !isOverflow)
+        if (waitingPassengers.Count >= capacity && !isOverflow)
         {
             isOverflow = true;
             currentTimer = overflowTimer;
@@ -113,6 +113,11 @@ public class Station : MonoBehaviour
     public void RemovePassenger(Passenger passenger)
     {
         waitingPassengers.Remove(passenger);
+
+        for (int i = 0; i < waitingPassengers.Count; i++)
+        {
+            waitingPassengers[i].transform.localPosition = new Vector3(i * 2.5f, 1f, 0f);
+        }
 
         if (waitingPassengers.Count <= capacity && isOverflow)
         {
