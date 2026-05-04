@@ -47,6 +47,6 @@ public class GameManager : MonoBehaviour
 
     public void UpdateUIText()
     {
-        dayUIText.text = $"{days[AssetManager.dayCount -1%7]}\n{Score.score}";
+        dayUIText.text = $"{days[(AssetManager.dayCount -1) % 7]}\n{Score.score}";
     }
 }

@@ -24,16 +24,14 @@ public class AssetManager : MonoBehaviour
     public Button newAssetButton1;
     public Button newAssetButton2;
 
-    private float weeklyTimer = 0f;
-    private const float weekInterval = 140f;
     private float dailyTimer = 0f;
     private const float dayInterval = 20f;
 
     public bool isWeekend = false;
 
     public static int dayCount = 1;
-    private int weekCount = 1;
-    private int displayWeek = 2;
+    private int weekCount = 0;
+    private int displayWeek = 1;
 
     private int rewardRemain = 0;
 
@@ -51,22 +49,22 @@ public class AssetManager : MonoBehaviour
         {
             if (dailyTimer > dayInterval)   // 1일 지나면
             {
+                if (dayCount % 7 == 0)
+                {
+                    weekCount++;
+                    rewardRemain++;
+
+                    if (inputManager.mode == MouseInput.Mode.None)
+                    {
+                        ShowNextReward();
+                    }
+                }
+
                 dayCount++;
                 gm.UpdateUIText();
                 dailyTimer = 0f;
             }
 
-            if (weeklyTimer > weekInterval) // 1주일 지나면
-            {
-                rewardRemain++;
-                weekCount++;
-                weeklyTimer = 0f;
-
-                if (inputManager.mode == MouseInput.Mode.None)
-                    ShowNextReward();
-            }
-
-            weeklyTimer += Time.deltaTime;
             dailyTimer += Time.deltaTime;
         }
     }
