@@ -86,7 +86,7 @@ public class LineManager : MonoBehaviour
 
         if (trainManager.activeTrains.Count < trainManager.availableTrainCount)
         {
-            trainManager.testStations = line_onMouse.stations;            
+            trainManager.Stations = line_onMouse.stations;            
             line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints));
         }
 
@@ -160,7 +160,6 @@ public class LineManager : MonoBehaviour
 
         foreach (var train in trainManager.activeTrains)
         {
-            if (train.lineId == line_onMouse.lineId)
             if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }

@@ -10,23 +10,27 @@ public enum TrainDirection
 }
 public class Train : MonoBehaviour
 {
-    private List<Station> path;
-    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
+
+    public int lineId;
+    public int capacity = 6;
     public int targetStationIndex = 0;
-    private int waypointTargetIndex  = 0;
-    public TrainDirection direction = TrainDirection.Forward;
+    public float rotationSpeed = 180f;
+    public Vector3 startPos; //출발 위치 기록용
+    private int waypointTargetIndex = 0;
+    private bool isStopping = false;
+    private bool departedFromStop = false; // 정차 후 출발했는지 여부
+
     public List<Passenger> passengers = new List<Passenger>();
     public Transform[] passengerSlots;
     public GameObject passengerIconPrefab;
-    public Sprite[] passengerIconSprites; 
-    public int capacity = 6;
+    public Sprite[] passengerIconSprites;
     private List<GameObject> passengerIcons = new List<GameObject>();
-    private bool isStopping = false;
-    private bool departedFromStop = false; // 정차 후 출발했는지 여부
-    private Vector3 lastDirection = Vector3.right;
-    public float rotationSpeed = 180f;
 
-    public int lineId;
+    private List<Station> path;
+    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
+    public TrainDirection direction = TrainDirection.Forward;
+    private Vector3 lastDirection = Vector3.right;
+
 
     [Header("Movement Settings")]
     public float maxSpeed = 2.5f;
@@ -34,19 +38,18 @@ public class Train : MonoBehaviour
     public float accelerationDist = 1.7f; // 가속 구간 거리
     public float decelerationDist = 1.7f; // 감속 구간 거리
 
-    public Vector3 startPos; //출발 위치 기록용
 
     //열차 승객 시각화. 초기 6개 슬릇 생성후 Active로 관리
     public void Init()
     {
-        for(int i = 0; i < capacity; i++)
+        for (int i = 0; i < capacity; i++)
         {
             GameObject icon = Instantiate(passengerIconPrefab, passengerSlots[i]);
             icon.SetActive(false);
             passengerIcons.Add(icon);
         }
     }
-    
+
     private void RefreshPassengerIcons()
     {
         for (int i = 0; i < capacity; i++)
@@ -63,20 +66,36 @@ public class Train : MonoBehaviour
         }
     }
     //열차 경로 설정 및 열차 생성위치 초기화
-    public void SetPath(List<Station> stations, List<Vector3> waypoints)
+    public void SetPath(List<Station> stations, List<Vector3> waypoints, bool isInit = false)
     {
+        var prevWaypoints = routeWaypoints;
         path = stations;
         routeWaypoints = new List<Vector3>(waypoints);
-
-        transform.position = routeWaypoints[0];
-        waypointTargetIndex = 1;
-        targetStationIndex = 0;
-
-        if (routeWaypoints.Count > 1)
+        if (isInit)
         {
-            lastDirection = (routeWaypoints[1] - routeWaypoints[0]).normalized;
-            float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            transform.position = routeWaypoints[0];
+            waypointTargetIndex = 1;
+            targetStationIndex = 0;
+
+            if (routeWaypoints.Count > 1)
+            {
+                lastDirection = (routeWaypoints[1] - routeWaypoints[0]).normalized;
+                float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+        }
+        else
+        {
+            var currentTargetWayPoint = prevWaypoints[waypointTargetIndex];
+
+            for (int i = 0; i < routeWaypoints.Count; ++i)
+            {
+                if (currentTargetWayPoint == routeWaypoints[i])
+                {
+                    waypointTargetIndex = i;
+                    break;
+                }
+            }
         }
     }
 
@@ -115,7 +134,7 @@ public class Train : MonoBehaviour
         Vector3 dir = (targetPos - transform.position).normalized;
         if (dir != Vector3.zero)
             lastDirection = dir;
-    
+
         float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
 
@@ -299,6 +318,7 @@ public class Train : MonoBehaviour
 
             foreach (var line in current.lines) // 이곳을 지나는 모든 노선
             {
+                if (line.lineId == lineId) continue;
                 foreach (var station in line.stations)  // 노선에 속하는 모든 역
                 {
                     if (!visitedStations.Contains(station))

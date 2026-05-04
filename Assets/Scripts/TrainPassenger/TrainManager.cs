@@ -8,7 +8,7 @@ public class TrainManager : MonoBehaviour
     public int availableTrainCount = 3;
     
     public GameObject trainPrefab;
-    public List<Station> testStations = new();
+    public List<Station> Stations = new();
 
     private void Update()
     {
@@ -20,12 +20,10 @@ public class TrainManager : MonoBehaviour
     }
     public Train SpawnTrain(int lineId, List<Vector3> waypoints)
     {
-        //[수정 예정] 실제 게임에선 0번 역이 아니라 사용자가 클릭한 노선의 시작점에 스폰
-        GameObject trainObject = Instantiate(trainPrefab, testStations[0].transform.position, Quaternion.identity);
+        GameObject trainObject = Instantiate(trainPrefab, Stations[0].transform.position, Quaternion.identity);
         Train train = trainObject.GetComponent<Train>();
 
-        //[수정 예정] 실제 데이터로 변경
-        train.SetPath(testStations, waypoints);
+        train.SetPath(Stations, waypoints, true);
         train.lineId = lineId;
         train.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[lineId];
         activeTrains.Add(train);
