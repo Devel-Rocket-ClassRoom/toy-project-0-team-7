@@ -8,18 +8,18 @@ public class StationManager : MonoBehaviour
     public Station[] prefabs;
 
     [Header("스폰 시간 조정")] // To Do: 추후 실제 게임에 맞게 느리게 조정해야함
-    [SerializeField] private float minRandomTime = 5f;
-    [SerializeField] private float maxRandomTime = 15f;
-    [SerializeField] private float maxScaleTime = 300f; // 스폰 시간이 빨라질 게임 시간 기준 (5분)
-    [SerializeField] private float minIntervalAtPeak = 2f; // 5분 지났을 때 최소 스폰 간격
-    [SerializeField] private float maxIntervalAtPeak = 5f; // 5분 지났을 때 최대 스폰 간격
+    [SerializeField] private float minRandomTime = 20f;
+    [SerializeField] private float maxRandomTime = 30f;
+    
     [Header("역 오른쪽 공간 offset")]
     private float rightOffset = 2.2f;
     private float minRadius;
     private float timer = 0f;
-    private float gameTime = 0f;
+    //private float gameTime = 0f;
     private float offset = 0.5f;
-    private int initialCount = 3;
+    private int initialCount = 3; // 처음 시작할 때 생성할 역의 수 (각각 다른 모양으로 3개) 
+    private int spawnedCount = 0;   // 처음 역이 세 개 생성된 후, 랜덤 스폰되는 횟수
+    private float initialSpawnTime = 15f;
     private List<Station> exisitingStations;
     public List<Station> ExisitingStations => exisitingStations;
     public PassengerManager pm;
@@ -36,28 +36,35 @@ public class StationManager : MonoBehaviour
     private void Start()
     {
         InitialRandomSpawn(initialCount);
-        timer = Random.Range(minRandomTime, maxRandomTime);
+        timer = initialSpawnTime;
+        Debug.Log($"[시작] 초기 스폰 완료 | 다음 스폰 시간 타이머: {timer:F2}");
+        spawnedCount++;    
     }
 
     private void Update()
     {
-        gameTime += Time.deltaTime;
-        
-        // 게임 초반에는 더 빨리 생성되도록 함 (존재하는 역이 3개 미만일 때만)
-        float t = Mathf.Clamp01(exisitingStations.Count / (float)initialCount);
-        float speedOffset = Mathf.Lerp(10f, 1f, t);
-
-        timer -= Time.deltaTime * speedOffset;
+        timer -= Time.deltaTime;
 
         if (timer <= 0f)
         {
-            //Debug.Log("[시간 초과] 역 생성됨");
+            Debug.Log("[시간 초과] 역 생성됨");
             RandomSpawn();
-            float difficultyT = Mathf.Clamp01(gameTime / maxScaleTime);
-            float scaleMin = Mathf.Lerp(minRandomTime, minIntervalAtPeak, difficultyT);
-            float scaleMax = Mathf.Lerp(maxRandomTime, maxIntervalAtPeak, difficultyT);
-            timer = Random.Range(scaleMin, scaleMax);
-            //Debug.Log($"[스폰] gameTime = {gameTime:F1}s | diffucultyT = {difficultyT:F2} | 다음 간격 = {timer:F2}");
+            timer = GetNextInterval();
+            spawnedCount++;
+            Debug.Log($"[스폰] {spawnedCount}번째 스폰 | 다음 스폰 시간 타이머: {timer:F2}");
+        }
+    }
+
+    private float GetNextInterval()
+    {
+        if (spawnedCount < 4)
+        {
+            return 27f;
+        }
+
+        else
+        {
+            return Random.Range(minRandomTime, maxRandomTime);  
         }
     }
 
