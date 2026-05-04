@@ -161,6 +161,7 @@ public class LineManager : MonoBehaviour
         foreach (var train in trainManager.activeTrains)
         {
             if (train.lineId == line_onMouse.lineId)
+            if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
         line_onMouse = null;
