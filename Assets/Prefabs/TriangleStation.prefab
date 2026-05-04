@@ -114,8 +114,11 @@ MonoBehaviour:
   - {fileID: -1290821818456711322, guid: e805a42cdc198aa4491fef2a3420af8e, type: 3}
   waitingArea: {fileID: 9008300916516942601}
   timerUI: {fileID: 1669241095385505682}
+  pm: {fileID: 0}
   capacity: 6
   overflowTimer: 10
+  minSpawnTime: 5
+  maxSpawnTime: 15
   waitingPassengers: []
   lines: []
 --- !u!58 &6791702972160247093
