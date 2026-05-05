@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.VisualScripting;
 
 // --- Station 데이터 클래스 ---
 public class Station : MonoBehaviour
@@ -12,6 +13,7 @@ public class Station : MonoBehaviour
     public Passenger[] passengerPrefabs;
     public Transform waitingArea;
     public StationTimerUI timerUI;
+    public bool isInterchange = false;
     private PassengerManager pm; 
     
     [Header("역 수용인원 및 초과 타이머 설정")] 
@@ -57,6 +59,17 @@ public class Station : MonoBehaviour
         }
     }
 
+    public void SetAsInterchange()
+    {
+        if (isInterchange) return;
+        isInterchange = true;
+        capacity = 10;
+        float scale = 1.5f;
+        transform.localScale *= scale;
+        waitingArea.localScale /= scale;
+        Debug.Log($"[교차역 지정] 수용인원 변경: {capacity}");
+    }
+
     public void StartSpawningPassengers(PassengerManager pm)
     {
         StartCoroutine(CoSpawnPassengers(pm));
@@ -81,6 +94,19 @@ public class Station : MonoBehaviour
         }
     }
 
+    private Vector3 GetPassengerLocalPos(int index)
+    {
+        if (isInterchange)
+        {
+            int col = index % 5;
+            int row = index / 5;
+
+            return new Vector3(col * 2.5f, 1f + row * 2f, 0f);
+        }
+
+        return new Vector3(index * 2.5f, 1f, 0f);
+    }
+
 
     public Passenger AddPasssenger(StationType destination)
     {
@@ -95,7 +121,8 @@ public class Station : MonoBehaviour
         passenger.Init(destination);
 
         int index = waitingPassengers.Count;
-        passenger.transform.localPosition = new Vector3(index * 2.5f, 1f, 0f);
+        //passenger.transform.localPosition = new Vector3(index * 2.5f, 1f, 0f);
+        passenger.transform.localPosition = GetPassengerLocalPos(index);
 
         waitingPassengers.Add(passenger);
 
@@ -117,7 +144,8 @@ public class Station : MonoBehaviour
 
         for (int i = 0; i < waitingPassengers.Count; i++)
         {
-            waitingPassengers[i].transform.localPosition = new Vector3(i * 2.5f, 1f, 0f);
+            //waitingPassengers[i].transform.localPosition = new Vector3(i * 2.5f, 1f, 0f);
+            waitingPassengers[i].transform.localPosition = GetPassengerLocalPos(i);
         }
 
         if (waitingPassengers.Count <= capacity && isOverflow)
