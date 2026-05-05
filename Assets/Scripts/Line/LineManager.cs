@@ -1,12 +1,14 @@
 using System.Collections.Generic;
-using UnityEngine.UI;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LineManager : MonoBehaviour
 {
     public Line linePrefab;
     private Line line_onMouse;
     public bool IsValidLine => line_onMouse.stations.Count > 1;
+    public bool IsCircular => line_onMouse.isCircular;
 
     private LineRenderer lr;
 
@@ -24,7 +26,9 @@ public class LineManager : MonoBehaviour
 
     public bool isStartHandle;
 
+    // 자산
     public TrainManager trainManager;
+    public StationManager stationManager;
 
     private void Awake()
     {
@@ -69,6 +73,37 @@ public class LineManager : MonoBehaviour
         lr.SetPosition(0, pos);
     }
 
+    public bool ToggleStationInNewLine(Station station)
+    {
+        if (station == stationUnderMouse) return false;
+        stationUnderMouse = station;
+
+        // 있던 역 제외
+        if (station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
+            line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
+
+        // 역 추가
+        else if (!line_onMouse.isCircular)  // 순환 노선이 아닐 때
+        {
+            if (station == line_onMouse.stations[0])
+            {
+                line_onMouse.isCircular = true; // 순환 노선 설정
+                line_onMouse.UpdateWaypoints();
+                line_onMouse.UpdateHandles();
+                return true;
+            }
+
+            else if (!line_onMouse.stations.Contains(station))
+            {
+                line_onMouse.AddStation(station);   // 포함되지 않은 역은 추가
+            }
+        }
+
+        line_onMouse.UpdateWaypoints();
+        line_onMouse.UpdateHandles();
+        return false;
+    }
+
     public void FixNewLine()   // 선 확정
     {
         int lineId = -1;
@@ -94,6 +129,9 @@ public class LineManager : MonoBehaviour
             station.lines.Add(line_onMouse); // 역에 노선 참조 추가
         }
 
+        if (line_onMouse.isCircular)
+            HideHandle(true);
+
         AddLine(line_onMouse);
         line_onMouse = null;
         lr = null;
@@ -111,6 +149,13 @@ public class LineManager : MonoBehaviour
     {
         line_onMouse = handleHit.collider.GetComponent<Handle>().line;
         lr = line_onMouse.GetComponent<LineRenderer>();
+
+        if (line_onMouse.isCircular)
+        {
+            line_onMouse.isCircular = false;
+            line_onMouse.UpdateWaypoints();
+            line_onMouse.handleStart.gameObject.SetActive(true);
+        }
 
         touchingHandle = handleHit.collider.gameObject;
         touchingHandle.SetActive(false);
@@ -246,14 +291,6 @@ public class LineManager : MonoBehaviour
 
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-    public void AddStationInMakingLine(Station station)
-    {
-        if (!line_onMouse.stations.Contains(station))
-        {
-            line_onMouse.AddStation(station);
-        }
-    }
-
     public void AddLine(Line line)
     {
         lines[line.lineId] = line;
@@ -301,6 +338,12 @@ public class LineManager : MonoBehaviour
         touchingHandle.SetActive(false);
     }
 
+    public void RevealHandle(bool isStart)
+    {
+        var handle = isStart ? line_onMouse.handleStart.gameObject : line_onMouse.handleEnd.gameObject;
+        handle.SetActive(true);
+    }
+
     public void UpdateStartPreviewPoint(Vector3 previewPoint)
     {
         previewPoint.z = 0f;
@@ -334,8 +377,17 @@ public class LineManager : MonoBehaviour
     {
         previewPoint.z = 0f;
 
-        var from = line_onMouse.stations[segmentIndex].transform.position;
-        var to = line_onMouse.stations[segmentIndex + 1].transform.position;
+        Vector3 from, to;
+        if (line_onMouse.isCircular && segmentIndex >= line_onMouse.stations.Count -1)
+        {
+            from = line_onMouse.stations[segmentIndex].transform.position;
+            to = line_onMouse.stations[0].transform.position;
+        }
+        else
+        {
+            from = line_onMouse.stations[segmentIndex].transform.position;
+            to = line_onMouse.stations[segmentIndex + 1].transform.position;
+        }
 
         Vector3 bend1 = line_onMouse.GetBendPoint(from, previewPoint);
         Vector3 bend2 = line_onMouse.GetBendPoint(previewPoint, to);
@@ -343,27 +395,40 @@ public class LineManager : MonoBehaviour
         bend2.z = 0f;
 
         var tempWaypoints = new List<Vector3>();
-        for (int i = 0; i < line_onMouse.stations.Count; i++)
-        {
-            if (i > 0)
-            {
-                if (i == segmentIndex + 1)  // 추가 변곡점(3점)이 필요한 구간
-                {
-                    tempWaypoints.Add(bend1);
-                    tempWaypoints.Add(previewPoint);
-                    tempWaypoints.Add(bend2);
-                }
+        int stationCount = line_onMouse.stations.Count;
 
-                else    // 일반 waypoints 구할 때처럼
-                {
-                    var a = line_onMouse.stations[i - 1].transform.position;
-                    var b = line_onMouse.stations[i].transform.position;
-                    tempWaypoints.Add(line_onMouse.GetBendPoint(a, b));
-                }
-            }
+        for (int i = 0; i < stationCount; i++)
+        {
+            int nextIndex = (i + 1) % stationCount;
+            bool isLastSegment = line_onMouse.isCircular && i == stationCount - 1;
+            bool isLastNonCircular = !line_onMouse.isCircular && i == stationCount - 1;
 
             // 승강장 위치 추가
             var pos = line_onMouse.stations[i].transform.position;
+            pos.z = 0f;
+            tempWaypoints.Add(pos);
+
+            if (isLastNonCircular) break; // 순환 노선이 아니면 마지막 역 추가 후 종료
+
+            var nextPos = line_onMouse.stations[nextIndex].transform.position;
+
+            if (i == segmentIndex) // 당기는 구간
+            {
+                tempWaypoints.Add(bend1);
+                tempWaypoints.Add(previewPoint);
+                tempWaypoints.Add(bend2);
+            }
+            else
+            {
+                var bendPoint = line_onMouse.GetBendPoint(pos, nextPos);
+                bendPoint.z = 0f;
+                tempWaypoints.Add(bendPoint);
+            }
+        }
+
+        if (line_onMouse.isCircular)    // 순환 노선이면 첫번째 역 추가
+        {
+            var pos = line_onMouse.stations[0].transform.position;
             pos.z = 0f;
             tempWaypoints.Add(pos);
         }

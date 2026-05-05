@@ -58,12 +58,7 @@ public class MouseInput : MonoBehaviour
                 pos.z = 0f;
 
                 lineManager.StartExtendLine(handleHit, pos);
-
-                if (handleHit.collider.GetComponent<Handle>().isStartHandle)
-                    isStartHandle = true;
-
-                else
-                    isStartHandle = false;
+                isStartHandle = handleHit.collider.GetComponent<Handle>().isStartHandle;
 
                 return;
             }
@@ -99,7 +94,11 @@ public class MouseInput : MonoBehaviour
                         if (stationHit.collider != null)
                         {
                             var station = stationHit.collider.GetComponent<Station>();
-                            lineManager.AddStationInMakingLine(station);
+                            var isCircular = lineManager.ToggleStationInNewLine(station);
+                            if (isCircular)
+                            {
+                                StopDragging();
+                            }
                         }
                         break;
 
@@ -118,7 +117,7 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.EditLine:
-                        lineManager.UpdateEditPreviewPoint(previewPoint); 
+                        lineManager.UpdateEditPreviewPoint(previewPoint);
                         if (stationHit.collider != null)
                         {
                             bool goExtend = lineManager.ToggleStationInEditLine(stationHit.collider.GetComponent<Station>());
@@ -164,8 +163,10 @@ public class MouseInput : MonoBehaviour
         switch (mode)
         {
             case Mode.NewLine:
-                if (lineManager.IsValidLine) lineManager.FixNewLine();
-                else lineManager.CancelNewLine();
+                if (lineManager.IsValidLine)
+                    lineManager.FixNewLine();                
+                else 
+                    lineManager.CancelNewLine();
                 break;
 
             case Mode.ExtendLine:
