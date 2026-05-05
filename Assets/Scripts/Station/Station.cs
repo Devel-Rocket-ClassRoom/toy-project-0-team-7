@@ -82,11 +82,11 @@ public class Station : MonoBehaviour
     }
 
 
-    public void AddPasssenger(StationType destination)
+    public Passenger AddPasssenger(StationType destination)
     {
         if (waitingPassengers.Count >= capacity)
         {
-            return;
+            return null;
         }
 
         Passenger prefab = passengerPrefabs[(int)destination];
@@ -105,8 +105,9 @@ public class Station : MonoBehaviour
             currentTimer = overflowTimer;
 
             if (timerUI != null) timerUI.gameObject.SetActive(true);
-
         }
+
+        return passenger;
     }
 
     // --- 승객이 열차를 타서 역에서 없애야할 때 호출할 메서드 ---
