@@ -161,9 +161,9 @@ public class LineManager : MonoBehaviour
         touchingHandle.SetActive(false);
     }
 
-    public void ToggleStationInExtendLine(Station station, bool isStart)
+    public bool ToggleStationInExtendLine(Station station, bool isStart)
     {
-        if (station == stationUnderMouse) return;
+        if (station == stationUnderMouse) return false;
         stationUnderMouse = station;
 
         // 있던 역 제외
@@ -175,11 +175,28 @@ public class LineManager : MonoBehaviour
         // 없던 역 추가
         else if (isStart && !line_onMouse.stations.Contains(station))   // 시작 핸들
             line_onMouse.InsertStation(station, 0);
-        else if (!isStart && !line_onMouse.stations.Contains(station))   // 끝 핸들
-            line_onMouse.AddStation(station);
+        else if (!isStart)   // 끝 핸들
+        {
+            if (!line_onMouse.isCircular)
+            {
+                if (station == line_onMouse.stations[0])
+                {
+                    line_onMouse.isCircular = true; // 순환 노선 설정
+                    line_onMouse.UpdateWaypoints();
+                    line_onMouse.UpdateHandles();
+                    return true;
+                }
+
+                else if (!line_onMouse.stations.Contains(station))
+                {
+                    line_onMouse.AddStation(station);   // 포함되지 않은 역은 추가
+                }
+            }
+        }
 
         line_onMouse.UpdateWaypoints();
         line_onMouse.UpdateHandles();
+        return false;
     }
 
     public void FinishExtendLine()

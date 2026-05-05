@@ -91,18 +91,19 @@ public class Line : MonoBehaviour
 
         Vector3 dirEnd;
         if (isCircular)
-        {
+        {            
             dirEnd = (waypoints[0] - waypoints[^1]).normalized;
             handleEnd.transform.position = stations[0].transform.position;
+            handleEnd.SetHandleDirection(dirEnd);
+            handleEnd.SetColor(color);
         }
         else
         {
             dirEnd = (waypoints[^1] - waypoints[^2]).normalized;
             handleEnd.transform.position = stations[^1].transform.position;
+            handleEnd.SetHandleDirection(dirEnd);
+            handleEnd.SetColor(color);
         }
-
-        handleEnd.SetHandleDirection(dirEnd);
-        handleEnd.SetColor(color);
     }
 
     public void UpdateWaypoints()

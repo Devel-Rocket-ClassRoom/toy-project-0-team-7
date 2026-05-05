@@ -108,7 +108,11 @@ public class MouseInput : MonoBehaviour
                         if (stationHit.collider != null)
                         {
                             var station = stationHit.collider.GetComponent<Station>();
-                            lineManager.ToggleStationInExtendLine(station, isStartHandle);
+                            var isCircular = lineManager.ToggleStationInExtendLine(station, isStartHandle);
+                            if (isCircular)
+                            {
+                                StopDragging();
+                            }
                         }
                         else
                         {
