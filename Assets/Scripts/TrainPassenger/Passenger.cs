@@ -4,6 +4,11 @@ public class Passenger : MonoBehaviour
 {
     //가고싶은 역
     public StationType destination { get; private set; }
+
+    public Station transferStation;
+
+    public int blockedLineId = -1;
+
     //승객 상태
     private PassengerState state;
     public PassengerState State
@@ -12,15 +17,13 @@ public class Passenger : MonoBehaviour
         set
         {
             state = value;
-            Debug.Log($"Passenger state changed to: {state}");
+            //Debug.Log($"Passenger state changed to: {state}");
         }
     }
   
     public void Init(StationType dest)
     {
-        this.destination = dest;
-        this.state = PassengerState.Waiting;
+        destination = dest;
+        state = PassengerState.Waiting;
     }
-
 }
-
