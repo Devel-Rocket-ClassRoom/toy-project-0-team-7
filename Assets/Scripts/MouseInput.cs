@@ -97,6 +97,7 @@ public class MouseInput : MonoBehaviour
                             var isCircular = lineManager.ToggleStationInNewLine(station);
                             if (isCircular)
                             {
+                                isStartHandle = false;
                                 StopDragging();
                             }
                         }
@@ -111,6 +112,7 @@ public class MouseInput : MonoBehaviour
                             var isCircular = lineManager.ToggleStationInExtendLine(station, isStartHandle);
                             if (isCircular)
                             {
+                                isStartHandle = lineManager.isStartHandle;
                                 StopDragging();
                             }
                         }

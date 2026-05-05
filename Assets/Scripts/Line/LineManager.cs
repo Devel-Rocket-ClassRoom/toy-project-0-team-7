@@ -83,13 +83,14 @@ public class LineManager : MonoBehaviour
             line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
 
         // 역 추가
-        else if (!line_onMouse.isCircular)  // 순환 노선이 아닐 때
+        else
         {
             if (station == line_onMouse.stations[0])
             {
                 line_onMouse.isCircular = true; // 순환 노선 설정
                 line_onMouse.UpdateWaypoints();
                 line_onMouse.UpdateHandles();
+                isStartHandle = false;
                 return true;
             }
 
@@ -129,6 +130,8 @@ public class LineManager : MonoBehaviour
             station.lines.Add(line_onMouse); // 역에 노선 참조 추가
         }
 
+        RevealHandle();
+
         if (line_onMouse.isCircular)
             HideHandle(true);
 
@@ -155,6 +158,7 @@ public class LineManager : MonoBehaviour
             line_onMouse.isCircular = false;
             line_onMouse.UpdateWaypoints();
             line_onMouse.handleStart.gameObject.SetActive(true);
+            isStartHandle = false;
         }
 
         touchingHandle = handleHit.collider.gameObject;
@@ -173,9 +177,26 @@ public class LineManager : MonoBehaviour
             line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
 
         // 없던 역 추가
-        else if (isStart && !line_onMouse.stations.Contains(station))   // 시작 핸들
-            line_onMouse.InsertStation(station, 0);
-        else if (!isStart)   // 끝 핸들
+        else if (isStart)   // 시작 핸들
+        {
+            if (!line_onMouse.isCircular)
+            {
+                if (station == line_onMouse.stations[line_onMouse.stations.Count -1])
+                {
+                    line_onMouse.isCircular = true; // 순환 노선 설정
+                    line_onMouse.UpdateWaypoints();
+                    line_onMouse.UpdateHandles();
+                    return true;
+                }
+
+                else if (!line_onMouse.stations.Contains(station))
+                {
+                    line_onMouse.InsertStation(station, 0);   // 포함되지 않은 역은 추가
+                }
+            }
+        }
+
+        else   // 끝 핸들
         {
             if (!line_onMouse.isCircular)
             {
@@ -224,7 +245,6 @@ public class LineManager : MonoBehaviour
             if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
         }
-        line_onMouse = null;
 
         if (touchingHandle != null)
         {
@@ -232,6 +252,12 @@ public class LineManager : MonoBehaviour
             touchingHandle = null;
         }
 
+        RevealHandle();
+
+        if (line_onMouse.isCircular)
+            HideHandle(true);
+        
+        line_onMouse = null;
         stationUnderMouse = null;
         lr = null;
     }
@@ -359,6 +385,12 @@ public class LineManager : MonoBehaviour
     {
         var handle = isStart ? line_onMouse.handleStart.gameObject : line_onMouse.handleEnd.gameObject;
         handle.SetActive(true);
+    }
+
+    public void RevealHandle()
+    {
+        line_onMouse.handleStart.gameObject.SetActive(true);
+        line_onMouse.handleEnd.gameObject.SetActive(true);
     }
 
     public void UpdateStartPreviewPoint(Vector3 previewPoint)
