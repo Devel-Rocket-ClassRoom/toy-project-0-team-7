@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
     private float zoomVelocity;
     public Vector3 targetStation;
 
-    private bool IsGameOver => gm.isGameOver;
+    private bool IsGameOver => gm != null && gm.isGameOver;
 
     private void Awake()
     {

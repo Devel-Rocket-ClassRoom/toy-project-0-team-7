@@ -51,6 +51,9 @@ public class Train : MonoBehaviour
         for (int i = 0; i < capacity; i++)
         {
             GameObject icon = Instantiate(passengerIconPrefab, passengerSlots[i]);
+            Color baseColor = Colors.colors[lineId];
+            Color passengerColor = Color.Lerp(baseColor, Color.white, 0.8f);
+            icon.GetComponent<SpriteRenderer>().color = passengerColor;
             icon.SetActive(false);
             passengerIcons.Add(icon);
         }
