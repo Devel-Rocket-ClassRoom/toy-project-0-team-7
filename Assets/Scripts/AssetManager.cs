@@ -24,6 +24,8 @@ public class AssetManager : MonoBehaviour
     public Button newAssetButton1;
     public Button newAssetButton2;
 
+    public GameObject interchangeDragButton;
+    
     private float dailyTimer = 0f;
     private const float dayInterval = 20f;
 
@@ -129,6 +131,7 @@ public class AssetManager : MonoBehaviour
     public void OnClickNewAsset()
     {
         IncreaseLine(); // 테스트 가능한 자산이 하나뿐이라 일단 두 버튼 다 노선으로 통일함.
+        IncreaseInterchange(); // 교차역 추가
         InactivePanel();
         rewardRemain--;
         displayWeek++;
@@ -143,6 +146,12 @@ public class AssetManager : MonoBehaviour
             isWeekend = false;
             gameUIGroup.interactable = true;
         }
+    }
+
+    public void IncreaseInterchange()
+    {
+        // InterchangeDragButton 활성화
+        interchangeDragButton.SetActive(true);
     }
 
     public void OnInputReleased()

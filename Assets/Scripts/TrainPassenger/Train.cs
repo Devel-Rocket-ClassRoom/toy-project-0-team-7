@@ -240,7 +240,9 @@ public class Train : MonoBehaviour
             HandleBoarding(currentStation);
         }
 
-        yield return new WaitForSeconds(1.2f);
+        float stopTime = currentStation.isInterchange ? 0.6f : 1.2f;
+        Debug.Log($"[열차 정차 시간] 교차역: {currentStation.isInterchange} / 정차 시간: {stopTime}");
+        yield return new WaitForSeconds(stopTime);
 
         AdvanceWaypoint();
         departedFromStop = true;

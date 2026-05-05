@@ -4,13 +4,14 @@ public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
     
-    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain, InterchangeStation }
     public Mode mode;
 
     private Camera cam;
     public LineManager lineManager;
 
     private bool isStartHandle;
+    private Station interchangeTarget;
 
     public AssetManager assetManager;
     public CameraController cameraDirector;
@@ -139,6 +140,10 @@ public class MouseInput : MonoBehaviour
                     case Mode.MoveTrain:
                         Debug.Log("Mode.MoveTrain");
                         break;
+
+                    case Mode.InterchangeStation:
+                        interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
+                        break;
                 }
             }
 
@@ -178,9 +183,19 @@ public class MouseInput : MonoBehaviour
             case Mode.MoveTrain:
                 Debug.Log("Mode.MoveTrain End");
                 break;
+
+            case Mode.InterchangeStation:
+                interchangeTarget?.SetAsInterchange();
+                interchangeTarget = null;
+                break;
         }
 
         mode = Mode.None;
         assetManager.OnInputReleased();
+    }
+
+    public void ChangeToInterchangeStationMode()
+    {
+        mode = Mode.InterchangeStation;
     }
 }
