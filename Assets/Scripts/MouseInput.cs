@@ -4,7 +4,7 @@ public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
     
-    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain, InterchangeStation }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain, InterchangeStation, Carriage }
     public Mode mode;
 
     private Camera cam;
@@ -16,6 +16,7 @@ public class MouseInput : MonoBehaviour
     private Station interchangeTarget;
     private Line trainTarget;
 
+    private Line carriageTarget;
 
     void Start()
     {
@@ -150,6 +151,11 @@ public class MouseInput : MonoBehaviour
                     case Mode.InterchangeStation:
                         interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
                         break;
+                        
+                    case Mode.Carriage:
+                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        break;
+
                 }
             }
 
@@ -167,8 +173,11 @@ public class MouseInput : MonoBehaviour
                         
                         break;
                     case Mode.NewTrain:
-                        
                         trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        break;
+
+                    case Mode.Carriage:
+                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
                 
@@ -180,6 +189,16 @@ public class MouseInput : MonoBehaviour
     public void ChangeToNewTrainMode()
     {
         mode = Mode.NewTrain;
+    }
+
+    public void ChangeToCarriageMode()
+    {
+        mode = Mode.Carriage;
+    }
+
+    public void ChangeToInterchangeStationMode()
+    {
+        mode = Mode.InterchangeStation;
     }
 
     public void StopDragging()
@@ -226,14 +245,18 @@ public class MouseInput : MonoBehaviour
                 interchangeTarget?.SetAsInterchange();
                 interchangeTarget = null;
                 break;
+            case Mode.Carriage:
+                if (carriageTarget != null)
+                {
+                    // CarriageManager의 메서드 호출하여 객차 추가
+                    // 예시: carriageManager.AddCarriage(carriageTarget.lineId);
+                    Debug.Log($"[객차 배치] 객차가 배치되었습니다. 라인 ID: {carriageTarget.lineId}");
+                }
+                carriageTarget = null;
+                break;
         }
 
         mode = Mode.None;
         assetManager.OnInputReleased();
-    }
-
-    public void ChangeToInterchangeStationMode()
-    {
-        mode = Mode.InterchangeStation;
     }
 }

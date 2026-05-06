@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation }
+    public enum Assets { Line, InterChangeStation, Carriage }
 
     public GameManager gm;
 
@@ -30,10 +30,13 @@ public class AssetManager : MonoBehaviour
     public TextMeshProUGUI assetButtonText1;
     public TextMeshProUGUI assetButtonText2;
 
+// --- 드래그 버튼 및 UI 요소 ---   
     public GameObject interchangeDragButton;
     public GameObject trainDragButton;
+    public GameObject carriageDragButton;
     public Image interchangeAssetUI;
     public Image trainAssetUI;
+    public Image carriageAssetUI;
     
     private float dailyTimer = 0f;
     private const float dayInterval = 2f;
@@ -59,6 +62,7 @@ public class AssetManager : MonoBehaviour
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+        sprites.Add(Resources.Load<Sprite>("carriage"));
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
@@ -67,8 +71,10 @@ public class AssetManager : MonoBehaviour
         newAssetButton2.gameObject.SetActive(false);
 
         interchangeDragButton.SetActive(false);
-        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
+        carriageDragButton.SetActive(false);
         UpdateTrainUI();
+
+        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
     }
 
     private void Update()
@@ -158,6 +164,10 @@ public class AssetManager : MonoBehaviour
                 text.text = "교차역";
                 button.image.sprite = sprites[1];
                 break;
+            case Assets.Carriage:
+                text.text = "객차";
+                button.image.sprite = sprites[2];
+                break;
         }
     }
 
@@ -191,6 +201,9 @@ public class AssetManager : MonoBehaviour
                 break;
             case Assets.InterChangeStation:
                 IncreaseInterchange();
+                break;
+            case Assets.Carriage:
+                IncreaseCarriage();
                 break;
         }
 
@@ -232,7 +245,7 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseCarriage()
     {
-        Debug.Log("객차 수 증가"); // CarriageManager.-----
+        
     }
 
     public void IncreaseInterchange()
