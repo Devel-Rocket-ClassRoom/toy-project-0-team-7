@@ -92,8 +92,8 @@ public class Line : MonoBehaviour
         Vector3 dirEnd;
         if (isCircular)
         {
-            dirEnd = (waypoints[0] - waypoints[^1]).normalized;
-            handleEnd.transform.position = stations[0].transform.position;
+            dirEnd = (waypoints[0] - waypoints[^2]).normalized;
+            handleEnd.transform.position = handleStart.transform.position;
         }
         else
         {
