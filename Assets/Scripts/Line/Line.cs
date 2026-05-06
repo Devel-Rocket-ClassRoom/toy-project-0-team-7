@@ -103,10 +103,10 @@ public class Line : MonoBehaviour
         handleEnd.SetHandleDirection(dirEnd);
         handleEnd.SetColor(color);
 
-        handleStart.gameObject.SetActive(false);
-        handleEnd.gameObject.SetActive(false);
-        handleStart.gameObject.SetActive(true);
-        handleEnd.gameObject.SetActive(true);
+        handleStart.GetComponent<Collider2D>().enabled = false;
+        handleStart.GetComponent<Collider2D>().enabled = true;
+        handleEnd.GetComponent<Collider2D>().enabled = false;
+        handleEnd.GetComponent<Collider2D>().enabled = true;
     }
 
     public void UpdateWaypoints()
