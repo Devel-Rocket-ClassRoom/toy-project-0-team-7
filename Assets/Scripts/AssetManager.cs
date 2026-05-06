@@ -1,7 +1,8 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
@@ -45,17 +46,22 @@ public class AssetManager : MonoBehaviour
     private int rewardRemain = 0;
 
     private float savedTimeScale;
+    
+    private List<Sprite> sprites = new();
 
-    // --- 교차역 관련 변수 ---
+// --- 교차역 관련 변수 ---
     private int interchangeCount = 0;
 
     private void Awake()
     {
+        sprites.Add(Resources.Load<Sprite>("line"));
+        sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
         newTrainButton.gameObject.SetActive(false);
         newAssetButton1.gameObject.SetActive(false);
-        newInterchangeButton.gameObject.SetActive(false);
+        newAssetButton2.gameObject.SetActive(false);
         interchangeDragButton.SetActive(false);
     }
 
@@ -115,28 +121,24 @@ public class AssetManager : MonoBehaviour
         }
         while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.IsLinesFull));
 
-        newAssetButton1.onClick.RemoveAllListeners();
-        newAssetButton2.onClick.RemoveAllListeners();
-        newAssetButton1.onClick.AddListener(() => OnClickNewAsset(asset1));
-        newAssetButton2.onClick.AddListener(() => OnClickNewAsset(asset2));
+        SetAssetButton(newAssetButton1, assetButtonText1, asset1);
+        SetAssetButton(newAssetButton2, assetButtonText2, asset2);
+    }
 
-        switch (asset1)
+    public void SetAssetButton(Button button, TextMeshProUGUI text, Assets asset)
+    {
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => OnClickNewAsset(asset));
+
+        switch (asset)
         {
             case Assets.Line:
-                assetButtonText1.text = "노선";
+                text.text = "노선";
+                button.image.sprite = sprites[0];
                 break;
             case Assets.InterChangeStation:
-                assetButtonText1.text = "교차역";
-                break;
-        }
-
-        switch (asset2)
-        {
-            case Assets.Line:
-                assetButtonText2.text = "노선";
-                break;
-            case Assets.InterChangeStation:
-                assetButtonText2.text = "교차역";
+                text.text = "교차역";
+                button.image.sprite = sprites[1];
                 break;
         }
     }
@@ -167,7 +169,6 @@ public class AssetManager : MonoBehaviour
         {
             case Assets.Line:
                 IncreaseLine();
-                
                 break;
             case Assets.InterChangeStation:
                 IncreaseInterchange();
