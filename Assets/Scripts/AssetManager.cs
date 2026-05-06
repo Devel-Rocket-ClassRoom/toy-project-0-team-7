@@ -51,7 +51,7 @@ public class AssetManager : MonoBehaviour
         rewardPanel.SetActive(false);
         newTrainButton.gameObject.SetActive(false);
         newAssetButton1.gameObject.SetActive(false);
-        newInterchangeButton.gameObject.SetActive(false);
+        newAssetButton2.gameObject.SetActive(false);
         interchangeDragButton.SetActive(false);
     }
 
