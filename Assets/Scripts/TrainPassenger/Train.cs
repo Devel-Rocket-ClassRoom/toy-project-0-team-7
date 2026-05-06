@@ -11,24 +11,28 @@ public enum TrainDirection
 public class Train : MonoBehaviour
 {
     private GameManager gm;
-    
+
     public int lineId;
     public int capacity = 6;
-
-    public int targetStationIndex = 0;
     public float rotationSpeed = 180f;
+
     public Vector3 startPos; //출발 위치 기록용
+    public int targetStationIndex = 0;
     private int waypointTargetIndex = 0;
+    private List<Station> path;
+    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
+    private bool isShorteningPending = false; // 노선 단축 예약 플래그
+    private List<Station> pendingStations;
+    private List<Vector3> pendingWaypoints;
     private bool isStopping = false;
     private bool departedFromStop = false; // 정차 후 출발했는지 여부
+
     public List<Passenger> passengers = new List<Passenger>();
     public Transform[] passengerSlots;
     public GameObject passengerIconPrefab;
     public Sprite[] passengerIconSprites;
     private List<GameObject> passengerIcons = new List<GameObject>();
 
-    private List<Station> path;
-    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
     public TrainDirection direction = TrainDirection.Forward;
     private Vector3 lastDirection = Vector3.right;
 
@@ -74,12 +78,10 @@ public class Train : MonoBehaviour
     //열차 경로 설정 및 열차 생성위치 초기화
     public void SetPath(List<Station> stations, List<Vector3> waypoints, bool isInit = false)
     {
-        var prevWaypoints = routeWaypoints;
-        path = stations;
-        routeWaypoints = new List<Vector3>(waypoints);
-
         if (isInit)
         {
+            path = stations;
+            routeWaypoints = new List<Vector3>(waypoints);
             transform.position = routeWaypoints[0];
             waypointTargetIndex = 1;
             targetStationIndex = 0;
@@ -90,19 +92,26 @@ public class Train : MonoBehaviour
                 float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
+            return;
         }
-        else
-        {
-            var currentTargetWayPoint = prevWaypoints[waypointTargetIndex];
 
-            for (int i = 0; i < routeWaypoints.Count; ++i)
+        Vector3 currentTargetWayPoint = routeWaypoints[waypointTargetIndex];
+        bool foundMatch = false;
+
+        for (int i = 0; i < waypoints.Count; ++i)
+        {
+            if (currentTargetWayPoint == waypoints[i])
             {
-                if (currentTargetWayPoint == routeWaypoints[i])
-                {
-                    waypointTargetIndex = i;
-                    break;
-                }
+                foundMatch = true;
+                break;
             }
+        }
+
+        if (!foundMatch) // 노선 삭제 했을때
+        {
+            isShorteningPending = true; //새로운 경로 대기
+            pendingStations = stations;
+            pendingWaypoints = new List<Vector3>(waypoints);
 
             foreach (var p in passengers)
             {
@@ -119,7 +128,35 @@ public class Train : MonoBehaviour
                     p.transferStation = FindTransferStation(p);
                 }
             }
+            return;
         }
+        path = stations;
+        routeWaypoints = new List<Vector3>(waypoints);
+
+        for (int i = 0; i < routeWaypoints.Count; ++i)
+        {
+            if (currentTargetWayPoint == routeWaypoints[i])
+            {
+                waypointTargetIndex = i;
+                break;
+            }
+        }
+        foreach (var p in passengers)
+        {
+            int dir = direction == TrainDirection.Forward ? 1 : -1;
+            int myDist = BFSDistance(p.destination, targetStationIndex + dir, dir);
+
+            if (myDist == int.MaxValue) // 현재 방향으로 갈 수 없으면
+            {
+                // 다음 정차역에서 내림
+                p.transferStation = path[targetStationIndex];
+            }
+            else
+            {
+                p.transferStation = FindTransferStation(p);
+            }
+        }
+
     }
 
     public void Move()
@@ -166,7 +203,39 @@ public class Train : MonoBehaviour
         if (remainingDistance < 0.05f)
         {
             transform.position = targetPos;
+            if (isShorteningPending && direction == TrainDirection.Backward)
+            {
+                int mergeIdx = -1;
+                // 현재 위치(2번)가 새 노선의 웨이포인트 중 어디랑 일치하는지 찾기
+                for (int i = 0; i < pendingWaypoints.Count; i++)
+                {
+                    if (Vector3.Distance(transform.position, pendingWaypoints[i]) < 0.05f)
+                    {
+                        mergeIdx = i;
+                        break;
+                    }
+                }
 
+                // 새 노선에서 합류 지점(2번)을 찾았다면, 드디어 새 노선으로 갈아탑니다!
+                if (mergeIdx >= 0)
+                {
+                    isShorteningPending = false;
+                    path = pendingStations;
+                    routeWaypoints = pendingWaypoints;
+
+                    // 시나리오상 2번 -> 6번 -> 7번으로 가야 하므로
+                    // 새 노선의 인덱스 상에서 역방향(Backward)으로 진행하도록 세팅합니다.
+                    waypointTargetIndex = mergeIdx;
+                    direction = TrainDirection.Backward;
+
+                    startPos = transform.position;
+                    targetStationIndex = waypointTargetIndex / 2;
+
+                    // 새 노선으로 갈아탔으니 다음 웨이포인트(6번)를 향해 진행
+                    AdvanceWaypoint();
+                    return;
+                }
+            }
             if (shouldStopHere)
             {
                 //정차 및 승하차 프로세스 시작
@@ -282,11 +351,12 @@ public class Train : MonoBehaviour
     }
     public void HandleAlighting(Station station)
     {
+        Debug.Log($"하차합니다 1");
         for (int i = passengers.Count - 1; i >= 0; i--)
         {
             var p = passengers[i];
             Debug.Log($"p.transferStation: {p.transferStation?.name ?? "없음"}, station: {station.name}");
-
+            Debug.Log($"하차합니다 2");
             if (p.destination == station.Shape)
             {
                 p.State = PassengerState.Arrived;
@@ -298,6 +368,7 @@ public class Train : MonoBehaviour
                 passengers.RemoveAt(i);
 
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
+                Debug.Log($"하차합니다 3");
             }
             //환승하는경우
             else if (p.transferStation == station)
@@ -311,6 +382,7 @@ public class Train : MonoBehaviour
                 Destroy(p.gameObject);
                 passengers.RemoveAt(i);
             }
+            Debug.Log($"하차합니다 4");
         }
         RefreshPassengerIcons();
     }
@@ -357,8 +429,8 @@ public class Train : MonoBehaviour
         if (p.blockedLineId == lineId) return false;
 
         var dir = direction == TrainDirection.Forward ? 1 : -1;
-        int myDist = BFSDistance(p.destination, targetStationIndex +dir, dir);
-        int oppDist = BFSDistance(p.destination, targetStationIndex -dir, -dir);
+        int myDist = BFSDistance(p.destination, targetStationIndex + dir, dir);
+        int oppDist = BFSDistance(p.destination, targetStationIndex - dir, -dir);
 
         return myDist != int.MaxValue && myDist <= oppDist;
     }
