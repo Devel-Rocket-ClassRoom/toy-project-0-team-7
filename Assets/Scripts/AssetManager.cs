@@ -37,7 +37,7 @@ public class AssetManager : MonoBehaviour
     public Image trainAssetUI;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 1f;
+    private const float dayInterval = 2f;
 
     public bool isWeekend = false;
 
@@ -54,6 +54,7 @@ public class AssetManager : MonoBehaviour
 // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
     private int remainingTrainCount = 0; 
+    public int RemainingTrainCount => remainingTrainCount;  
 
     private void Awake()
     {

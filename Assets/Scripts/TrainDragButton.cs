@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -25,6 +26,7 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!GetComponent<Button>().interactable) return; 
         mouseInput.ChangeToNewTrainMode();
         ghostImage.SetActive(true); 
     }
