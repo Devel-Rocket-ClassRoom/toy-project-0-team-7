@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum TrainDirection
 {
@@ -80,7 +81,7 @@ public class Train : MonoBehaviour
     {
         if (isInit)
         {
-            path = stations;
+            path = new List<Station>(stations);
             routeWaypoints = new List<Vector3>(waypoints);
             transform.position = routeWaypoints[0];
             waypointTargetIndex = 1;
@@ -110,7 +111,7 @@ public class Train : MonoBehaviour
         if (!foundMatch) // 노선 삭제 했을때
         {
             isShorteningPending = true; //새로운 경로 대기
-            pendingStations = stations;
+            pendingStations = new List<Station>(stations);
             pendingWaypoints = new List<Vector3>(waypoints);
 
             foreach (var p in passengers)
@@ -130,7 +131,7 @@ public class Train : MonoBehaviour
             }
             return;
         }
-        path = stations;
+        path = new List<Station>(stations);
         routeWaypoints = new List<Vector3>(waypoints);
 
         for (int i = 0; i < routeWaypoints.Count; ++i)
@@ -203,7 +204,7 @@ public class Train : MonoBehaviour
         if (remainingDistance < 0.05f)
         {
             transform.position = targetPos;
-            if (isShorteningPending && direction == TrainDirection.Backward)
+            if (isShorteningPending)
             {
                 int mergeIdx = -1;
                 // 현재 위치(2번)가 새 노선의 웨이포인트 중 어디랑 일치하는지 찾기
@@ -223,22 +224,20 @@ public class Train : MonoBehaviour
                     path = pendingStations;
                     routeWaypoints = pendingWaypoints;
 
-                    // 시나리오상 2번 -> 6번 -> 7번으로 가야 하므로
-                    // 새 노선의 인덱스 상에서 역방향(Backward)으로 진행하도록 세팅합니다.
                     waypointTargetIndex = mergeIdx;
-                    direction = TrainDirection.Backward;
 
                     startPos = transform.position;
                     targetStationIndex = waypointTargetIndex / 2;
 
-                    // 새 노선으로 갈아탔으니 다음 웨이포인트(6번)를 향해 진행
-                    AdvanceWaypoint();
+                    //AdvanceWaypoint();
+                    Debug.Log($"멈춰야 하는 역인가: {shouldStopHere}");
                     return;
                 }
             }
             if (shouldStopHere)
             {
                 //정차 및 승하차 프로세스 시작
+                Debug.Log($"정차 및 승하차 프로세스 진입");
                 targetStationIndex = GetStationIndex(nextStation);
                 StartCoroutine(CoStationProcessRoutine());
             }
@@ -299,7 +298,7 @@ public class Train : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
 
-            Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>");
+            Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>승강장 개수: {path.Count}");
             //내릴 승객 처리
             HandleAlighting(currentStation);
 
@@ -351,12 +350,10 @@ public class Train : MonoBehaviour
     }
     public void HandleAlighting(Station station)
     {
-        Debug.Log($"하차합니다 1");
         for (int i = passengers.Count - 1; i >= 0; i--)
         {
             var p = passengers[i];
             Debug.Log($"p.transferStation: {p.transferStation?.name ?? "없음"}, station: {station.name}");
-            Debug.Log($"하차합니다 2");
             if (p.destination == station.Shape)
             {
                 p.State = PassengerState.Arrived;
@@ -368,7 +365,6 @@ public class Train : MonoBehaviour
                 passengers.RemoveAt(i);
 
                 Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
-                Debug.Log($"하차합니다 3");
             }
             //환승하는경우
             else if (p.transferStation == station)
@@ -382,7 +378,6 @@ public class Train : MonoBehaviour
                 Destroy(p.gameObject);
                 passengers.RemoveAt(i);
             }
-            Debug.Log($"하차합니다 4");
         }
         RefreshPassengerIcons();
     }
