@@ -8,13 +8,14 @@ public class MouseInput : MonoBehaviour
     public Mode mode;
 
     private Camera cam;
+    public CameraController cameraDirector;
     public LineManager lineManager;
-
+    public TrainManager trainManager;
+    public AssetManager assetManager;
     private bool isStartHandle;
     private Station interchangeTarget;
+    private Line trainTarget;
 
-    public AssetManager assetManager;
-    public CameraController cameraDirector;
 
     void Start()
     {
@@ -139,7 +140,7 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.NewTrain:
-                        Debug.Log("Mode.NewTrain");
+                        trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
 
                     case Mode.MoveTrain:
@@ -157,15 +158,17 @@ public class MouseInput : MonoBehaviour
                 switch (mode)
                 {
                     case Mode.InterchangeStation:
+                        interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
+
                         if (interchangeTarget != null)
                         {
-                            interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
-
-                            if (interchangeTarget != null)
-                            {
-                                assetManager.InterchangeUsed();
-                            }
+                            assetManager.InterchangeUsed();
                         }
+                        
+                        break;
+                    case Mode.NewTrain:
+                        
+                        trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
                 
@@ -199,7 +202,21 @@ public class MouseInput : MonoBehaviour
                 break;
 
             case Mode.NewTrain:
-                Debug.Log("Mode.NewTrain End");
+                if (trainTarget != null && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT)
+                {
+                    trainManager.Stations = trainTarget.stations;
+                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints));
+                    Debug.Log($"[열차 배치] 열차가 배치되었습니다. 라인 ID: {trainTarget.lineId}");
+                    Debug.Log($"[열차 배치] 남은 기관차 수: {trainManager.availableTrainCount}");
+                    assetManager.UpdateTrainUI();
+                }
+
+                if (trainTarget != null && trainTarget.trains.Count >= Line.MAX_TRAIN_COUNT)
+                {
+                    Debug.Log($"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}");
+                }
+                
+                trainTarget = null;
                 break;
 
             case Mode.MoveTrain:

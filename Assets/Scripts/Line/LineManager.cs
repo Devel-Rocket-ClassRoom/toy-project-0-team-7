@@ -29,6 +29,7 @@ public class LineManager : MonoBehaviour
     // 자산
     public TrainManager trainManager;
     public StationManager stationManager;
+    public AssetManager assetManager;
 
     private void Awake()
     {
@@ -123,6 +124,7 @@ public class LineManager : MonoBehaviour
         {
             trainManager.Stations = line_onMouse.stations;            
             line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints));
+            assetManager.UpdateTrainUI(); // 열차 자산 UI 업데이트
         }
 
         foreach (var station in line_onMouse.stations)

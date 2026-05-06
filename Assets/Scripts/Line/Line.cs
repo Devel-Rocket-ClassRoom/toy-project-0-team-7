@@ -18,6 +18,7 @@ public class Line : MonoBehaviour
     public Handle handleStart;
     public Handle handleEnd;
     private Color color;
+    public const int MAX_TRAIN_COUNT = 4; // 노선당 최대 열차 수
 
     private void Awake()
     {

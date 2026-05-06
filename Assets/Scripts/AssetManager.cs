@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation }
+    public enum Assets { Line, InterChangeStation, Train}
 
     public GameManager gm;
 
@@ -28,14 +28,16 @@ public class AssetManager : MonoBehaviour
     public Button newTrainButton;
     public Button newAssetButton1;
     public Button newAssetButton2;
-    public Button newInterchangeButton;
     public TextMeshProUGUI assetButtonText1;
     public TextMeshProUGUI assetButtonText2;
 
     public GameObject interchangeDragButton;
+    public GameObject trainDragButton;
+    public Image interchangeAssetUI;
+    public Image trainAssetUI;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 2f;
+    private const float dayInterval = 1f;
 
     public bool isWeekend = false;
 
@@ -49,20 +51,26 @@ public class AssetManager : MonoBehaviour
     
     private List<Sprite> sprites = new();
 
-// --- 교차역 관련 변수 ---
+// --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
+    private int remainingTrainCount = 0; 
 
     private void Awake()
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+        //sprites.Add(Resources.Load<Sprite>("train"));
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
         newTrainButton.gameObject.SetActive(false);
         newAssetButton1.gameObject.SetActive(false);
         newAssetButton2.gameObject.SetActive(false);
+
         interchangeDragButton.SetActive(false);
+        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
+        UpdateTrainUI();    
+        
     }
 
     private void Update()
@@ -154,6 +162,7 @@ public class AssetManager : MonoBehaviour
 
     public void OnClickNewTrain()
     {
+        Debug.Log("[기관차 획득] 기관차 1대가 추가되었습니다.");    
         IncreaseTrain();
         newTrainButton.gameObject.SetActive(false);
 
@@ -199,8 +208,11 @@ public class AssetManager : MonoBehaviour
     }
 
     public void IncreaseTrain()
-    {
+    { 
         trainManager.AddAvailableTrain();
+        UpdateTrainUI();
+        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
+        Debug.Log($"[기관차 획득] 사용 가능한 기관차 수: {remainingTrainCount}");
     }
 
     public void IncreaseLine()  // if문 검사 필요
@@ -218,23 +230,40 @@ public class AssetManager : MonoBehaviour
         // InterchangeDragButton 생성 + 활성화 + 리스너 추가
         interchangeCount++;
         Debug.Log($"[교차역 획득] 사용 가능한 교차역 수: {interchangeCount}");
-        interchangeDragButton.SetActive(true);
+        if (interchangeCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        {
+            interchangeDragButton.SetActive(true);
+        }
+
+        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
     }
 
     public void InterchangeUsed()
     {
         interchangeCount--;
         Debug.Log($"[교차역 사용] 남은 교차역 수: {interchangeCount}");
-        if (interchangeCount <= 0)
-        {
-            interchangeDragButton.SetActive(false);
-            Debug.Log("[교차역 사용] 모든 교차역이 사용되었습니다. 드래그 버튼 비활성화.");
-        }
+        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
     }
 
     public void OnInputReleased()
     {
         if (rewardRemain > 0 && !isWeekend)
             ShowNextReward();
+    }
+
+    // --- 열차 UI 업데이트 ---
+    // 열차 개수 0개 -> 회색 처리 
+    public void UpdateTrainUI()
+    {
+        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
+        UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount);
+        Debug.Log($"[기관차 UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
+    }
+
+    // --- 자산 UI 업데이트 ---
+    private void UpdateAssetUI(Image image, Button button, int count)
+    {
+        image.color = count > 0 ? Color.white : Color.gray;
+        button.interactable = count > 0;
     }
 }

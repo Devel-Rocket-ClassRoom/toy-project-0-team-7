@@ -38,6 +38,7 @@ public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHand
     public void OnEndDrag(PointerEventData eventData)
     {
         ghostImage.SetActive(false);
+        
     }
 
     private void UpdateGhostPos(Vector2 screenPos)
