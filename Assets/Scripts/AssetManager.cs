@@ -33,7 +33,7 @@ public class AssetManager : MonoBehaviour
     public GameObject interchangeDragButton;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 1f;
+    [SerializeField] private const float dayInterval = 1f;
 
     public bool isWeekend = false;
 
@@ -49,6 +49,10 @@ public class AssetManager : MonoBehaviour
     {
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
+        newTrainButton.gameObject.SetActive(false);
+        newAssetButton1.gameObject.SetActive(false);
+        newInterchangeButton.gameObject.SetActive(false);
+        interchangeDragButton.SetActive(false);
     }
 
     private void Update()

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -16,6 +15,11 @@ public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHand
         ghostRect = ghostImage.GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         cam = Camera.main;
+        ghostImage.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
         ghostImage.SetActive(false);
     }
 
