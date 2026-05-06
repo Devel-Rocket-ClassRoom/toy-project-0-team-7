@@ -21,13 +21,13 @@ public class AssetManager : MonoBehaviour
     public TextMeshProUGUI message;
 
     public Button newTrainButton;
-    public Button newAssetButton1;
-    public Button newAssetButton2;
+    public Button newAssetButton1; 
+    public Button newInterchangeButton; 
 
     public GameObject interchangeDragButton;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 20f;
+    [SerializeField] private const float dayInterval = 1f;
 
     public bool isWeekend = false;
 
@@ -43,6 +43,10 @@ public class AssetManager : MonoBehaviour
     {
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
+        newTrainButton.gameObject.SetActive(false);
+        newAssetButton1.gameObject.SetActive(false);
+        newInterchangeButton.gameObject.SetActive(false);
+        interchangeDragButton.SetActive(false);
     }
 
     private void Update()
@@ -110,7 +114,7 @@ public class AssetManager : MonoBehaviour
     {
         rewardPanel.SetActive(false);
         newAssetButton1.gameObject.SetActive(false);
-        newAssetButton2.gameObject.SetActive(false);
+        newInterchangeButton.gameObject.SetActive(false);
     }
 
     public void OnClickNewTrain()
@@ -121,17 +125,16 @@ public class AssetManager : MonoBehaviour
         message.text = $"지하철에 어떤 자산을 고르시겠습니까?";
 
         newAssetButton1.onClick.RemoveAllListeners();
-        newAssetButton2.onClick.RemoveAllListeners();
-        newAssetButton1.onClick.AddListener(() => OnClickNewAsset());
-        newAssetButton2.onClick.AddListener(() => OnClickNewAsset());
+        newInterchangeButton.onClick.RemoveAllListeners();
+        newAssetButton1.onClick.AddListener(() => OnClickNewAsset()); 
+        newInterchangeButton.onClick.AddListener(() => OnClickNewInterchange());
         newAssetButton1.gameObject.SetActive(true);
-        newAssetButton2.gameObject.SetActive(true);
+        newInterchangeButton.gameObject.SetActive(true);
     }
 
     public void OnClickNewAsset()
     {
         IncreaseLine(); // 테스트 가능한 자산이 하나뿐이라 일단 두 버튼 다 노선으로 통일함.
-        IncreaseInterchange(); // 교차역 추가
         InactivePanel();
         rewardRemain--;
         displayWeek++;
@@ -147,6 +150,30 @@ public class AssetManager : MonoBehaviour
             gameUIGroup.interactable = true;
         }
     }
+
+    public void OnClickNewInterchange()
+    {
+        IncreaseInterchange();
+        CloseRewardPanel(); 
+    }
+
+    private void CloseRewardPanel()
+    {
+       InactivePanel();
+        rewardRemain--;
+        displayWeek++;
+
+        if (rewardRemain > 0 && inputManager.mode == MouseInput.Mode.None)
+        {            
+            ActivePanel(); // 다음 리워드 표시
+        }
+        else
+        {
+            Time.timeScale = savedTimeScale; // 1f 대신 복구
+            isWeekend = false;
+            gameUIGroup.interactable = true;
+        }
+    }   
 
     public void IncreaseInterchange()
     {
