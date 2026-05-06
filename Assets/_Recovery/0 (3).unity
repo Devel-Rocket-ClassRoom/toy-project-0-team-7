@@ -162,10 +162,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 245602053435519256, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: mouseInput
-      value: 
-      objectReference: {fileID: 327881186}
     - target: {fileID: 336124784019339023, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -357,10 +353,6 @@ PrefabInstance:
     - target: {fileID: 3315548160215713798, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3432058250281418892, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_text
-      value: assetName
       objectReference: {fileID: 0}
     - target: {fileID: 3448733483421498162, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_AnchorMax.y
@@ -487,7 +479,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4794274352410906333, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_AnchoredPosition.x
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4794274352410906333, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
@@ -541,10 +533,6 @@ PrefabInstance:
     - target: {fileID: 5219690817376543560, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5243483321123437222, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_text
-      value: assetName
       objectReference: {fileID: 0}
     - target: {fileID: 5416347932234298300, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_Name
@@ -676,22 +664,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5744754315399224529, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6437989653953479321, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6437989653953479321, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6437989653953479321, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6437989653953479321, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -853,17 +825,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 691a349141e1fa643a6a83d903d53d40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StationManager
---- !u!114 &224804476 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3432058250281418892, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-  m_PrefabInstance: {fileID: 18189103}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &327881184
 GameObject:
   m_ObjectHideFlags: 0
@@ -973,16 +934,12 @@ MonoBehaviour:
   gameUIGroup: {fileID: 885856491}
   lineManager: {fileID: 1349927380}
   trainManager: {fileID: 1423698472}
-  stationManager: {fileID: 0}
   rewardPanel: {fileID: 1398573521}
   week: {fileID: 1630671360}
   message: {fileID: 1264225725}
   newTrainButton: {fileID: 17010248}
   newAssetButton1: {fileID: 1902914516}
   newAssetButton2: {fileID: 1199314975}
-  assetButtonText1: {fileID: 224804476}
-  assetButtonText2: {fileID: 1517207809}
-  interchangeDragButton: {fileID: 1998958344}
   isWeekend: 0
 --- !u!1 &622383155
 GameObject:
@@ -1336,17 +1293,6 @@ MonoBehaviour:
   availableTrainCount: 3
   trainPrefab: {fileID: 4742342668300227339, guid: 17f56966a31b4e542813a02901357916, type: 3}
   Stations: []
---- !u!114 &1517207809 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5243483321123437222, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-  m_PrefabInstance: {fileID: 18189103}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &1530357587
 GameObject:
   m_ObjectHideFlags: 0
@@ -1476,11 +1422,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!1 &1998958344 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6618314837112751657, guid: 112f90f1f56056b40ab7a6510827a3dc, type: 3}
-  m_PrefabInstance: {fileID: 18189103}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2143226770
 GameObject:
   m_ObjectHideFlags: 0

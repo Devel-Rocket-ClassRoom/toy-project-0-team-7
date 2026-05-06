@@ -1,9 +1,12 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class AssetManager : MonoBehaviour
 {
+    public enum Assets { Line, InterChangeStation }
+
     public GameManager gm;
 
     public MouseInput inputManager;
@@ -12,8 +15,9 @@ public class AssetManager : MonoBehaviour
     public LineManager lineManager;
     public const int MAX_LINE_COUNT = 7;
 
+    // (추가) 다른 자산 관리자들 . . .
     public TrainManager trainManager;
-
+    public StationManager stationManager;
     // (추가) 다른 자산 관리자들 . . .
 
     public GameObject rewardPanel;
@@ -21,8 +25,10 @@ public class AssetManager : MonoBehaviour
     public TextMeshProUGUI message;
 
     public Button newTrainButton;
-    public Button newAssetButton1; 
-    public Button newInterchangeButton; 
+    public Button newAssetButton1;
+    public Button newAssetButton2;
+    public TextMeshProUGUI assetButtonText1;
+    public TextMeshProUGUI assetButtonText2;
 
     public GameObject interchangeDragButton;
     
@@ -75,21 +81,6 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    public void IncreaseLine()  // if문 검사 필요
-    {
-        lineManager.AddAvailableLine();
-    }
-
-    public void IncreaseTrain()
-    {
-        trainManager.AddAvailableTrain();
-    }
-
-    public void IncreaseCarriage()
-    {
-        Debug.Log("객차 수 증가"); // CarriageManager.-----
-    }
-
     public void ShowNextReward()
     {
         if (rewardRemain <= 0) return;
@@ -99,6 +90,51 @@ public class AssetManager : MonoBehaviour
         isWeekend = true;
         gameUIGroup.interactable = false;
         ActivePanel();
+
+        // 선택 자산 세팅
+        Array assets = Enum.GetValues(typeof(Assets));
+        Assets asset1;
+        Assets asset2;
+
+        // 첫 번째 자산 뽑기
+        while (true)
+        {
+            asset1 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
+            if (asset1 == Assets.Line && lineManager.IsLinesFull) continue;
+            break;
+        }
+
+        // 두 번째 자산 뽑기
+        do
+        {
+            asset2 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
+        }
+        while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.IsLinesFull));
+
+        newAssetButton1.onClick.RemoveAllListeners();
+        newAssetButton2.onClick.RemoveAllListeners();
+        newAssetButton1.onClick.AddListener(() => OnClickNewAsset(asset1));
+        newAssetButton2.onClick.AddListener(() => OnClickNewAsset(asset2));
+
+        switch (asset1)
+        {
+            case Assets.Line:
+                assetButtonText1.text = "노선";
+                break;
+            case Assets.InterChangeStation:
+                assetButtonText1.text = "교차역";
+                break;
+        }
+
+        switch (asset2)
+        {
+            case Assets.Line:
+                assetButtonText2.text = "노선";
+                break;
+            case Assets.InterChangeStation:
+                assetButtonText2.text = "교차역";
+                break;
+        }
     }
 
     public void ActivePanel()
@@ -110,13 +146,6 @@ public class AssetManager : MonoBehaviour
         rewardPanel.SetActive(true);
     }
 
-    public void InactivePanel()
-    {
-        rewardPanel.SetActive(false);
-        newAssetButton1.gameObject.SetActive(false);
-        newInterchangeButton.gameObject.SetActive(false);
-    }
-
     public void OnClickNewTrain()
     {
         IncreaseTrain();
@@ -124,17 +153,23 @@ public class AssetManager : MonoBehaviour
 
         message.text = $"지하철에 어떤 자산을 고르시겠습니까?";
 
-        newAssetButton1.onClick.RemoveAllListeners();
-        newInterchangeButton.onClick.RemoveAllListeners();
-        newAssetButton1.onClick.AddListener(() => OnClickNewAsset()); 
-        newInterchangeButton.onClick.AddListener(() => OnClickNewInterchange());
         newAssetButton1.gameObject.SetActive(true);
-        newInterchangeButton.gameObject.SetActive(true);
+        newAssetButton2.gameObject.SetActive(true);
     }
 
-    public void OnClickNewAsset()
+    public void OnClickNewAsset(Assets asset)
     {
-        IncreaseLine(); // 테스트 가능한 자산이 하나뿐이라 일단 두 버튼 다 노선으로 통일함.
+        switch (asset)
+        {
+            case Assets.Line:
+                IncreaseLine();
+                
+                break;
+            case Assets.InterChangeStation:
+                IncreaseInterchange();
+                break;
+        }
+
         InactivePanel();
         rewardRemain--;
         displayWeek++;
@@ -151,33 +186,32 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    public void OnClickNewInterchange()
+    public void InactivePanel()
     {
-        IncreaseInterchange();
-        CloseRewardPanel(); 
+        rewardPanel.SetActive(false);
+        newAssetButton1.gameObject.SetActive(false);
+        newAssetButton2.gameObject.SetActive(false);
     }
 
-    private void CloseRewardPanel()
+    public void IncreaseTrain()
     {
-       InactivePanel();
-        rewardRemain--;
-        displayWeek++;
+        trainManager.AddAvailableTrain();
+    }
 
-        if (rewardRemain > 0 && inputManager.mode == MouseInput.Mode.None)
-        {            
-            ActivePanel(); // 다음 리워드 표시
-        }
-        else
-        {
-            Time.timeScale = savedTimeScale; // 1f 대신 복구
-            isWeekend = false;
-            gameUIGroup.interactable = true;
-        }
-    }   
+    public void IncreaseLine()  // if문 검사 필요
+    {
+        lineManager.AddAvailableLine();
+    }
+
+    public void IncreaseCarriage()
+    {
+        Debug.Log("객차 수 증가"); // CarriageManager.-----
+    }
 
     public void IncreaseInterchange()
     {
-        // InterchangeDragButton 활성화
+        
+        // InterchangeDragButton 생성 + 활성화 + 리스너 추가
         interchangeDragButton.SetActive(true);
     }
 

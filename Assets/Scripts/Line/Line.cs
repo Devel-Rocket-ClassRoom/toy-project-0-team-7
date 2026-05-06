@@ -6,9 +6,10 @@ public class Line : MonoBehaviour
     public bool isOnMaking = true;
 
     public int lineId;
+    public bool isCircular = false;
+
     public List<Station> stations = new();  // 순서 중요
     public List<Train> trains = new();
-    //public bool isCircular = false;
 
     public List<Vector3> waypoints = new();
     private LineRenderer lr;
@@ -80,6 +81,7 @@ public class Line : MonoBehaviour
 
     public void UpdateHandles()
     {
+        if (handleStart == null || handleEnd == null) return;
         if (stations.Count < 1 || waypoints.Count < 2) return;
 
         var dirStart = (waypoints[0] - waypoints[1]).normalized;
@@ -87,8 +89,17 @@ public class Line : MonoBehaviour
         handleStart.SetHandleDirection(dirStart);
         handleStart.SetColor(color);
 
-        var dirEnd = (waypoints[^1] - waypoints[^2]).normalized;
-        handleEnd.transform.position = stations[^1].transform.position;
+        Vector3 dirEnd;
+        if (isCircular)
+        {
+            dirEnd = (waypoints[0] - waypoints[^1]).normalized;
+            handleEnd.transform.position = stations[0].transform.position;
+        }
+        else
+        {
+            dirEnd = (waypoints[^1] - waypoints[^2]).normalized;
+            handleEnd.transform.position = stations[^1].transform.position;
+        }
         handleEnd.SetHandleDirection(dirEnd);
         handleEnd.SetColor(color);
     }
@@ -97,23 +108,38 @@ public class Line : MonoBehaviour
     {
         waypoints.Clear();
 
-        for (int i = 0; i < stations.Count; i++)
+        int stationCount = stations.Count;
+
+        for (int i = 0; i < stationCount; i++)
         {
-            if (i > 0)
-            {
-                Vector3 bend = GetBendPoint(
-                    stations[i - 1].transform.position,
-                    stations[i].transform.position);
-                bend.z = 0f;    
-                waypoints.Add(bend);
-            }
+            int nextI = (i + 1) % stationCount;
+            bool isLast = i == stationCount - 1;
 
             var pos = stations[i].transform.position;
             pos.z = 0f;
             waypoints.Add(pos);
+
+            if (isLast && !isCircular) break;
+
+            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextI].transform.position);
+            bendPoint.z = 0f;
+            waypoints.Add(bendPoint);
         }
 
-        if (isOnMaking) // 생성 중
+        if (isCircular)
+        {
+            var firstPos = stations[0].transform.position;
+            firstPos.z = 0f;
+            waypoints.Add(firstPos);
+        }
+
+        if (!isOnMaking || isCircular)
+        {
+            lr.positionCount = waypoints.Count;
+            for (int i = 0; i < waypoints.Count; i++)
+                lr.SetPosition(i, waypoints[i]);
+        }
+        else
         {
             lr.positionCount = waypoints.Count + 2;
             for (int i = 0; i < waypoints.Count; i++)
@@ -121,20 +147,10 @@ public class Line : MonoBehaviour
             lr.SetPosition(waypoints.Count, waypoints[^1]);
             lr.SetPosition(waypoints.Count + 1, waypoints[^1]);
         }
-        else
-        {
-            lr.positionCount = waypoints.Count;
-            for (int i = 0; i < waypoints.Count; i++)
-                lr.SetPosition(i, waypoints[i]);
-        }
 
-        // EdgeCollider 설정
         var points = new Vector2[waypoints.Count];
-
-        for (int i = 0; i< waypoints.Count; i++)
-        {
+        for (int i = 0; i < waypoints.Count; i++)
             points[i] = waypoints[i];
-        }
 
         GetComponent<EdgeCollider2D>().points = points;
     }
