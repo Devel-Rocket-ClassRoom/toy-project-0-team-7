@@ -28,13 +28,14 @@ public class AssetManager : MonoBehaviour
     public Button newTrainButton;
     public Button newAssetButton1;
     public Button newAssetButton2;
+    public Button newInterchangeButton;
     public TextMeshProUGUI assetButtonText1;
     public TextMeshProUGUI assetButtonText2;
 
     public GameObject interchangeDragButton;
     
     private float dailyTimer = 0f;
-    [SerializeField] private const float dayInterval = 1f;
+    private const float dayInterval = 2f;
 
     public bool isWeekend = false;
 
@@ -45,8 +46,11 @@ public class AssetManager : MonoBehaviour
     private int rewardRemain = 0;
 
     private float savedTimeScale;
-
+    
     private List<Sprite> sprites = new();
+
+// --- 교차역 관련 변수 ---
+    private int interchangeCount = 0;
 
     private void Awake()
     {
@@ -211,9 +215,21 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseInterchange()
     {
-        
         // InterchangeDragButton 생성 + 활성화 + 리스너 추가
+        interchangeCount++;
+        Debug.Log($"[교차역 획득] 사용 가능한 교차역 수: {interchangeCount}");
         interchangeDragButton.SetActive(true);
+    }
+
+    public void InterchangeUsed()
+    {
+        interchangeCount--;
+        Debug.Log($"[교차역 사용] 남은 교차역 수: {interchangeCount}");
+        if (interchangeCount <= 0)
+        {
+            interchangeDragButton.SetActive(false);
+            Debug.Log("[교차역 사용] 모든 교차역이 사용되었습니다. 드래그 버튼 비활성화.");
+        }
     }
 
     public void OnInputReleased()

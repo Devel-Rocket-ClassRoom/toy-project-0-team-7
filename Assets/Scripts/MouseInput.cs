@@ -154,6 +154,21 @@ public class MouseInput : MonoBehaviour
 
             if (Input.GetMouseButtonUp(0))  // 릴리즈
             {
+                switch (mode)
+                {
+                    case Mode.InterchangeStation:
+                        if (interchangeTarget != null)
+                        {
+                            interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
+
+                            if (interchangeTarget != null)
+                            {
+                                assetManager.InterchangeUsed();
+                            }
+                        }
+                        break;
+                }
+                
                 StopDragging();
             }
         }
