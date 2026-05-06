@@ -64,6 +64,15 @@ public class Station : MonoBehaviour
         if (isInterchange) return;
         isInterchange = true;
         capacity = 10;
+
+        if (isOverflow && waitingPassengers.Count < capacity)
+        {
+            isOverflow = false;
+            currentTimer = overflowTimer;
+
+            if (timerUI != null) timerUI.gameObject.SetActive(false);
+        }
+
         float scale = 1.5f;
         transform.localScale *= scale;
         waitingArea.localScale /= scale;
@@ -86,7 +95,6 @@ public class Station : MonoBehaviour
             {
                 StationType dest = pm.GetRandomDestExcluding(this.shape);
                 AddPasssenger(dest);  
-                //Debug.Log($"[승객 스폰] {shape} 역에서 {spawnCount}명 승객 스폰");
             }
               
             float spawnInterval = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
@@ -101,7 +109,7 @@ public class Station : MonoBehaviour
             int col = index % 5;
             int row = index / 5;
 
-            return new Vector3(col * 2.5f, 1f + row * 2f, 0f);
+            return new Vector3(col * 2.5f, 1f + row * 3f, 0f);
         }
 
         return new Vector3(index * 2.5f, 1f, 0f);
@@ -121,7 +129,6 @@ public class Station : MonoBehaviour
         passenger.Init(destination);
 
         int index = waitingPassengers.Count;
-        //passenger.transform.localPosition = new Vector3(index * 2.5f, 1f, 0f);
         passenger.transform.localPosition = GetPassengerLocalPos(index);
 
         waitingPassengers.Add(passenger);
@@ -144,7 +151,6 @@ public class Station : MonoBehaviour
 
         for (int i = 0; i < waitingPassengers.Count; i++)
         {
-            //waitingPassengers[i].transform.localPosition = new Vector3(i * 2.5f, 1f, 0f);
             waitingPassengers[i].transform.localPosition = GetPassengerLocalPos(i);
         }
 

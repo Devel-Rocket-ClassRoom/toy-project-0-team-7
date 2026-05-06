@@ -51,7 +51,6 @@ public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHand
             {
                 Vector2 stationScreenPos = cam.WorldToScreenPoint(hit.collider.transform.position);
                 MoveGhost(stationScreenPos);
-
                 return;
             }
         }
