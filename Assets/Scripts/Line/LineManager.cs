@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class LineManager : MonoBehaviour
 {
@@ -135,6 +134,7 @@ public class LineManager : MonoBehaviour
         if (line_onMouse.isCircular)
             HideHandle(true);
 
+        line_onMouse.UpdateHandles();
         AddLine(line_onMouse);
         line_onMouse = null;
         lr = null;
@@ -375,7 +375,7 @@ public class LineManager : MonoBehaviour
         var colors = lineButtons[availableLineCount - 1].colors;
         colors.normalColor = new Color(1, 1, 1);
         colors.disabledColor = colors.normalColor;
-        lineButtons[availableLineCount - 1].colors = colors;  
+        lineButtons[availableLineCount - 1].colors = colors;
     }
 
     public void HideHandle(bool isStart)
