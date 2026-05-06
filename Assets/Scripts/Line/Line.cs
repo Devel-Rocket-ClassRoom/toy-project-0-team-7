@@ -17,7 +17,7 @@ public class Line : MonoBehaviour
     public GameObject handlePrefab;
     public Handle handleStart;
     public Handle handleEnd;
-    private Color color;
+    private Color color = new Color(1, 1, 1);
 
     private void Awake()
     {
@@ -102,6 +102,11 @@ public class Line : MonoBehaviour
         }
         handleEnd.SetHandleDirection(dirEnd);
         handleEnd.SetColor(color);
+
+        handleStart.gameObject.SetActive(false);
+        handleEnd.gameObject.SetActive(false);
+        handleStart.gameObject.SetActive(true);
+        handleEnd.gameObject.SetActive(true);
     }
 
     public void UpdateWaypoints()
@@ -112,7 +117,7 @@ public class Line : MonoBehaviour
 
         for (int i = 0; i < stationCount; i++)
         {
-            int nextI = (i + 1) % stationCount;
+            int nextIndex = (i + 1) % stationCount;
             bool isLast = i == stationCount - 1;
 
             var pos = stations[i].transform.position;
@@ -121,7 +126,7 @@ public class Line : MonoBehaviour
 
             if (isLast && !isCircular) break;
 
-            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextI].transform.position);
+            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextIndex].transform.position);
             bendPoint.z = 0f;
             waypoints.Add(bendPoint);
         }
