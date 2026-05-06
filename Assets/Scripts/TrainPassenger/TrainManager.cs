@@ -18,13 +18,14 @@ public class TrainManager : MonoBehaviour
                 train.Move();
         
     }
-    public Train SpawnTrain(int lineId, List<Vector3> waypoints)
+    public Train SpawnTrain(int lineId, List<Vector3> waypoints, Line line)
     {
         GameObject trainObject = Instantiate(trainPrefab, Stations[0].transform.position, Quaternion.identity);
         Train train = trainObject.GetComponent<Train>();
 
         train.SetPath(Stations, waypoints, true);
         train.lineId = lineId;
+        train.myLine = line;
         train.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[lineId];
         activeTrains.Add(train);
         train.Init();

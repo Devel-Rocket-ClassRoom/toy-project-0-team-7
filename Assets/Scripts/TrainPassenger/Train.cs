@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.iOS;
 
 public enum TrainDirection
 {
@@ -13,7 +14,9 @@ public class Train : MonoBehaviour
 {
     private GameManager gm;
 
+    public Line myLine;
     public int lineId;
+
     public int capacity = 6;
     public float rotationSpeed = 180f;
 
@@ -204,10 +207,9 @@ public class Train : MonoBehaviour
         if (remainingDistance < 0.05f)
         {
             transform.position = targetPos;
-            if (isShorteningPending)
+            if (isShorteningPending) //노선 일부 삭제했을때
             {
                 int mergeIdx = -1;
-                // 현재 위치(2번)가 새 노선의 웨이포인트 중 어디랑 일치하는지 찾기
                 for (int i = 0; i < pendingWaypoints.Count; i++)
                 {
                     if (Vector3.Distance(transform.position, pendingWaypoints[i]) < 0.05f)
@@ -217,7 +219,6 @@ public class Train : MonoBehaviour
                     }
                 }
 
-                // 새 노선에서 합류 지점(2번)을 찾았다면, 드디어 새 노선으로 갈아탑니다!
                 if (mergeIdx >= 0)
                 {
                     isShorteningPending = false;
@@ -229,15 +230,12 @@ public class Train : MonoBehaviour
                     startPos = transform.position;
                     targetStationIndex = waypointTargetIndex / 2;
 
-                    //AdvanceWaypoint();
-                    Debug.Log($"멈춰야 하는 역인가: {shouldStopHere}");
                     return;
                 }
             }
             if (shouldStopHere)
             {
                 //정차 및 승하차 프로세스 시작
-                Debug.Log($"정차 및 승하차 프로세스 진입");
                 targetStationIndex = GetStationIndex(nextStation);
                 StartCoroutine(CoStationProcessRoutine());
             }
@@ -252,12 +250,17 @@ public class Train : MonoBehaviour
     public void AdvanceWaypoint()
     {
         startPos = transform.position;
+        bool isCircularLine = (myLine != null) && myLine.isCircular;
         // 방향에 따라 다음 타겟 waypoint 결정 
         if (direction == TrainDirection.Forward)
         {
             if (waypointTargetIndex < routeWaypoints.Count - 1)
             {
                 waypointTargetIndex++;
+            }
+            else if (isCircularLine)
+            {
+                waypointTargetIndex = 0;
             }
             else // 다음역 없으면 방향 전환
             {
@@ -270,6 +273,10 @@ public class Train : MonoBehaviour
             if (waypointTargetIndex > 0)
             {
                 waypointTargetIndex--;
+            }
+            else if (isCircularLine)
+            {
+                waypointTargetIndex = routeWaypoints.Count - 1;
             }
             else
             {
@@ -514,10 +521,13 @@ public class Train : MonoBehaviour
 
     private void UpdateDirection()
     {
+        if (myLine != null && myLine.isCircular) return;
+
         if (targetStationIndex == path.Count - 1)
             direction = TrainDirection.Backward;
         else if (targetStationIndex == 0)
             direction = TrainDirection.Forward;
+
     }
 
     //역 판별 헬퍼 함수들
@@ -538,6 +548,8 @@ public class Train : MonoBehaviour
     }
     private bool IsTerminalStation(Station station)
     {
+        if (myLine != null && myLine.isCircular) return false;
+
         int idx = path.IndexOf(station);
         return idx == 0 || idx == path.Count - 1;
     }
