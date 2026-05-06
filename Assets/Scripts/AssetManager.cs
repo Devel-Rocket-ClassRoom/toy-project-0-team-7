@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation, Train}
+    public enum Assets { Line, InterChangeStation }
 
     public GameManager gm;
 
@@ -18,7 +18,6 @@ public class AssetManager : MonoBehaviour
 
     // (추가) 다른 자산 관리자들 . . .
     public TrainManager trainManager;
-    public StationManager stationManager;
     // (추가) 다른 자산 관리자들 . . .
 
     public GameObject rewardPanel;
@@ -60,7 +59,6 @@ public class AssetManager : MonoBehaviour
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
-        //sprites.Add(Resources.Load<Sprite>("train"));
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
