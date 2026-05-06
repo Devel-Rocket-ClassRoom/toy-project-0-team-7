@@ -16,6 +16,7 @@ public class LineManager : MonoBehaviour
     private int availableLineCount = 3;
 
     public bool IsLinesFull => lineCount == availableLineCount;
+    public bool CantAddLine => availableLineCount == AssetManager.MAX_LINE_COUNT;
 
     public Button[] lineButtons = new Button[AssetManager.MAX_LINE_COUNT];
 

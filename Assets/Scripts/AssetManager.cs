@@ -68,8 +68,7 @@ public class AssetManager : MonoBehaviour
 
         interchangeDragButton.SetActive(false);
         Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
-        UpdateTrainUI();    
-        
+        UpdateTrainUI();
     }
 
     private void Update()
@@ -114,19 +113,31 @@ public class AssetManager : MonoBehaviour
         Assets asset2;
 
         // 첫 번째 자산 뽑기
-        while (true)
+        var max = 100;
+        var a = 1;
+        do
         {
             asset1 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
-            if (asset1 == Assets.Line && lineManager.IsLinesFull) continue;
-            break;
+            a++;
+
+            if (a == max) break;
         }
+        while (asset1 == Assets.Line && lineManager.CantAddLine);
+        Debug.Log(asset1);
+        Debug.Log($"a = {a}");
 
         // 두 번째 자산 뽑기
+        a = 1;
         do
         {
             asset2 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
+            a++;
+
+            if (a == max) break;
         }
-        while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.IsLinesFull));
+        while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.CantAddLine));
+        Debug.Log(asset2);
+        Debug.Log($"a = {a}");
 
         SetAssetButton(newAssetButton1, assetButtonText1, asset1);
         SetAssetButton(newAssetButton2, assetButtonText2, asset2);
@@ -207,7 +218,7 @@ public class AssetManager : MonoBehaviour
     }
 
     public void IncreaseTrain()
-    { 
+    {
         trainManager.AddAvailableTrain();
         UpdateTrainUI();
         remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
