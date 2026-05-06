@@ -93,8 +93,8 @@ public class Line : MonoBehaviour
         Vector3 dirEnd;
         if (isCircular)
         {
-            dirEnd = (waypoints[0] - waypoints[^1]).normalized;
-            handleEnd.transform.position = stations[0].transform.position;
+            dirEnd = (waypoints[0] - waypoints[^2]).normalized;
+            handleEnd.transform.position = handleStart.transform.position;
         }
         else
         {
@@ -103,6 +103,11 @@ public class Line : MonoBehaviour
         }
         handleEnd.SetHandleDirection(dirEnd);
         handleEnd.SetColor(color);
+
+        handleStart.GetComponent<Collider2D>().enabled = false;
+        handleStart.GetComponent<Collider2D>().enabled = true;
+        handleEnd.GetComponent<Collider2D>().enabled = false;
+        handleEnd.GetComponent<Collider2D>().enabled = true;
     }
 
     public void UpdateWaypoints()
@@ -113,7 +118,7 @@ public class Line : MonoBehaviour
 
         for (int i = 0; i < stationCount; i++)
         {
-            int nextI = (i + 1) % stationCount;
+            int nextIndex = (i + 1) % stationCount;
             bool isLast = i == stationCount - 1;
 
             var pos = stations[i].transform.position;
@@ -122,7 +127,7 @@ public class Line : MonoBehaviour
 
             if (isLast && !isCircular) break;
 
-            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextI].transform.position);
+            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextIndex].transform.position);
             bendPoint.z = 0f;
             waypoints.Add(bendPoint);
         }

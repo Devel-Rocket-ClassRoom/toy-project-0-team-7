@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class LineManager : MonoBehaviour
 {
@@ -81,12 +80,21 @@ public class LineManager : MonoBehaviour
 
         // 있던 역 제외
         if (station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
+        {
             line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
+
+            if (line_onMouse.isCircular && line_onMouse.stations.Count < 3)
+            {
+                line_onMouse.isCircular = false;
+                line_onMouse.UpdateWaypoints();
+                line_onMouse.UpdateHandles();
+            }
+        }
 
         // 역 추가
         else
         {
-            if (station == line_onMouse.stations[0])
+            if (station == line_onMouse.stations[0] && line_onMouse.stations.Count >= 3)
             {
                 line_onMouse.isCircular = true; // 순환 노선 설정
                 line_onMouse.UpdateWaypoints();
@@ -135,8 +143,9 @@ public class LineManager : MonoBehaviour
         RevealHandles();
 
         if (line_onMouse.isCircular)
-            HideHandle(true);
+            line_onMouse.handleStart.gameObject.SetActive(false);
 
+        line_onMouse.UpdateHandles();
         AddLine(line_onMouse);
         line_onMouse = null;
         lr = null;
@@ -261,8 +270,8 @@ public class LineManager : MonoBehaviour
         RevealHandles();
 
         if (line_onMouse.isCircular)
-            HideHandle(true);
-        
+            line_onMouse.handleStart.gameObject.SetActive(false);
+
         line_onMouse = null;
         stationUnderMouse = null;
         lr = null;
@@ -288,6 +297,16 @@ public class LineManager : MonoBehaviour
             bool isEndStation = (index == 0 || index == line_onMouse.stations.Count - 1);
 
             line_onMouse.RemoveStation(index);
+
+            if (line_onMouse.isCircular && line_onMouse.stations.Count < 3)
+            {
+                line_onMouse.isCircular = false;
+                line_onMouse.UpdateWaypoints();
+                line_onMouse.UpdateHandles();
+                // 핸들 둘 활성화
+                line_onMouse.handleStart.gameObject.SetActive(true);
+                line_onMouse.handleEnd.gameObject.SetActive(true);
+            }
 
             if (index <= segmentIndex) segmentIndex--;
             segmentIndex = Mathf.Clamp(segmentIndex, 0, line_onMouse.stations.Count - 2);
@@ -377,7 +396,7 @@ public class LineManager : MonoBehaviour
         var colors = lineButtons[availableLineCount - 1].colors;
         colors.normalColor = new Color(1, 1, 1);
         colors.disabledColor = colors.normalColor;
-        lineButtons[availableLineCount - 1].colors = colors;  
+        lineButtons[availableLineCount - 1].colors = colors;
     }
 
     public void HideHandle(bool isStart)

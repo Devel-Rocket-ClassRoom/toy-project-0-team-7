@@ -132,7 +132,7 @@ public class MouseInput : MonoBehaviour
                             {
                                 mode = Mode.ExtendLine;
                                 isStartHandle = lineManager.isStartHandle;
-                                lineManager.HideHandle(isStartHandle); // 핸들 숨기기
+                                lineManager.HideHandle(true); // 핸들 숨기기
                             }
                         }
                         else

@@ -921,17 +921,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: StationSpawner
       objectReference: {fileID: 0}
+    - target: {fileID: 8686567831944256591, guid: d732e3543ad51424c977517c10c25262, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8718536375113299409, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.14905347
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8718536375113299409, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.06044087
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8718536375113299409, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8718536375113299409, guid: d732e3543ad51424c977517c10c25262, type: 3}
       propertyPath: m_LocalRotation.w
