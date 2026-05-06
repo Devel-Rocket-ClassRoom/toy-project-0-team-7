@@ -71,21 +71,6 @@ public class AssetManager : MonoBehaviour
         }
     }
 
-    public void IncreaseLine()  // if문 검사 필요
-    {
-        lineManager.AddAvailableLine();
-    }
-
-    public void IncreaseTrain()
-    {
-        trainManager.AddAvailableTrain();
-    }
-
-    public void IncreaseCarriage()
-    {
-        Debug.Log("객차 수 증가"); // CarriageManager.-----
-    }
-
     public void ShowNextReward()
     {
         if (rewardRemain <= 0) return;
@@ -104,13 +89,6 @@ public class AssetManager : MonoBehaviour
 
         newTrainButton.gameObject.SetActive(true);
         rewardPanel.SetActive(true);
-    }
-
-    public void InactivePanel()
-    {
-        rewardPanel.SetActive(false);
-        newAssetButton1.gameObject.SetActive(false);
-        newAssetButton2.gameObject.SetActive(false);
     }
 
     public void OnClickNewTrain()
@@ -148,9 +126,31 @@ public class AssetManager : MonoBehaviour
         }
     }
 
+    public void InactivePanel()
+    {
+        rewardPanel.SetActive(false);
+        newAssetButton1.gameObject.SetActive(false);
+        newAssetButton2.gameObject.SetActive(false);
+    }
+
+    public void IncreaseTrain()
+    {
+        trainManager.AddAvailableTrain();
+    }
+
+    public void IncreaseLine()  // if문 검사 필요
+    {
+        lineManager.AddAvailableLine();
+    }
+
+    public void IncreaseCarriage()
+    {
+        Debug.Log("객차 수 증가"); // CarriageManager.-----
+    }
+
     public void IncreaseInterchange()
     {
-        // InterchangeDragButton 활성화
+        // InterchangeDragButton 활성화        
         interchangeDragButton.SetActive(true);
     }
 

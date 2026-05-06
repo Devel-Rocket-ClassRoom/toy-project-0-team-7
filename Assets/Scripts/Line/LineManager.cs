@@ -130,7 +130,7 @@ public class LineManager : MonoBehaviour
             station.lines.Add(line_onMouse); // 역에 노선 참조 추가
         }
 
-        RevealHandle();
+        RevealHandles();
 
         if (line_onMouse.isCircular)
             HideHandle(true);
@@ -157,7 +157,7 @@ public class LineManager : MonoBehaviour
         {
             line_onMouse.isCircular = false;
             line_onMouse.UpdateWaypoints();
-            line_onMouse.handleStart.gameObject.SetActive(true);
+            RevealHandles();
             isStartHandle = false;
         }
 
@@ -183,6 +183,10 @@ public class LineManager : MonoBehaviour
             {
                 if (station == line_onMouse.stations[line_onMouse.stations.Count -1])
                 {
+                    var lastStation = line_onMouse.stations[^1];
+                    line_onMouse.RemoveStation(line_onMouse.stations.Count -1);
+                    line_onMouse.InsertStation(lastStation, 0);
+
                     line_onMouse.isCircular = true; // 순환 노선 설정
                     line_onMouse.UpdateWaypoints();
                     line_onMouse.UpdateHandles();
@@ -252,7 +256,7 @@ public class LineManager : MonoBehaviour
             touchingHandle = null;
         }
 
-        RevealHandle();
+        RevealHandles();
 
         if (line_onMouse.isCircular)
             HideHandle(true);
@@ -387,7 +391,7 @@ public class LineManager : MonoBehaviour
         handle.SetActive(true);
     }
 
-    public void RevealHandle()
+    public void RevealHandles()
     {
         line_onMouse.handleStart.gameObject.SetActive(true);
         line_onMouse.handleEnd.gameObject.SetActive(true);
