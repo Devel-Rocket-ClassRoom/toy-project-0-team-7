@@ -150,7 +150,7 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseInterchange()
     {
-        // InterchangeDragButton 활성화        
+        // InterchangeDragButton 생성 + 활성화 + 리스너 추가
         interchangeDragButton.SetActive(true);
     }
 
