@@ -349,7 +349,7 @@ public class Train : MonoBehaviour
             //내릴 승객 처리
             HandleAlighting(currentStation);
 
-            yield return null;
+            yield return new WaitForSeconds(0.5f);
 
             //탈 승객 처리
             HandleBoarding(currentStation);
