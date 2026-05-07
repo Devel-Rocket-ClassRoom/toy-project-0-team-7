@@ -1,7 +1,7 @@
-using UnityEngine;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class Train : MonoBehaviour
 {
@@ -46,9 +46,14 @@ public class Train : MonoBehaviour
     public float accelerationDist = 1.7f; // 가속 구간 거리
     public float decelerationDist = 1.7f; // 감속 구간 거리
 
+    private LineRenderer lr;
+    Color color;
+    Color showColor;
+
     private void Awake()
     {
         gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        lr = GetComponent<LineRenderer>();
     }
 
     //열차 승객 시각화. 초기 6개 슬릇 생성후 Active로 관리
@@ -57,8 +62,13 @@ public class Train : MonoBehaviour
         for (int i = 0; i < capacity; i++)
         {
             GameObject icon = Instantiate(passengerIconPrefab, passengerSlots[i]);
-            Color baseColor = Colors.colors[lineId];
-            Color passengerColor = Color.Lerp(baseColor, Color.white, 0.8f);
+
+            color = Colors.colors[lineId];
+            showColor = color;
+            Color.RGBToHSV(showColor, out float h, out float s, out float v);
+            showColor = Color.HSVToRGB(h, s * 0.3f, v); // 채도 30%
+
+            var passengerColor = Color.Lerp(color, Color.white, 0.8f);
             icon.GetComponent<SpriteRenderer>().color = passengerColor;
             icon.SetActive(false);
             passengerIcons.Add(icon);
@@ -113,6 +123,17 @@ public class Train : MonoBehaviour
 
         if (!foundMatch) // 노선 삭제 했을때
         {
+            // 라인 그리기
+            lr.positionCount = routeWaypoints.Count;
+
+            for (int i = 0; i < routeWaypoints.Count; i++)
+            {
+                lr.SetPosition(i, routeWaypoints[i]);
+            }
+            lr.startColor = showColor;
+            lr.endColor = showColor;
+            // 라인 그리기
+
             isShorteningPending = true; //새로운 경로 대기
             pendingStations = new List<Station>(stations);
             pendingWaypoints = new List<Vector3>(waypoints);
@@ -230,6 +251,7 @@ public class Train : MonoBehaviour
                     startPos = transform.position;
                     targetStationIndex = waypointTargetIndex / 2;
 
+                    lr.positionCount = 0; // 잔상 제거
                     return;
                 }
             }

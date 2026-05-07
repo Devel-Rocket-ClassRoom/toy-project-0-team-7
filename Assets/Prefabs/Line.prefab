@@ -81,7 +81,7 @@ LineRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Positions: []
   m_Parameters:
@@ -156,10 +156,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Line
   isOnMaking: 1
   lineId: 0
+  isCircular: 0
   stations: []
   trains: []
   waypoints: []
   handlePrefab: {fileID: 1740203717147980539, guid: d52f2c6d410fe5344991dcab685b8986, type: 3}
+  handleStart: {fileID: 0}
+  handleEnd: {fileID: 0}
 --- !u!68 &-7969581213687635018
 EdgeCollider2D:
   m_ObjectHideFlags: 0
