@@ -134,7 +134,7 @@ LineRenderer:
       m_NumAlphaKeys: 2
     numCornerVertices: 10
     numCapVertices: 10
-    alignment: 1
+    alignment: 0
     textureMode: 0
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
@@ -156,10 +156,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Line
   isOnMaking: 1
   lineId: 0
+  isCircular: 0
   stations: []
   trains: []
   waypoints: []
   handlePrefab: {fileID: 1740203717147980539, guid: d52f2c6d410fe5344991dcab685b8986, type: 3}
+  handleStart: {fileID: 0}
+  handleEnd: {fileID: 0}
 --- !u!68 &-7969581213687635018
 EdgeCollider2D:
   m_ObjectHideFlags: 0

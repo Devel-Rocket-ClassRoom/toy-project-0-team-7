@@ -6,7 +6,11 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
+<<<<<<< feature/#61
     public enum Assets { Line, InterChangeStation, Carriage }
+=======
+    public enum Assets { Line, InterChangeStation, HighTrain }
+>>>>>>> dev
 
     public GameManager gm;
 
@@ -33,8 +37,13 @@ public class AssetManager : MonoBehaviour
 // --- 드래그 버튼 및 UI 요소 ---   
     public GameObject interchangeDragButton;
     public GameObject trainDragButton;
+<<<<<<< feature/#61
     public GameObject carriageDragButton;
+=======
+    public GameObject highTrainDragButton;
+>>>>>>> dev
     public Image interchangeAssetUI;
+    public Image highTrainAssetUI;
     public Image trainAssetUI;
     public Image carriageAssetUI;
     
@@ -55,15 +64,28 @@ public class AssetManager : MonoBehaviour
 
 // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
+<<<<<<< feature/#61
     private int remainingTrainCount = 0; 
     private int carriageCount = 0;
     public int RemainingTrainCount => remainingTrainCount;  
+=======
+    private int highTrainCount = 0;
+
+    private int remainingTrainCount = 0;
+    private int remainingHighTrainCount = 0;
+    public int RemainingTrainCount => remainingTrainCount;
+    public int RemainingHighTrainCount => remainingHighTrainCount;
+>>>>>>> dev
 
     private void Awake()
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+<<<<<<< feature/#61
         sprites.Add(Resources.Load<Sprite>("carriage"));
+=======
+        sprites.Add(Resources.Load<Sprite>("highSpeedTrain"));
+>>>>>>> dev
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
@@ -72,7 +94,12 @@ public class AssetManager : MonoBehaviour
         newAssetButton2.gameObject.SetActive(false);
 
         interchangeDragButton.SetActive(false);
+<<<<<<< feature/#61
         carriageDragButton.SetActive(false);
+=======
+        highTrainDragButton.SetActive(false);
+        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
+>>>>>>> dev
         UpdateTrainUI();
 
         Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
@@ -165,8 +192,13 @@ public class AssetManager : MonoBehaviour
                 text.text = "교차역";
                 button.image.sprite = sprites[1];
                 break;
+<<<<<<< feature/#61
             case Assets.Carriage:
                 text.text = "객차";
+=======
+            case Assets.HighTrain:
+                text.text = "고속 열차";
+>>>>>>> dev
                 button.image.sprite = sprites[2];
                 break;
         }
@@ -203,8 +235,13 @@ public class AssetManager : MonoBehaviour
             case Assets.InterChangeStation:
                 IncreaseInterchange();
                 break;
+<<<<<<< feature/#61
             case Assets.Carriage:
                 IncreaseCarriage();
+=======
+            case Assets.HighTrain:
+                IncreaseHighTrain();
+>>>>>>> dev
                 break;
         }
 
@@ -237,6 +274,21 @@ public class AssetManager : MonoBehaviour
         UpdateTrainUI();
         remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
         Debug.Log($"[기관차 획득] 사용 가능한 기관차 수: {remainingTrainCount}");
+    }
+
+    public void IncreaseHighTrain()
+    {
+        highTrainCount++;
+
+        if (highTrainCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        {
+            highTrainDragButton.SetActive(true);
+        }
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+
+        trainManager.AddHighSpeedTrain();
+        UpdateHighTrainUI();
+        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
     }
 
     public void IncreaseLine()  // if문 검사 필요
@@ -291,9 +343,16 @@ public class AssetManager : MonoBehaviour
     // 열차 개수 0개 -> 회색 처리 
     public void UpdateTrainUI()
     {
-        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
+        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeBasicTrainCount;
         UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount);
-        Debug.Log($"[기관차 UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
+        Debug.Log($"[UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
+    }
+
+    public void UpdateHighTrainUI()
+    {
+        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+        Debug.Log($"[UI 업데이트] 사용 가능한 고속 열차 수: {remainingHighTrainCount}");
     }
 
     // --- 자산 UI 업데이트 ---

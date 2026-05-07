@@ -24,7 +24,7 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         ghostImage.SetActive(false);
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public virtual void OnBeginDrag(PointerEventData eventData)
     {
         if (!GetComponent<Button>().interactable) return; 
         mouseInput.ChangeToNewTrainMode();
@@ -38,8 +38,7 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        ghostImage.SetActive(false);
-        
+        ghostImage.SetActive(false);        
     }
 
     private void UpdateGhostPos(Vector2 screenPos)

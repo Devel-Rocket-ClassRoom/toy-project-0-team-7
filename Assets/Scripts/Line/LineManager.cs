@@ -193,7 +193,7 @@ public class LineManager : MonoBehaviour
         {
             if (!line_onMouse.isCircular)
             {
-                if (station == line_onMouse.stations[line_onMouse.stations.Count -1])
+                if (station == line_onMouse.stations[line_onMouse.stations.Count -1] && line_onMouse.stations.Count >= 3)
                 {
                     var lastStation = line_onMouse.stations[^1];
                     line_onMouse.RemoveStation(line_onMouse.stations.Count -1);
@@ -216,7 +216,7 @@ public class LineManager : MonoBehaviour
         {
             if (!line_onMouse.isCircular)
             {
-                if (station == line_onMouse.stations[0])
+                if (station == line_onMouse.stations[0] && line_onMouse.stations.Count >= 3)
                 {
                     line_onMouse.isCircular = true; // 순환 노선 설정
                     line_onMouse.UpdateWaypoints();
