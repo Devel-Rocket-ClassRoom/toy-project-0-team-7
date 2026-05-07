@@ -25,6 +25,11 @@ public class Train : MonoBehaviour
     private List<Vector3> positionHistory = new List<Vector3>(); // 위치 기록용
     public const int MAX_CARRIAGE_COUNT = 2;
     public int CarriageCount => attachedCarriages.Count;
+
+    // --- 자산 삭제 관련 필드 ---
+    public bool isHighSpeedTrain = false;
+    public IReadOnlyList<GameObject> AttachedCarriages => attachedCarriages;
+    
     public float rotationSpeed = 180f;
 
     public Vector3 startPos; //출발 위치 기록용
@@ -622,6 +627,8 @@ public class Train : MonoBehaviour
         return idx == 0 || idx == path.Count - 1;
     }
 
+    // --- carriage 관련 메서드 ---
+
     public void AttachCarriage(GameObject carriage, Transform[] carriageSlots)
     {
         attachedCarriages.Add(carriage);
@@ -676,4 +683,7 @@ public class Train : MonoBehaviour
             }
         }
     }
+
+    // --- 자산 삭제 관련 메서드 ---
+
 }

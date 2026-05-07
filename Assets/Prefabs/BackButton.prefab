@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7734250863773841220}
   - component: {fileID: 2816214675485975295}
   - component: {fileID: 5198952530378385616}
+  - component: {fileID: 2793694121586086471}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -120,3 +121,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2793694121586086471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7357038555029364085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeabf4c89b2404a26a591cab99ed458b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BackButtonUi
