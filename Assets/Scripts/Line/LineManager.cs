@@ -132,7 +132,7 @@ public class LineManager : MonoBehaviour
         if (trainManager.activeTrains.Count < trainManager.availableTrainCount)
         {
             trainManager.Stations = line_onMouse.stations;            
-            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints));
+            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints, line_onMouse));
             assetManager.UpdateTrainUI(); // 열차 자산 UI 업데이트
         }
 

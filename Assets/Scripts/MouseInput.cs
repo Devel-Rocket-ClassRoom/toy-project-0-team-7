@@ -205,7 +205,7 @@ public class MouseInput : MonoBehaviour
                 if (trainTarget != null && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT && assetManager.RemainingTrainCount > 0)
                 {
                     trainManager.Stations = trainTarget.stations;
-                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints));
+                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints, trainTarget));
                     Debug.Log($"[열차 배치] 열차가 배치되었습니다. 라인 ID: {trainTarget.lineId}");
                     assetManager.UpdateTrainUI();
                 }
