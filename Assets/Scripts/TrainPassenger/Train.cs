@@ -1,17 +1,17 @@
+using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.iOS;
 
-public enum TrainDirection
-{
-    Forward,
-    Backward
-}
 public class Train : MonoBehaviour
 {
+    public enum TrainDirection
+    {
+        Forward,
+        Backward
+    }
+    public TrainDirection direction = TrainDirection.Forward;
+
     private GameManager gm;
 
     public Line myLine;
@@ -24,7 +24,8 @@ public class Train : MonoBehaviour
     public int targetStationIndex = 0;
     private int waypointTargetIndex = 0;
     private List<Station> path;
-    private List<Vector3> routeWaypoints = new List<Vector3>(); //라인에서 받아올 경로
+    private List<Vector3> routeWaypoints = new List<Vector3>(); // 라인에서 받아올 경로
+
     private bool isShorteningPending = false; // 노선 단축 예약 플래그
     private List<Station> pendingStations;
     private List<Vector3> pendingWaypoints;
@@ -37,7 +38,6 @@ public class Train : MonoBehaviour
     public Sprite[] passengerIconSprites;
     private List<GameObject> passengerIcons = new List<GameObject>();
 
-    public TrainDirection direction = TrainDirection.Forward;
     private Vector3 lastDirection = Vector3.right;
 
     [Header("Movement Settings")]
@@ -64,7 +64,6 @@ public class Train : MonoBehaviour
             passengerIcons.Add(icon);
         }
     }
-
     private void RefreshPassengerIcons()
     {
         for (int i = 0; i < capacity; i++)
@@ -79,7 +78,8 @@ public class Train : MonoBehaviour
                 passengerIcons[i].SetActive(false);
         }
     }
-    //열차 경로 설정 및 열차 생성위치 초기화
+
+    // 열차 경로 설정 및 열차 생성 위치 초기화
     public void SetPath(List<Station> stations, List<Vector3> waypoints, bool isInit = false)
     {
         if (isInit)
@@ -398,10 +398,25 @@ public class Train : MonoBehaviour
 
         // 현재 노선에서 방향 기준으로 갈 수 있는 역만 추가
         int distance = 0;
-        for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
+
+        if (myLine.isCircular)
         {
-            queue.Enqueue((path[i], distance));
-            distance++;
+            int i = currentIndex;
+            do
+            {
+                queue.Enqueue((path[i], distance));
+                distance++;
+                i = (i + dir + path.Count) % path.Count; // 순환 인덱스
+            }
+            while (i != currentIndex);
+        }
+        else
+        {
+            for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
+            {
+                queue.Enqueue((path[i], distance));
+                distance++;
+            }
         }
 
         while (queue.Count > 0)
@@ -430,6 +445,11 @@ public class Train : MonoBehaviour
     {
         if (p.blockedLineId == lineId) return false;
 
+        if (myLine != null && myLine.isCircular)
+        {
+            return BFSDistance(p.destination, targetStationIndex, 1) != int.MaxValue;
+        }
+
         var dir = direction == TrainDirection.Forward ? 1 : -1;
         int myDist = BFSDistance(p.destination, targetStationIndex + dir, dir);
         int oppDist = BFSDistance(p.destination, targetStationIndex - dir, -dir);
@@ -451,9 +471,22 @@ public class Train : MonoBehaviour
         HashSet<Station> visitedStations = new();
         Queue<Station> queue = new();
 
-        for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
+        if (myLine.isCircular)
         {
-            queue.Enqueue(path[i]);
+            int i = currentIndex;
+            do
+            {
+                queue.Enqueue(path[i]);
+                i = (i + dir + path.Count) % path.Count;
+            }
+            while (i != currentIndex);
+        }
+        else
+        {
+            for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
+            {
+                queue.Enqueue(path[i]);
+            }
         }
 
         while (queue.Count > 0)
