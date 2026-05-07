@@ -66,7 +66,7 @@ public class Station : MonoBehaviour
         isInterchange = true;
         capacity = 10;
 
-        if (isOverflow && waitingPassengers.Count < capacity)
+        if (isOverflow && waitingPassengers.Count <= capacity)
         {
             isOverflow = false;
             currentTimer = overflowTimer;
@@ -119,7 +119,7 @@ public class Station : MonoBehaviour
 
     public Passenger AddPasssenger(StationType destination)
     {
-        if (waitingPassengers.Count >= capacity)
+        if (waitingPassengers.Count > capacity)
         {
             return null;
         }
@@ -134,7 +134,7 @@ public class Station : MonoBehaviour
 
         waitingPassengers.Add(passenger);
 
-        if (waitingPassengers.Count >= capacity && !isOverflow)
+        if (waitingPassengers.Count > capacity && !isOverflow)
         {
             isOverflow = true;
             currentTimer = overflowTimer;

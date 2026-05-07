@@ -305,7 +305,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 5
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: d8183d2928da9d54fa1d7ffca1e2ee7a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -336,7 +336,6 @@ MonoBehaviour:
   - {fileID: -1290821818456711322, guid: e805a42cdc198aa4491fef2a3420af8e, type: 3}
   waitingArea: {fileID: 7150361133312655134}
   timerUI: {fileID: 461064570583954138}
-  isInterchange: 0
   capacity: 6
   overflowTimer: 30
   minSpawnTime: 5
