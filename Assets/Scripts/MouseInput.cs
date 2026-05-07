@@ -162,7 +162,7 @@ public class MouseInput : MonoBehaviour
                     case Mode.InterchangeStation:
                         interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
 
-                        if (interchangeTarget != null)
+                        if (interchangeTarget != null && !interchangeTarget.IsInterchange)
                         {
                             assetManager.InterchangeUsed();
                         }
