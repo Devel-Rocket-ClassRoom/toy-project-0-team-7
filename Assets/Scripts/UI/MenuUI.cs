@@ -6,6 +6,7 @@ public class MenuUI : MonoBehaviour
 {
     public Button restartButton;
     public Button menuButton;
+    public GameManager gameManager;
 
     private void Start()
     {
@@ -15,6 +16,8 @@ public class MenuUI : MonoBehaviour
     public void OnClickRestart()
     {
         Time.timeScale = 1f;
+        gameManager.gameResultText.text = "";
+        AssetManager.dayCount = 1;  
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
