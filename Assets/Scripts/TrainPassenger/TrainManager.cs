@@ -63,7 +63,5 @@ public class TrainManager : MonoBehaviour
 
         carriage.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[train.lineId];
         train.AttachCarriage(carriage, carriageSlots);
-
-        
     }
 }

@@ -23,6 +23,8 @@ public class Train : MonoBehaviour
     private int carriageCapacity = 6;
     private List<GameObject> attachedCarriages = new List<GameObject>(); 
     private List<Vector3> positionHistory = new List<Vector3>(); // 위치 기록용
+    public const int MAX_CARRIAGE_COUNT = 2;
+    public int CarriageCount => attachedCarriages.Count;
 
 
     public float rotationSpeed = 180f;

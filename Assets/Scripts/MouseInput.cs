@@ -246,14 +246,20 @@ public class MouseInput : MonoBehaviour
                 interchangeTarget = null;
                 break;
             case Mode.Carriage:
-                if (carriageTarget != null)
+                if (carriageTarget != null && carriageTarget.trains.Count > 0)
                 {
                     var point = cam.ScreenToWorldPoint(Input.mousePosition);
-                    Train closet = carriageTarget.trains.OrderBy(t => Vector3.Distance(t.transform.position, point)).First();
-                    trainManager.AddCarriage(closet);
-                    assetManager.CarriageUsed();    
-                    Debug.Log($"[객차 배치] 객차가 배치되었습니다. 라인 ID: {carriageTarget.lineId}");
+                    Train closest = carriageTarget.trains.OrderBy(t => Vector3.Distance(t.transform.position, point)).First();
+                    
+                    if (closest.CarriageCount < Train.MAX_CARRIAGE_COUNT)
+                    {
+                        Debug.Log($"[객차] Train: {closest.GetInstanceID()}, CarriageCount: {closest.CarriageCount}, MAX: {Train.MAX_CARRIAGE_COUNT}");
+
+                        trainManager.AddCarriage(closest);
+                        assetManager.CarriageUsed();    
+                    }
                 }
+                
                 carriageTarget = null;
                 break;
         }
