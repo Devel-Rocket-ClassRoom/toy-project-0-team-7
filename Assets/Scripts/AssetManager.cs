@@ -39,7 +39,7 @@ public class AssetManager : MonoBehaviour
     public Image carriageAssetUI;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 2f;
+    private const float dayInterval = 20f;
 
     public bool isWeekend = false;
 
