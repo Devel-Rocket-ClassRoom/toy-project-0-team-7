@@ -11,6 +11,7 @@ TagManager:
   - PassengerManager
   - Asset
   - GameManager
+  - Train
   layers:
   - Default
   - TransparentFX

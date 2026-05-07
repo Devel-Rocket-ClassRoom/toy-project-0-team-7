@@ -12,6 +12,7 @@ public class TrainManager : MonoBehaviour
 
     public GameObject trainPrefab;
     public GameObject highTrainPrefab;
+    public GameObject carriagePrefab;
     public List<Station> Stations = new();
 
     private void Update()
@@ -71,6 +72,18 @@ public class TrainManager : MonoBehaviour
 
     public void AddCarriage(Train train)
     {
+        GameObject carriage = Instantiate(carriagePrefab, train.transform.position, train.transform.rotation);
+        Train carriageTrain = carriage.GetComponent<Train>();
+        Transform[] carriageSlots = carriageTrain?.passengerSlots;
 
+        if (carriageTrain != null)
+        {
+            Destroy(carriageTrain);
+        }
+
+        Destroy(carriage.GetComponent<Collider2D>()); 
+
+        carriage.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[train.lineId];
+        train.AttachCarriage(carriage, carriageSlots);
     }
 }

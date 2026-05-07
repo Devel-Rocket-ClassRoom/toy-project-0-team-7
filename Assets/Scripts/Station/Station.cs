@@ -13,7 +13,8 @@ public class Station : MonoBehaviour
     public Passenger[] passengerPrefabs;
     public Transform waitingArea;
     public StationTimerUI timerUI;
-    public bool isInterchange = false;
+    private bool isInterchange = false;
+    public bool IsInterchange => isInterchange;
     private PassengerManager pm; 
     
     [Header("역 수용인원 및 초과 타이머 설정")] 
