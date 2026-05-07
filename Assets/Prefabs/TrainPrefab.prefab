@@ -175,6 +175,7 @@ MonoBehaviour:
   lineId: 0
   capacity: 6
   carriageCapacity: 6
+  isHighSpeedTrain: 0
   rotationSpeed: 360
   startPos: {x: 0, y: 0, z: 0}
   targetStationIndex: 0
@@ -242,7 +243,7 @@ LineRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -2
+  m_SortingOrder: -1
   m_MaskInteraction: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -381,7 +382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6892629033733031979, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_SortingOrder
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalScale.x
