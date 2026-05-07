@@ -8,10 +8,13 @@ public class StartMenuManager : MonoBehaviour
     public Button optionsButton;
     public Button backButton;
 
+    public GameObject creditPanel;
+
     private void Start()
     {
+        creditPanel.SetActive(false);
         playButton.onClick.AddListener(OnClickPlay);
-        optionsButton.onClick.AddListener(OnClickOptions);
+        optionsButton.onClick.AddListener(OnClickCredit);
         backButton.onClick.AddListener(OnClickBack);
     }
 
@@ -20,13 +23,15 @@ public class StartMenuManager : MonoBehaviour
         SceneManager.LoadScene("Sky");
     }
 
-    private void OnClickOptions()
+    private void OnClickCredit()
     {
-        // To do: 추후 구현 예정 or 아예 생략
+        creditPanel.SetActive(true);
+
     }
 
     private void OnClickBack()
     {
+        creditPanel.SetActive(false);
         SceneManager.LoadScene("MainTitleScene");
     }
 }
