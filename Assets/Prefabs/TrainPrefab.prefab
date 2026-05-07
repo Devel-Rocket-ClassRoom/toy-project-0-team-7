@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 1503156722985362708}
   m_Layer: 0
   m_Name: TrainPrefab
-  m_TagString: Untagged
+  m_TagString: Train
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -169,9 +169,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b539de0795913e4fa04d97ccc953a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
-  gm: {fileID: 5762644595033891365, guid: 014546e2eba2557438f19950dd4e0b64, type: 3}
-  targetStationIndex: 0
   direction: 0
+  myLine: {fileID: 0}
+  lineId: 0
+  capacity: 6
+  rotationSpeed: 360
+  startPos: {x: 0, y: 0, z: 0}
+  targetStationIndex: 0
   passengers: []
   passengerSlots:
   - {fileID: 5824735396961903056}
@@ -185,14 +189,10 @@ MonoBehaviour:
   - {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   - {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   - {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  capacity: 6
-  rotationSpeed: 360
-  lineId: 0
   maxSpeed: 2.5
   minSpeed: 0.5
   accelerationDist: 1.7
   decelerationDist: 1.7
-  startPos: {x: 0, y: 0, z: 0}
 --- !u!1 &7616202258190282123
 GameObject:
   m_ObjectHideFlags: 0

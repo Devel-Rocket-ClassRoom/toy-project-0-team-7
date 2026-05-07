@@ -18,6 +18,13 @@ public class Train : MonoBehaviour
     public int lineId;
 
     public int capacity = 6;
+
+    // --- carriage 관련 변수 ---
+    private int carriageCapacity = 6;
+    private List<GameObject> attachedCarriages = new List<GameObject>(); 
+    private List<Vector3> positionHistory = new List<Vector3>(); // 위치 기록용
+
+
     public float rotationSpeed = 180f;
 
     public Vector3 startPos; //출발 위치 기록용
@@ -245,6 +252,14 @@ public class Train : MonoBehaviour
             }
 
         }
+
+        // --- carriage 위치 업데이트 ---
+         if (attachedCarriages.Count > 0)
+         {
+             RecordPosition();
+             UpdateCarriagePositions();
+         }
+        
     }
     // waypoint 인덱스 진행 (방향 포함)
     public void AdvanceWaypoint()
@@ -315,8 +330,8 @@ public class Train : MonoBehaviour
             HandleBoarding(currentStation);
         }
 
-        float stopTime = currentStation.isInterchange ? 0.6f : 1.2f;
-        Debug.Log($"[열차 정차 시간] 교차역: {currentStation.isInterchange} / 정차 시간: {stopTime}");
+        float stopTime = currentStation.IsInterchange ? 0.6f : 1.2f;
+        Debug.Log($"[열차 정차 시간] 교차역: {currentStation.IsInterchange} / 정차 시간: {stopTime}");
         yield return new WaitForSeconds(stopTime);
 
         AdvanceWaypoint();
@@ -585,5 +600,61 @@ public class Train : MonoBehaviour
 
         int idx = path.IndexOf(station);
         return idx == 0 || idx == path.Count - 1;
+    }
+
+    // --- carriage 자산 관련 메서드 ---
+    public void AttachCarriage(GameObject carriage, Transform[] carriageSlots)
+    {
+        attachedCarriages.Add(carriage);
+
+        if (carriageSlots != null)
+        {
+            foreach (var slot in carriageSlots)
+            {
+                GameObject icon = Instantiate(passengerIconPrefab, slot);
+                Color baseColor = Colors.colors[lineId];
+                Color passengerColor = Color.Lerp(baseColor, Color.white, 0.8f);
+                icon.GetComponent<SpriteRenderer>().color = passengerColor;
+                icon.SetActive(false);
+                passengerIcons.Add(icon);
+            }
+            capacity += carriageCapacity;
+        }
+    }
+
+    private void RecordPosition()
+    {
+        if (positionHistory.Count == 0 || Vector3.Distance(transform.position, positionHistory[positionHistory.Count - 1]) > 0.02f)
+        {
+            positionHistory.Add(transform.position);
+        }
+    }
+
+    private void UpdateCarriagePositions()
+    {
+        for (int i = 0; i < attachedCarriages.Count; i++)
+        {
+            float targetDist = 0.7f * (i + 1); 
+            float dist = 0f;
+
+            for (int j = positionHistory.Count - 1; j > 0; j--)
+            {
+                float segLen = Vector3.Distance(positionHistory[j], positionHistory[j-1]);
+                if (dist + segLen >= targetDist)
+                {
+                    float t = (targetDist - dist) / segLen;
+                    Vector3 targetPos = Vector3.Lerp(positionHistory[j], positionHistory[j - 1], t);
+                    Vector3 dir = (positionHistory[j - 1] - positionHistory[j]).normalized;
+                    attachedCarriages[i].transform.position = targetPos;
+                    if (dir != Vector3.zero)
+                    {
+                        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                        attachedCarriages[i].transform.rotation = Quaternion.Euler(0f, 0f, angle);
+                    }
+                    break;
+                }
+                dist += segLen;
+            }
+        }
     }
 }

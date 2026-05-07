@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Linq;
 public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
@@ -166,7 +166,7 @@ public class MouseInput : MonoBehaviour
                     case Mode.InterchangeStation:
                         interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
 
-                        if (interchangeTarget != null)
+                        if (interchangeTarget != null && !interchangeTarget.IsInterchange)
                         {
                             assetManager.InterchangeUsed();
                         }
@@ -248,8 +248,10 @@ public class MouseInput : MonoBehaviour
             case Mode.Carriage:
                 if (carriageTarget != null)
                 {
-                    // CarriageManager의 메서드 호출하여 객차 추가
-                    // 예시: carriageManager.AddCarriage(carriageTarget.lineId);
+                    var point = cam.ScreenToWorldPoint(Input.mousePosition);
+                    Train closet = carriageTarget.trains.OrderBy(t => Vector3.Distance(t.transform.position, point)).First();
+                    trainManager.AddCarriage(closet);
+                    assetManager.CarriageUsed();    
                     Debug.Log($"[객차 배치] 객차가 배치되었습니다. 라인 ID: {carriageTarget.lineId}");
                 }
                 carriageTarget = null;

@@ -26,7 +26,7 @@ public class CarriageDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!GetComponent<Button>().interactable) return; 
-        //mouseInput.ChangeToNewCarriageMode();
+        mouseInput.ChangeToCarriageMode();
         ghostImage.SetActive(true);    
     }
 
@@ -38,7 +38,6 @@ public class CarriageDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler
     public void OnEndDrag(PointerEventData eventData)
     {
         ghostImage.SetActive(false);
-        
     }
 
     private void UpdateGhostPos(Vector2 screenPos)
@@ -60,8 +59,13 @@ public class CarriageDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     private void MoveGhost(Vector2 screenPos)
     {
-        Vector2 anchoredPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPos, cam, out anchoredPos);
-        ghostRect.anchoredPosition = anchoredPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.GetComponent<RectTransform>(),
+            screenPos,
+            canvas.worldCamera,
+            out Vector2 localPoint
+        );
+
+        ghostRect.localPosition = localPoint;
     }
 }

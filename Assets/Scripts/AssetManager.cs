@@ -39,7 +39,7 @@ public class AssetManager : MonoBehaviour
     public Image carriageAssetUI;
     
     private float dailyTimer = 0f;
-    private const float dayInterval = 20f;
+    private const float dayInterval = 1f;
 
     public bool isWeekend = false;
 
@@ -56,6 +56,7 @@ public class AssetManager : MonoBehaviour
 // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
     private int remainingTrainCount = 0; 
+    private int carriageCount = 0;
     public int RemainingTrainCount => remainingTrainCount;  
 
     private void Awake()
@@ -245,7 +246,12 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseCarriage()
     {
-        
+        carriageCount++;
+        if (carriageCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        {
+            carriageDragButton.SetActive(true);
+        }
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
     }
 
     public void IncreaseInterchange()
@@ -259,6 +265,13 @@ public class AssetManager : MonoBehaviour
         }
 
         UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
+    }
+
+    public void CarriageUsed()
+    {
+        carriageCount--;
+        Debug.Log($"[객차 사용] 객차 1대가 추가되었습니다.");
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);   
     }
 
     public void InterchangeUsed()

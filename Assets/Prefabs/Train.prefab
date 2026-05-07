@@ -104,14 +104,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b539de0795913e4fa04d97ccc953a30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
-  targetStationIndex: 0
   direction: 0
-  passengers: []
+  myLine: {fileID: 0}
+  lineId: 0
   capacity: 6
   rotationSpeed: 180
-  lineId: 0
+  startPos: {x: 0, y: 0, z: 0}
+  targetStationIndex: 0
+  passengers: []
+  passengerSlots: []
+  passengerIconPrefab: {fileID: 0}
+  passengerIconSprites: []
   maxSpeed: 2.5
   minSpeed: 0.5
   accelerationDist: 1.7
   decelerationDist: 1.7
-  startPos: {x: 0, y: 0, z: 0}
