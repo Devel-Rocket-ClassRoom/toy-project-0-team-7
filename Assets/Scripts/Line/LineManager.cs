@@ -378,7 +378,18 @@ public class LineManager : MonoBehaviour
             station.lines.Remove(lines[index]);
 
         foreach (var train in lines[index].trains)
+        {
+            for (int i = 0; i< train.CarriageCount; i++)
+            {
+                assetManager.CarriageReturned();
+            }
+
             trainManager.RemoveTrain(train);
+        }
+
+        assetManager.UpdateTrainUI(); 
+        assetManager.UpdateHighTrainUI(); 
+        Debug.Log($"[노선 제거] 노선 {index}이(가) 제거되었습니다. activeTrainCount: {trainManager.activeTrains.Count}, availableTrainCount: {trainManager.availableTrainCount}, activeHighSpeedTrainCount: {trainManager.activeHighSpeedTrainCount}, availableHighSpeedTrain: {trainManager.availableHighSpeedTrain}");
         
 
         Destroy(lines[index].gameObject);       
