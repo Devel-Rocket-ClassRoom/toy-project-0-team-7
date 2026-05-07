@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation }
+    public enum Assets { Line, InterChangeStation, HighTrain }
 
     public GameManager gm;
 
@@ -32,7 +32,9 @@ public class AssetManager : MonoBehaviour
 
     public GameObject interchangeDragButton;
     public GameObject trainDragButton;
+    public GameObject highTrainDragButton;
     public Image interchangeAssetUI;
+    public Image highTrainAssetUI;
     public Image trainAssetUI;
     
     private float dailyTimer = 0f;
@@ -52,13 +54,18 @@ public class AssetManager : MonoBehaviour
 
 // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
-    private int remainingTrainCount = 0; 
-    public int RemainingTrainCount => remainingTrainCount;  
+    private int highTrainCount = 0;
+
+    private int remainingTrainCount = 0;
+    private int remainingHighTrainCount = 0;
+    public int RemainingTrainCount => remainingTrainCount;
+    public int RemainingHighTrainCount => remainingHighTrainCount;
 
     private void Awake()
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+        sprites.Add(Resources.Load<Sprite>("highSpeedTrain"));
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
         rewardPanel.SetActive(false);
@@ -67,6 +74,7 @@ public class AssetManager : MonoBehaviour
         newAssetButton2.gameObject.SetActive(false);
 
         interchangeDragButton.SetActive(false);
+        highTrainDragButton.SetActive(false);
         Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
         UpdateTrainUI();
     }
@@ -158,6 +166,10 @@ public class AssetManager : MonoBehaviour
                 text.text = "교차역";
                 button.image.sprite = sprites[1];
                 break;
+            case Assets.HighTrain:
+                text.text = "고속 열차";
+                button.image.sprite = sprites[2];
+                break;
         }
     }
 
@@ -192,6 +204,9 @@ public class AssetManager : MonoBehaviour
             case Assets.InterChangeStation:
                 IncreaseInterchange();
                 break;
+            case Assets.HighTrain:
+                IncreaseHighTrain();
+                break;
         }
 
         InactivePanel();
@@ -223,6 +238,21 @@ public class AssetManager : MonoBehaviour
         UpdateTrainUI();
         remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
         Debug.Log($"[기관차 획득] 사용 가능한 기관차 수: {remainingTrainCount}");
+    }
+
+    public void IncreaseHighTrain()
+    {
+        highTrainCount++;
+
+        if (highTrainCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        {
+            highTrainDragButton.SetActive(true);
+        }
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+
+        trainManager.AddHighSpeedTrain();
+        UpdateHighTrainUI();
+        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
     }
 
     public void IncreaseLine()  // if문 검사 필요
@@ -265,9 +295,16 @@ public class AssetManager : MonoBehaviour
     // 열차 개수 0개 -> 회색 처리 
     public void UpdateTrainUI()
     {
-        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeTrains.Count;
+        remainingTrainCount = trainManager.availableTrainCount - trainManager.activeBasicTrainCount;
         UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount);
-        Debug.Log($"[기관차 UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
+        Debug.Log($"[UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
+    }
+
+    public void UpdateHighTrainUI()
+    {
+        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+        Debug.Log($"[UI 업데이트] 사용 가능한 고속 열차 수: {remainingHighTrainCount}");
     }
 
     // --- 자산 UI 업데이트 ---
