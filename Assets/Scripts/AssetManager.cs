@@ -37,6 +37,12 @@ public class AssetManager : MonoBehaviour
     public Image trainAssetUI;
     public Image carriageAssetUI;
 
+    // --- 자산 개수 관리 text 갱신 변수 ---
+    public TextMeshProUGUI interchangeCountText;
+    public TextMeshProUGUI carriageCountText;
+    public TextMeshProUGUI highTrainCountText;
+    public TextMeshProUGUI trainCountText;
+
     private float dailyTimer = 0f;
     private const float dayInterval = 20f;
 
@@ -259,7 +265,7 @@ public class AssetManager : MonoBehaviour
         {
             highTrainDragButton.SetActive(true);
         }
-        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount, highTrainCountText);
 
         trainManager.AddHighSpeedTrain();
         UpdateHighTrainUI();
@@ -278,7 +284,7 @@ public class AssetManager : MonoBehaviour
         {
             carriageDragButton.SetActive(true);
         }
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
     }
 
     public void IncreaseInterchange()
@@ -291,28 +297,28 @@ public class AssetManager : MonoBehaviour
             interchangeDragButton.SetActive(true);
         }
 
-        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
+        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount, interchangeCountText);
     }
 
     public void CarriageUsed()
     {
         carriageCount--;
         Debug.Log($"[객차 사용] 객차 1대가 추가되었습니다.");
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
     }
 
     public void CarriageReturned()
     {
         carriageCount++;
         Debug.Log($"[객차 반환] 객차 1대가 반환되었습니다.");
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
     }
 
     public void InterchangeUsed()
     {
         interchangeCount--;
         Debug.Log($"[교차역 사용] 남은 교차역 수: {interchangeCount}");
-        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
+        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount, interchangeCountText);
     }
 
     public void OnInputReleased()
@@ -326,21 +332,26 @@ public class AssetManager : MonoBehaviour
     public void UpdateTrainUI()
     {
         remainingTrainCount = trainManager.availableTrainCount - trainManager.activeBasicTrainCount;
-        UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount);
+        UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount, trainCountText);
         Debug.Log($"[UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
     }
 
     public void UpdateHighTrainUI()
     {
         remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
-        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount);
+        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount, highTrainCountText);
         Debug.Log($"[UI 업데이트] 사용 가능한 고속 열차 수: {remainingHighTrainCount}");
     }
 
     // --- 자산 UI 업데이트 ---
-    private void UpdateAssetUI(Image image, Button button, int count)
+    private void UpdateAssetUI(Image image, Button button, int count, TextMeshProUGUI countText = null)
     {
         image.color = count > 0 ? Color.white : Color.gray;
         button.interactable = count > 0;
+
+        if (countText != null)
+        {
+            countText.text = count.ToString();
+        }
     }
 }
