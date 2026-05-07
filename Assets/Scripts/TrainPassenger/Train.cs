@@ -400,7 +400,6 @@ public class Train : MonoBehaviour
         for (int i = passengers.Count - 1; i >= 0; i--)
         {
             var p = passengers[i];
-            Debug.Log($"p.transferStation: {p.transferStation?.name ?? "없음"}, station: {station.name}");
             if (p.destination == station.Shape)
             {
                 p.State = PassengerState.Arrived;
@@ -491,10 +490,10 @@ public class Train : MonoBehaviour
         }
 
         var dir = direction == TrainDirection.Forward ? 1 : -1;
-        int myDist = BFSDistance(p.destination, targetStationIndex + dir, dir);
-        int oppDist = BFSDistance(p.destination, targetStationIndex - dir, -dir);
+        int nextIndex = Mathf.Clamp(targetStationIndex + dir, 0, path.Count - 1);
+        int myDist = BFSDistance(p.destination, nextIndex, dir);
 
-        return myDist != int.MaxValue && myDist <= oppDist;
+        return myDist != int.MaxValue;
     }
 
     public bool NeedsTransfer(Passenger p, Station station)
@@ -568,9 +567,10 @@ public class Train : MonoBehaviour
     public Station FindTransferStation(Passenger p)
     {
         int dir = direction == TrainDirection.Forward ? 1 : -1;
-        int startIndex = targetStationIndex + dir;
+        //int startIndex = targetStationIndex + dir;
+        int startIndex = Mathf.Clamp(targetStationIndex + dir, 0, path.Count - 1);
 
-        if (startIndex < 0 || startIndex >= path.Count) return null;
+        //if (startIndex < 0 || startIndex >= path.Count) return null;
 
         // 현재 노선에서 방향 기준으로 순회
         for (int i = startIndex; i >= 0 && i < path.Count; i += dir)
@@ -581,6 +581,21 @@ public class Train : MonoBehaviour
             if (station.Shape == p.destination) return null;
 
             // 이 역에서 환승하면 목적지 갈 수 있으면 환승역으로 지정
+            foreach (var line in station.lines)
+            {
+                if (line.lineId == lineId) continue;
+                if (line.stations.Any(s => s.Shape == p.destination))
+                    return station;
+            }
+        }
+
+        // 현재 방향으로 못 찾으면 반대 방향도 탐색
+        for (int i = startIndex - dir; i >= 0 && i < path.Count; i -= dir)
+        {
+            var station = path[i];
+
+            if (station.Shape == p.destination) return null;
+
             foreach (var line in station.lines)
             {
                 if (line.lineId == lineId) continue;
