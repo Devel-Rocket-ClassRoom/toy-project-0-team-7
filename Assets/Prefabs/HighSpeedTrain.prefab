@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 1503156722985362708}
   - component: {fileID: 3028837286663107672}
   m_Layer: 0
-  m_Name: TrainPrefab
+  m_Name: HighSpeedTrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   - {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   - {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   - {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  maxSpeed: 2.5
+  maxSpeed: 5
   minSpeed: 0.5
   accelerationDist: 1.7
   decelerationDist: 1.7
@@ -379,12 +379,20 @@ PrefabInstance:
       value: Train
       objectReference: {fileID: 0}
     - target: {fileID: 6892629033733031979, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
+    - target: {fileID: 6892629033733031979, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_SortingOrder
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.6
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -400,19 +408,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -424,7 +432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8659560242005967046, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -4749873058282100827, guid: 700115ec0850d674ca074e0e4098a18f, type: 3}
