@@ -123,17 +123,6 @@ public class Train : MonoBehaviour
 
         if (!foundMatch) // 노선 삭제 했을때
         {
-            // 라인 그리기
-            lr.positionCount = routeWaypoints.Count;
-
-            for (int i = 0; i < routeWaypoints.Count; i++)
-            {
-                lr.SetPosition(i, routeWaypoints[i]);
-            }
-            lr.startColor = showColor;
-            lr.endColor = showColor;
-            // 라인 그리기
-
             isShorteningPending = true; //새로운 경로 대기
             pendingStations = new List<Station>(stations);
             pendingWaypoints = new List<Vector3>(waypoints);
@@ -186,6 +175,17 @@ public class Train : MonoBehaviour
 
     public void Move()
     {
+        // 라인 그리기
+        lr.positionCount = routeWaypoints.Count;
+
+        for (int i = 0; i < routeWaypoints.Count; i++)
+        {
+            lr.SetPosition(i, routeWaypoints[i]);
+        }
+        lr.startColor = showColor;
+        lr.endColor = showColor;
+        // 라인 그리기
+
         if (isStopping || routeWaypoints.Count == 0) return;
 
         Vector3 targetPos = routeWaypoints[waypointTargetIndex];
@@ -251,7 +251,7 @@ public class Train : MonoBehaviour
                     startPos = transform.position;
                     targetStationIndex = waypointTargetIndex / 2;
 
-                    lr.positionCount = 0; // 잔상 제거
+                    //lr.positionCount = 0; // 잔상 제거
                     return;
                 }
             }

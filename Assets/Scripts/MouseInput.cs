@@ -4,7 +4,7 @@ public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
     
-    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, MoveTrain, InterchangeStation }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, HighTrain, InterchangeStation }
     public Mode mode;
 
     private Camera cam;
@@ -15,7 +15,6 @@ public class MouseInput : MonoBehaviour
     private bool isStartHandle;
     private Station interchangeTarget;
     private Line trainTarget;
-
 
     void Start()
     {
@@ -140,11 +139,8 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.NewTrain:
+                    case Mode.HighTrain:
                         trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
-                        break;
-
-                    case Mode.MoveTrain:
-                        Debug.Log("Mode.MoveTrain");
                         break;
 
                     case Mode.InterchangeStation:
@@ -167,7 +163,7 @@ public class MouseInput : MonoBehaviour
                         
                         break;
                     case Mode.NewTrain:
-                        
+                    case Mode.HighTrain:                        
                         trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
@@ -175,11 +171,6 @@ public class MouseInput : MonoBehaviour
                 StopDragging();
             }
         }
-    }
-
-    public void ChangeToNewTrainMode()
-    {
-        mode = Mode.NewTrain;
     }
 
     public void StopDragging()
@@ -218,8 +209,21 @@ public class MouseInput : MonoBehaviour
                 trainTarget = null;
                 break;
 
-            case Mode.MoveTrain:
-                Debug.Log("Mode.MoveTrain End");
+            case Mode.HighTrain:
+                if (trainTarget != null && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT && assetManager.RemainingHighTrainCount > 0)
+                {
+                    trainManager.Stations = trainTarget.stations;
+                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints, trainTarget, true));
+                    Debug.Log($"[열차 배치] 열차가 배치되었습니다. 라인 ID: {trainTarget.lineId}");
+                    assetManager.UpdateHighTrainUI();
+                }
+
+                if (trainTarget != null && trainTarget.trains.Count >= Line.MAX_TRAIN_COUNT)
+                {
+                    Debug.Log($"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}");
+                }
+
+                trainTarget = null;
                 break;
 
             case Mode.InterchangeStation:
@@ -230,6 +234,16 @@ public class MouseInput : MonoBehaviour
 
         mode = Mode.None;
         assetManager.OnInputReleased();
+    }
+
+    public void ChangeToNewTrainMode()
+    {
+        mode = Mode.NewTrain;
+    }
+
+    public void ChangeToHighTrainMode()
+    {
+        mode = Mode.HighTrain;
     }
 
     public void ChangeToInterchangeStationMode()
