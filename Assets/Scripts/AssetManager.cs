@@ -301,6 +301,13 @@ public class AssetManager : MonoBehaviour
         UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
     }
 
+    public void CarriageReturned()
+    {
+        carriageCount++;
+        Debug.Log($"[객차 반환] 객차 1대가 반환되었습니다.");
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
+    }
+
     public void InterchangeUsed()
     {
         interchangeCount--;

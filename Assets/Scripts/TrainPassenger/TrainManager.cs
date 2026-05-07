@@ -45,6 +45,7 @@ public class TrainManager : MonoBehaviour
         train.myLine = line;
         train.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[lineId];
         activeTrains.Add(train);
+        train.isHighSpeedTrain = isHighTrain;
         train.Init();
 
         return train;
@@ -66,6 +67,22 @@ public class TrainManager : MonoBehaviour
 
     public void RemoveTrain(Train train)
     {
+        foreach (var carriage in train.AttachedCarriages)
+        {
+            Destroy(carriage);
+        }
+
+        if (train.isHighSpeedTrain)
+        {
+            activeHighSpeedTrainCount--;
+            Debug.Log($"[열차 반환] 고속 열차 1대가 제거되었습니다. activeHighSpeedTrainCount: {activeHighSpeedTrainCount}");
+        }
+        else
+        {
+            activeBasicTrainCount--;
+            Debug.Log($"[열차 반환] 일반 열차 1대가 제거되었습니다. activeBasicTrainCount: {activeBasicTrainCount}");
+        }
+        
         Destroy(train.gameObject);
         activeTrains.Remove(train);
     }
