@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,10 @@ public class Train : MonoBehaviour
     public int lineId;
 
     public int capacity = 6;
+
+    private List<Vector3> attachedCarriage = new List<Vector3>();
+    public int CarriageCount => attachedCarriage.Count;
+    public const int MAX_CARRIAGE_COUNT = 2;
     public float rotationSpeed = 180f;
 
     public Vector3 startPos; //출발 위치 기록용

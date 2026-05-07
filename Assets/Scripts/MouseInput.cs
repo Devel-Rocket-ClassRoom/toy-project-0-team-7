@@ -1,10 +1,11 @@
+using System.Linq;
 using UnityEngine;
 
 public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
     
-    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, HighTrain, InterchangeStation }
+    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, HighTrain, InterchangeStation, Carriage }
     public Mode mode;
 
     private Camera cam;
@@ -15,6 +16,7 @@ public class MouseInput : MonoBehaviour
     private bool isStartHandle;
     private Station interchangeTarget;
     private Line trainTarget;
+    private Line carriageTarget;
 
     void Start()
     {
@@ -146,6 +148,10 @@ public class MouseInput : MonoBehaviour
                     case Mode.InterchangeStation:
                         interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
                         break;
+
+                    case Mode.Carriage:
+                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        break;
                 }
             }
 
@@ -165,6 +171,9 @@ public class MouseInput : MonoBehaviour
                     case Mode.NewTrain:
                     case Mode.HighTrain:                        
                         trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        break;
+                    case Mode.Carriage:
+                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
                 
@@ -230,6 +239,22 @@ public class MouseInput : MonoBehaviour
                 interchangeTarget?.SetAsInterchange();
                 interchangeTarget = null;
                 break;
+            case Mode.Carriage:
+                if (carriageTarget != null && carriageTarget.trains.Count > 0)
+                {
+                    var point = cam.ScreenToWorldPoint(Input.mousePosition);
+                    Train closest = carriageTarget.trains.OrderBy(t => Vector3.Distance(t.transform.position, point)).First();
+
+                    if (closest.CarriageCount < Train.MAX_CARRIAGE_COUNT)
+                    {
+                        Debug.Log($"[객차] Train: {closest.GetInstanceID()}, CarriageCount: {closest.CarriageCount}, MAX: {Train.MAX_CARRIAGE_COUNT}");
+
+                        trainManager.AddCarriage(closest);
+                        assetManager.CarriageUsed();
+                    }
+                }
+                carriageTarget = null;
+                break;
         }
 
         mode = Mode.None;
@@ -249,5 +274,10 @@ public class MouseInput : MonoBehaviour
     public void ChangeToInterchangeStationMode()
     {
         mode = Mode.InterchangeStation;
+    }
+
+    public void ChangeToCarriageMode()
+    {
+        mode = Mode.Carriage;
     }
 }

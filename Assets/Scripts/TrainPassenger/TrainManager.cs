@@ -68,4 +68,9 @@ public class TrainManager : MonoBehaviour
         Destroy(train.gameObject);
         activeTrains.Remove(train);
     }
+
+    public void AddCarriage(Train train)
+    {
+
+    }
 }

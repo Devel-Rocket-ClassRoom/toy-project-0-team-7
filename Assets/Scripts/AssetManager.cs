@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation, HighTrain }
+    public enum Assets { Line, InterChangeStation, Carriage, HighTrain }
 
     public GameManager gm;
 
@@ -16,9 +16,7 @@ public class AssetManager : MonoBehaviour
     public LineManager lineManager;
     public const int MAX_LINE_COUNT = 7;
 
-    // (추가) 다른 자산 관리자들 . . .
     public TrainManager trainManager;
-    // (추가) 다른 자산 관리자들 . . .
 
     public GameObject rewardPanel;
     public TextMeshProUGUI week;
@@ -32,11 +30,13 @@ public class AssetManager : MonoBehaviour
 
     public GameObject interchangeDragButton;
     public GameObject trainDragButton;
+    public GameObject carriageDragButton;
     public GameObject highTrainDragButton;
     public Image interchangeAssetUI;
     public Image highTrainAssetUI;
     public Image trainAssetUI;
-    
+    public Image carriageAssetUI;
+
     private float dailyTimer = 0f;
     private const float dayInterval = 20f;
 
@@ -54,17 +54,20 @@ public class AssetManager : MonoBehaviour
 
 // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
+    private int carriageCount = 0;
     private int highTrainCount = 0;
 
     private int remainingTrainCount = 0;
-    private int remainingHighTrainCount = 0;
     public int RemainingTrainCount => remainingTrainCount;
+
+    private int remainingHighTrainCount = 0;
     public int RemainingHighTrainCount => remainingHighTrainCount;
 
     private void Awake()
     {
         sprites.Add(Resources.Load<Sprite>("line"));
         sprites.Add(Resources.Load<Sprite>("interchangeStation"));
+        sprites.Add(Resources.Load<Sprite>("carriage"));
         sprites.Add(Resources.Load<Sprite>("highSpeedTrain"));
 
         newTrainButton.onClick.AddListener(OnClickNewTrain);
@@ -74,9 +77,10 @@ public class AssetManager : MonoBehaviour
         newAssetButton2.gameObject.SetActive(false);
 
         interchangeDragButton.SetActive(false);
+        carriageDragButton.SetActive(false);
         highTrainDragButton.SetActive(false);
-        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
         UpdateTrainUI();
+        Debug.Log($"[초기화] 기관차 수: {trainManager.availableTrainCount}");
     }
 
     private void Update()
@@ -166,9 +170,13 @@ public class AssetManager : MonoBehaviour
                 text.text = "교차역";
                 button.image.sprite = sprites[1];
                 break;
+            case Assets.Carriage:
+                text.text = "객차";
+                button.image.sprite = sprites[2];
+                break;
             case Assets.HighTrain:
                 text.text = "고속 열차";
-                button.image.sprite = sprites[2];
+                button.image.sprite = sprites[3];
                 break;
         }
     }
@@ -203,6 +211,9 @@ public class AssetManager : MonoBehaviour
                 break;
             case Assets.InterChangeStation:
                 IncreaseInterchange();
+                break;
+            case Assets.Carriage:
+                IncreaseCarriage();
                 break;
             case Assets.HighTrain:
                 IncreaseHighTrain();
@@ -262,7 +273,12 @@ public class AssetManager : MonoBehaviour
 
     public void IncreaseCarriage()
     {
-        Debug.Log("객차 수 증가"); // CarriageManager.-----
+        carriageCount++;
+        if (carriageCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        {
+            carriageDragButton.SetActive(true);
+        }
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
     }
 
     public void IncreaseInterchange()
@@ -276,6 +292,13 @@ public class AssetManager : MonoBehaviour
         }
 
         UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount);
+    }
+
+    public void CarriageUsed()
+    {
+        carriageCount--;
+        Debug.Log($"[객차 사용] 객차 1대가 추가되었습니다.");
+        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount);
     }
 
     public void InterchangeUsed()
