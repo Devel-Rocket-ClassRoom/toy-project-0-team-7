@@ -433,51 +433,78 @@ public class Train : MonoBehaviour
         if (currentIndex < 0 || currentIndex >= path.Count) return int.MaxValue;
 
         HashSet<Station> visitedStations = new();
-        Queue<(Station station, int dist)> queue = new(); // 역 + 거리 쌍
+        // (역, 거리, 노선ID, 노선에서의 인덱스) 저장
+        Queue<(Station station, int dist, Line line, int lineIndex)> queue = new();
 
-        // 현재 노선에서 방향 기준으로 갈 수 있는 역만 추가
-        int distance = 0;
-
-        if (myLine.isCircular)
-        {
-            int i = currentIndex;
-            do
-            {
-                queue.Enqueue((path[i], distance));
-                distance++;
-                i = (i + dir + path.Count) % path.Count; // 순환 인덱스
-            }
-            while (i != currentIndex);
-        }
-        else
-        {
-            for (int i = currentIndex; i >= 0 && i < path.Count; i += dir)
-            {
-                queue.Enqueue((path[i], distance));
-                distance++;
-            }
-        }
+        // 시작역 추가
+        queue.Enqueue((path[currentIndex], 0, myLine, currentIndex));
 
         while (queue.Count > 0)
         {
-            var (current, dist) = queue.Dequeue();
+            var (current, dist, currentLine, currentLineIndex) = queue.Dequeue();
             if (visitedStations.Contains(current)) continue;
             visitedStations.Add(current);
 
-            if (current.Shape == dest) return dist; // 목적지 찾으면 거리 반환
+            if (current.Shape == dest) return dist;
 
+            // 현재 노선에서 다음 역 추가 (한 역씩만)
+            if (currentLine.isCircular)
+            {
+                int nextIdx = (currentLineIndex + dir + currentLine.stations.Count) % currentLine.stations.Count;
+                var nextStation = currentLine.stations[nextIdx];
+                if (!visitedStations.Contains(nextStation))
+                    queue.Enqueue((nextStation, dist + 1, currentLine, nextIdx));
+            }
+            else
+            {
+                int nextIdx = currentLineIndex + dir;
+                if (nextIdx >= 0 && nextIdx < currentLine.stations.Count)
+                {
+                    var nextStation = currentLine.stations[nextIdx];
+                    if (!visitedStations.Contains(nextStation))
+                        queue.Enqueue((nextStation, dist + 1, currentLine, nextIdx));
+                }
+                // 반대 방향도 탐색 (환승 후엔 양방향)
+                int prevIdx = currentLineIndex - dir;
+                if (currentLine.lineId != lineId && prevIdx >= 0 && prevIdx < currentLine.stations.Count)
+                {
+                    var prevStation = currentLine.stations[prevIdx];
+                    if (!visitedStations.Contains(prevStation))
+                        queue.Enqueue((prevStation, dist + 1, currentLine, prevIdx));
+                }
+            }
+
+            // 환승 노선 진입 (현재 역에서 다른 노선으로)
             foreach (var line in current.lines)
             {
-                if (line.lineId == lineId) continue; // 현재 노선 스킵
-                foreach (var station in line.stations)
+                if (line.lineId == currentLine.lineId) continue;
+                int transferIdx = line.stations.IndexOf(current);
+                if (transferIdx < 0) continue;
+                // 환승역 자체는 이미 visited 처리됐으니 양방향 다음 역만 추가
+                foreach (int transferDir in new[] { 1, -1 })
                 {
-                    if (!visitedStations.Contains(station))
-                        queue.Enqueue((station, dist + 1));
+                    if (line.isCircular)
+                    {
+                        int nextIdx = (transferIdx + transferDir + line.stations.Count) % line.stations.Count;
+                        var nextStation = line.stations[nextIdx];
+                        if (!visitedStations.Contains(nextStation))
+                            queue.Enqueue((nextStation, dist + 1, line, nextIdx));
+                    }
+                    else
+                    {
+                        int nextIdx = transferIdx + transferDir;
+                        if (nextIdx >= 0 && nextIdx < line.stations.Count)
+                        {
+                            var nextStation = line.stations[nextIdx];
+                            if (!visitedStations.Contains(nextStation))
+                                queue.Enqueue((nextStation, dist + 1, line, nextIdx));
+                        }
+                    }
                 }
             }
         }
 
-        return int.MaxValue; // 못 찾으면 최대값
+        return int.MaxValue;
     }
 
     public bool CanBoard(Passenger p)
