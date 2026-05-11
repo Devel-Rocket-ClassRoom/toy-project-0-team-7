@@ -18,8 +18,9 @@ public class TestStation : MonoBehaviour
         //삭제예정
         CreateTempPassengerObject(p);
         //테스트로그
-        Debug.Log($"<color=cyan>[승객 입성] {gameObject.name}({shapeType}) -> 목적지: {p.destination} (현재: {waitingPassengers.Count}명)");
-        
+        Debug.Log(
+            $"<color=cyan>[승객 입성] {gameObject.name}({shapeType}) -> 목적지: {p.destination} (현재: {waitingPassengers.Count}명)"
+        );
     }
 
     //여기서부터 다 삭제예정
@@ -63,11 +64,14 @@ public class TestStation : MonoBehaviour
     {
         switch (type)
         {
-            case StationType.Circle: return Color.red;    // 빨간 원
-            case StationType.Square: return Color.blue;   // 파란 사각형
-            case StationType.Triangle: return Color.green; // 초록 삼각형(캡슐)
-            default: return Color.white;
+            case StationType.Circle:
+                return Color.red; // 빨간 원
+            case StationType.Square:
+                return Color.blue; // 파란 사각형
+            case StationType.Triangle:
+                return Color.green; // 초록 삼각형(캡슐)
+            default:
+                return Color.white;
         }
     }
-
 }

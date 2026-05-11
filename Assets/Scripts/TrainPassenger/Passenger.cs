@@ -20,7 +20,7 @@ public class Passenger : MonoBehaviour
             //Debug.Log($"Passenger state changed to: {state}");
         }
     }
-  
+
     public void Init(StationType dest)
     {
         destination = dest;

@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -26,10 +26,10 @@ public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!GetComponent<Button>().interactable) return; 
+        if (!GetComponent<Button>().interactable)
+            return;
         mouseInput.ChangeToInterchangeStationMode();
         ghostImage.SetActive(true);
-    
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -40,7 +40,6 @@ public class InterchangeDragButton : MonoBehaviour, IBeginDragHandler, IDragHand
     public void OnEndDrag(PointerEventData eventData)
     {
         ghostImage.SetActive(false);
-
     }
 
     private void UpdateGhostPos(Vector2 screenPos)

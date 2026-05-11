@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 
 public class Train : MonoBehaviour
@@ -9,8 +9,9 @@ public class Train : MonoBehaviour
     public enum TrainDirection
     {
         Forward,
-        Backward
+        Backward,
     }
+
     public TrainDirection direction = TrainDirection.Forward;
 
     private GameManager gm;
@@ -21,7 +22,7 @@ public class Train : MonoBehaviour
     // --- carriage 연결 관련 ---
     public int capacity = 6;
     public int carriageCapacity = 6;
-    private List<GameObject> attachedCarriages = new List<GameObject>(); 
+    private List<GameObject> attachedCarriages = new List<GameObject>();
     private List<Vector3> positionHistory = new List<Vector3>(); // 위치 기록용
     public const int MAX_CARRIAGE_COUNT = 2;
     public int CarriageCount => attachedCarriages.Count;
@@ -29,7 +30,7 @@ public class Train : MonoBehaviour
     // --- 자산 삭제 관련 필드 ---
     public bool isHighSpeedTrain = false;
     public IReadOnlyList<GameObject> AttachedCarriages => attachedCarriages;
-    
+
     public float rotationSpeed = 180f;
 
     public Vector3 startPos; //출발 위치 기록용
@@ -86,14 +87,16 @@ public class Train : MonoBehaviour
             passengerIcons.Add(icon);
         }
     }
+
     private void RefreshPassengerIcons()
     {
         for (int i = 0; i < capacity; i++)
         {
             if (i < passengers.Count)
             {
-                passengerIcons[i].GetComponent<SpriteRenderer>().sprite =
-                    passengerIconSprites[(int)passengers[i].destination];
+                passengerIcons[i].GetComponent<SpriteRenderer>().sprite = passengerIconSprites[
+                    (int)passengers[i].destination
+                ];
                 passengerIcons[i].SetActive(true);
             }
             else
@@ -182,7 +185,6 @@ public class Train : MonoBehaviour
                 p.transferStation = FindTransferStation(p);
             }
         }
-
     }
 
     public void Move()
@@ -198,7 +200,8 @@ public class Train : MonoBehaviour
         lr.endColor = showColor;
         // 라인 그리기
 
-        if (isStopping || routeWaypoints.Count == 0) return;
+        if (isStopping || routeWaypoints.Count == 0)
+            return;
 
         Vector3 targetPos = routeWaypoints[waypointTargetIndex];
         //Station currentStation = path[targetStationIndex];
@@ -209,8 +212,10 @@ public class Train : MonoBehaviour
         bool isNextAStation = isStationWaypoint(waypointTargetIndex);
         Station nextStation = isNextAStation ? GetStationAtWaypoint(waypointTargetIndex) : null;
         //감속 판정 - 이번 역이 종점 이거나 정차해야 하는 역이면 감속 준비
-        bool shouldStopHere = isNextAStation && nextStation != null &&
-            (IsTerminalStation(nextStation) || ShouldStopAtStation(nextStation));
+        bool shouldStopHere =
+            isNextAStation
+            && nextStation != null
+            && (IsTerminalStation(nextStation) || ShouldStopAtStation(nextStation));
 
         float currentSpeed = maxSpeed;
         //속도 조절 로직. 느리게 출발해서 중간부분은 최고속도 유지하고 도착할때쯤에는 다시 느리게 이동
@@ -225,7 +230,8 @@ public class Train : MonoBehaviour
         {
             float t = traveledDistance / accelerationDist;
             currentSpeed = Mathf.Lerp(minSpeed, maxSpeed, t);
-            if (traveledDistance >= accelerationDist) departedFromStop = false;
+            if (traveledDistance >= accelerationDist)
+                departedFromStop = false;
         }
         //실제 이동
         Vector3 dir = (targetPos - transform.position).normalized;
@@ -235,8 +241,16 @@ public class Train : MonoBehaviour
         float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, currentSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
+        );
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            targetPos,
+            currentSpeed * Time.deltaTime
+        );
         if (remainingDistance < 0.05f)
         {
             transform.position = targetPos;
@@ -277,21 +291,21 @@ public class Train : MonoBehaviour
             {
                 AdvanceWaypoint();
             }
-
         }
 
         if (attachedCarriages.Count > 0)
         {
-            RecordPosition();   
+            RecordPosition();
             UpdateCarriagePositions();
         }
     }
+
     // waypoint 인덱스 진행 (방향 포함)
     public void AdvanceWaypoint()
     {
         startPos = transform.position;
         bool isCircularLine = (myLine != null) && myLine.isCircular;
-        // 방향에 따라 다음 타겟 waypoint 결정 
+        // 방향에 따라 다음 타겟 waypoint 결정
         if (direction == TrainDirection.Forward)
         {
             if (waypointTargetIndex < routeWaypoints.Count - 1)
@@ -345,7 +359,9 @@ public class Train : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, 0f, angle);
             }
 
-            Debug.Log($"<color=yellow>{currentStation.name} 정차 중...</color>승강장 개수: {path.Count}");
+            Debug.Log(
+                $"<color=yellow>{currentStation.name} 정차 중...</color>승강장 개수: {path.Count}"
+            );
             //내릴 승객 처리
             HandleAlighting(currentStation);
 
@@ -356,7 +372,9 @@ public class Train : MonoBehaviour
         }
 
         float stopTime = currentStation.IsInterchange ? 0.6f : 1.2f;
-        Debug.Log($"[열차 정차 시간] 교차역: {currentStation.IsInterchange} / 정차 시간: {stopTime}");
+        Debug.Log(
+            $"[열차 정차 시간] 교차역: {currentStation.IsInterchange} / 정차 시간: {stopTime}"
+        );
         yield return new WaitForSeconds(stopTime);
 
         AdvanceWaypoint();
@@ -369,7 +387,8 @@ public class Train : MonoBehaviour
         int i = 0;
         while (i < station.waitingPassengers.Count)
         {
-            if (passengers.Count >= capacity) break;
+            if (passengers.Count >= capacity)
+                break;
 
             Passenger p = station.waitingPassengers[i];
 
@@ -385,8 +404,10 @@ public class Train : MonoBehaviour
                 p.State = PassengerState.OnTrain;
                 passengers.Add(p);
 
-                p.gameObject.SetActive(false);  // 대기 중인 승객 비활성화
-                Debug.Log($"승객 탑승! 목적지: {p.destination} (열차 잔여석: {capacity - passengers.Count})");
+                p.gameObject.SetActive(false); // 대기 중인 승객 비활성화
+                Debug.Log(
+                    $"승객 탑승! 목적지: {p.destination} (열차 잔여석: {capacity - passengers.Count})"
+                );
             }
             else
             {
@@ -395,6 +416,7 @@ public class Train : MonoBehaviour
         }
         RefreshPassengerIcons();
     }
+
     public void HandleAlighting(Station station)
     {
         for (int i = passengers.Count - 1; i >= 0; i--)
@@ -410,7 +432,9 @@ public class Train : MonoBehaviour
                 Destroy(p.gameObject);
                 passengers.RemoveAt(i);
 
-                Debug.Log($"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})");
+                Debug.Log(
+                    $"<color=green>[하차 완료]</color> 목적지 {station.Shape} 도착! 점수 +1 (열차 잔여석: {capacity - passengers.Count})"
+                );
             }
             //환승하는경우
             else if (p.transferStation == station)
@@ -419,7 +443,8 @@ public class Train : MonoBehaviour
 
                 p.State = PassengerState.Waiting;
                 Passenger newP = station.AddPasssenger(p.destination);
-                if (newP != null) newP.blockedLineId = lineId;
+                if (newP != null)
+                    newP.blockedLineId = lineId;
 
                 Destroy(p.gameObject);
                 passengers.RemoveAt(i);
@@ -430,7 +455,8 @@ public class Train : MonoBehaviour
 
     public int BFSDistance(StationType dest, int currentIndex, int dir)
     {
-        if (currentIndex < 0 || currentIndex >= path.Count) return int.MaxValue;
+        if (currentIndex < 0 || currentIndex >= path.Count)
+            return int.MaxValue;
 
         HashSet<Station> visitedStations = new();
         // (역, 거리, 노선ID, 노선에서의 인덱스) 저장
@@ -442,15 +468,19 @@ public class Train : MonoBehaviour
         while (queue.Count > 0)
         {
             var (current, dist, currentLine, currentLineIndex) = queue.Dequeue();
-            if (visitedStations.Contains(current)) continue;
+            if (visitedStations.Contains(current))
+                continue;
             visitedStations.Add(current);
 
-            if (current.Shape == dest) return dist;
+            if (current.Shape == dest)
+                return dist;
 
             // 현재 노선에서 다음 역 추가 (한 역씩만)
             if (currentLine.isCircular)
             {
-                int nextIdx = (currentLineIndex + dir + currentLine.stations.Count) % currentLine.stations.Count;
+                int nextIdx =
+                    (currentLineIndex + dir + currentLine.stations.Count)
+                    % currentLine.stations.Count;
                 var nextStation = currentLine.stations[nextIdx];
                 if (!visitedStations.Contains(nextStation))
                     queue.Enqueue((nextStation, dist + 1, currentLine, nextIdx));
@@ -466,7 +496,11 @@ public class Train : MonoBehaviour
                 }
                 // 반대 방향도 탐색 (환승 후엔 양방향)
                 int prevIdx = currentLineIndex - dir;
-                if (currentLine.lineId != lineId && prevIdx >= 0 && prevIdx < currentLine.stations.Count)
+                if (
+                    currentLine.lineId != lineId
+                    && prevIdx >= 0
+                    && prevIdx < currentLine.stations.Count
+                )
                 {
                     var prevStation = currentLine.stations[prevIdx];
                     if (!visitedStations.Contains(prevStation))
@@ -477,15 +511,18 @@ public class Train : MonoBehaviour
             // 환승 노선 진입 (현재 역에서 다른 노선으로)
             foreach (var line in current.lines)
             {
-                if (line.lineId == currentLine.lineId) continue;
+                if (line.lineId == currentLine.lineId)
+                    continue;
                 int transferIdx = line.stations.IndexOf(current);
-                if (transferIdx < 0) continue;
+                if (transferIdx < 0)
+                    continue;
                 // 환승역 자체는 이미 visited 처리됐으니 양방향 다음 역만 추가
                 foreach (int transferDir in new[] { 1, -1 })
                 {
                     if (line.isCircular)
                     {
-                        int nextIdx = (transferIdx + transferDir + line.stations.Count) % line.stations.Count;
+                        int nextIdx =
+                            (transferIdx + transferDir + line.stations.Count) % line.stations.Count;
                         var nextStation = line.stations[nextIdx];
                         if (!visitedStations.Contains(nextStation))
                             queue.Enqueue((nextStation, dist + 1, line, nextIdx));
@@ -509,7 +546,8 @@ public class Train : MonoBehaviour
 
     public bool CanBoard(Passenger p)
     {
-        if (p.blockedLineId == lineId) return false;
+        if (p.blockedLineId == lineId)
+            return false;
 
         if (myLine != null && myLine.isCircular)
         {
@@ -525,9 +563,10 @@ public class Train : MonoBehaviour
 
     public bool NeedsTransfer(Passenger p, Station station)
     {
-        bool notOnCurrentLine = !path.Any(s => s.Shape == p.destination);   // 현재 노선에 목적지 없음
-        bool canReachViaTransfer = BFS(p.destination, path.IndexOf(station), 1)
-                                || BFS(p.destination, path.IndexOf(station), -1);   // 이 역에 내리면 목적지에 갈 수 있음
+        bool notOnCurrentLine = !path.Any(s => s.Shape == p.destination); // 현재 노선에 목적지 없음
+        bool canReachViaTransfer =
+            BFS(p.destination, path.IndexOf(station), 1)
+            || BFS(p.destination, path.IndexOf(station), -1); // 이 역에 내리면 목적지에 갈 수 있음
 
         return notOnCurrentLine && canReachViaTransfer;
     }
@@ -544,8 +583,7 @@ public class Train : MonoBehaviour
             {
                 queue.Enqueue(path[i]);
                 i = (i + dir + path.Count) % path.Count;
-            }
-            while (i != currentIndex);
+            } while (i != currentIndex);
         }
         else
         {
@@ -558,15 +596,18 @@ public class Train : MonoBehaviour
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
-            if (visitedStations.Contains(current)) continue;
+            if (visitedStations.Contains(current))
+                continue;
             visitedStations.Add(current);
 
-            if (current.Shape == dest) return true;
+            if (current.Shape == dest)
+                return true;
 
             foreach (var line in current.lines) // 이곳을 지나는 모든 노선
             {
-                if (line.lineId == lineId) continue;
-                foreach (var station in line.stations)  // 노선에 속하는 모든 역
+                if (line.lineId == lineId)
+                    continue;
+                foreach (var station in line.stations) // 노선에 속하는 모든 역
                 {
                     if (!visitedStations.Contains(station))
                         queue.Enqueue(station); // 환승 가능한 역 추가
@@ -582,11 +623,13 @@ public class Train : MonoBehaviour
     {
         foreach (var p in passengers)
         {
-            if (p.destination == station.Shape) return true;
+            if (p.destination == station.Shape)
+                return true;
         }
         foreach (var p in station.waitingPassengers)
         {
-            if (CanBoard(p)) return true;
+            if (CanBoard(p))
+                return true;
         }
         return false;
     }
@@ -605,12 +648,14 @@ public class Train : MonoBehaviour
             var station = path[i];
 
             // 직통으로 목적지 있으면 환승 필요 없음
-            if (station.Shape == p.destination) return null;
+            if (station.Shape == p.destination)
+                return null;
 
             // 이 역에서 환승하면 목적지 갈 수 있으면 환승역으로 지정
             foreach (var line in station.lines)
             {
-                if (line.lineId == lineId) continue;
+                if (line.lineId == lineId)
+                    continue;
                 if (line.stations.Any(s => s.Shape == p.destination))
                     return station;
             }
@@ -621,11 +666,13 @@ public class Train : MonoBehaviour
         {
             var station = path[i];
 
-            if (station.Shape == p.destination) return null;
+            if (station.Shape == p.destination)
+                return null;
 
             foreach (var line in station.lines)
             {
-                if (line.lineId == lineId) continue;
+                if (line.lineId == lineId)
+                    continue;
                 if (line.stations.Any(s => s.Shape == p.destination))
                     return station;
             }
@@ -636,13 +683,13 @@ public class Train : MonoBehaviour
 
     private void UpdateDirection()
     {
-        if (myLine != null && myLine.isCircular) return;
+        if (myLine != null && myLine.isCircular)
+            return;
 
         if (targetStationIndex == path.Count - 1)
             direction = TrainDirection.Backward;
         else if (targetStationIndex == 0)
             direction = TrainDirection.Forward;
-
     }
 
     //역 판별 헬퍼 함수들
@@ -654,16 +701,20 @@ public class Train : MonoBehaviour
     private Station GetStationAtWaypoint(int wpindex)
     {
         int stationIndex = wpindex / 2;
-        if (stationIndex < path.Count) return path[stationIndex];
+        if (stationIndex < path.Count)
+            return path[stationIndex];
         return null;
     }
+
     private int GetStationIndex(Station station)
     {
         return path.IndexOf(station);
     }
+
     private bool IsTerminalStation(Station station)
     {
-        if (myLine != null && myLine.isCircular) return false;
+        if (myLine != null && myLine.isCircular)
+            return false;
 
         int idx = path.IndexOf(station);
         return idx == 0 || idx == path.Count - 1;
@@ -692,7 +743,11 @@ public class Train : MonoBehaviour
 
     private void RecordPosition()
     {
-        if (positionHistory.Count == 0 || Vector3.Distance(transform.position, positionHistory[positionHistory.Count - 1]) > 0.02f)
+        if (
+            positionHistory.Count == 0
+            || Vector3.Distance(transform.position, positionHistory[positionHistory.Count - 1])
+                > 0.02f
+        )
         {
             positionHistory.Add(transform.position);
         }
@@ -702,12 +757,12 @@ public class Train : MonoBehaviour
     {
         for (int i = 0; i < attachedCarriages.Count; i++)
         {
-            float targetDist = 0.7f * (i + 1); 
+            float targetDist = 0.7f * (i + 1);
             float dist = 0f;
 
             for (int j = positionHistory.Count - 1; j > 0; j--)
             {
-                float segLen = Vector3.Distance(positionHistory[j], positionHistory[j-1]);
+                float segLen = Vector3.Distance(positionHistory[j], positionHistory[j - 1]);
                 if (dist + segLen >= targetDist)
                 {
                     float t = (targetDist - dist) / segLen;
@@ -727,5 +782,4 @@ public class Train : MonoBehaviour
     }
 
     // --- 자산 삭제 관련 메서드 ---
-
 }

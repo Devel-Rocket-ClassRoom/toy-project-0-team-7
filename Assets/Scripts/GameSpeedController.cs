@@ -9,7 +9,8 @@ public class GameSpeedController : MonoBehaviour
 
     private void Awake()
     {
-        pauseToggle.onValueChanged.AddListener(on => {
+        pauseToggle.onValueChanged.AddListener(on =>
+        {
             if (on)
             {
                 Time.timeScale = 0f;
@@ -19,7 +20,8 @@ public class GameSpeedController : MonoBehaviour
             }
         });
 
-        resumeToggle.onValueChanged.AddListener(on => {
+        resumeToggle.onValueChanged.AddListener(on =>
+        {
             if (on)
             {
                 Time.timeScale = 1f;
@@ -29,7 +31,8 @@ public class GameSpeedController : MonoBehaviour
             }
         });
 
-        doubleSpeedToggle.onValueChanged.AddListener(on => {
+        doubleSpeedToggle.onValueChanged.AddListener(on =>
+        {
             if (on)
             {
                 Time.timeScale = 2f;

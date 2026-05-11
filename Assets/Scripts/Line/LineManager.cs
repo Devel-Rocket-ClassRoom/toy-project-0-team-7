@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class LineManager : MonoBehaviour
 {
@@ -76,7 +76,8 @@ public class LineManager : MonoBehaviour
 
     public bool ToggleStationInNewLine(Station station)
     {
-        if (station == stationUnderMouse) return false;
+        if (station == stationUnderMouse)
+            return false;
         stationUnderMouse = station;
 
         // 있던 역 제외
@@ -91,7 +92,6 @@ public class LineManager : MonoBehaviour
                 line_onMouse.UpdateHandles();
             }
         }
-
         // 역 추가
         else
         {
@@ -103,10 +103,9 @@ public class LineManager : MonoBehaviour
                 isStartHandle = false;
                 return true;
             }
-
             else if (!line_onMouse.stations.Contains(station))
             {
-                line_onMouse.AddStation(station);   // 포함되지 않은 역은 추가
+                line_onMouse.AddStation(station); // 포함되지 않은 역은 추가
             }
         }
 
@@ -115,7 +114,7 @@ public class LineManager : MonoBehaviour
         return false;
     }
 
-    public void FixNewLine()   // 선 확정
+    public void FixNewLine() // 선 확정
     {
         int lineId = -1;
 
@@ -131,8 +130,10 @@ public class LineManager : MonoBehaviour
 
         if (trainManager.activeTrains.Count < trainManager.availableTrainCount)
         {
-            trainManager.Stations = line_onMouse.stations;            
-            line_onMouse.trains.Add(trainManager.SpawnTrain(lineId, line_onMouse.waypoints, line_onMouse));
+            trainManager.Stations = line_onMouse.stations;
+            line_onMouse.trains.Add(
+                trainManager.SpawnTrain(lineId, line_onMouse.waypoints, line_onMouse)
+            );
             assetManager.UpdateTrainUI(); // 열차 자산 UI 업데이트
         }
 
@@ -152,7 +153,7 @@ public class LineManager : MonoBehaviour
         lr = null;
     }
 
-    public void CancelNewLine()    // 선 만들기 취소
+    public void CancelNewLine() // 선 만들기 취소
     {
         Destroy(line_onMouse.gameObject);
         line_onMouse = null;
@@ -179,24 +180,31 @@ public class LineManager : MonoBehaviour
 
     public bool ToggleStationInExtendLine(Station station, bool isStart)
     {
-        if (station == stationUnderMouse) return false;
+        if (station == stationUnderMouse)
+            return false;
         stationUnderMouse = station;
 
         // 있던 역 제외
         if (isStart && station == line_onMouse.stations[0] && line_onMouse.stations.Count > 1)
             line_onMouse.RemoveStation(0);
-        else if (!isStart && station == line_onMouse.stations[^1] && line_onMouse.stations.Count > 1)
+        else if (
+            !isStart
+            && station == line_onMouse.stations[^1]
+            && line_onMouse.stations.Count > 1
+        )
             line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
-
         // 없던 역 추가
-        else if (isStart)   // 시작 핸들
+        else if (isStart) // 시작 핸들
         {
             if (!line_onMouse.isCircular)
             {
-                if (station == line_onMouse.stations[line_onMouse.stations.Count -1] && line_onMouse.stations.Count >= 3)
+                if (
+                    station == line_onMouse.stations[line_onMouse.stations.Count - 1]
+                    && line_onMouse.stations.Count >= 3
+                )
                 {
                     var lastStation = line_onMouse.stations[^1];
-                    line_onMouse.RemoveStation(line_onMouse.stations.Count -1);
+                    line_onMouse.RemoveStation(line_onMouse.stations.Count - 1);
                     line_onMouse.InsertStation(lastStation, 0);
 
                     line_onMouse.isCircular = true; // 순환 노선 설정
@@ -204,15 +212,13 @@ public class LineManager : MonoBehaviour
                     line_onMouse.UpdateHandles();
                     return true;
                 }
-
                 else if (!line_onMouse.stations.Contains(station))
                 {
-                    line_onMouse.InsertStation(station, 0);   // 포함되지 않은 역은 추가
+                    line_onMouse.InsertStation(station, 0); // 포함되지 않은 역은 추가
                 }
             }
         }
-
-        else   // 끝 핸들
+        else // 끝 핸들
         {
             if (!line_onMouse.isCircular)
             {
@@ -223,10 +229,9 @@ public class LineManager : MonoBehaviour
                     line_onMouse.UpdateHandles();
                     return true;
                 }
-
                 else if (!line_onMouse.stations.Contains(station))
                 {
-                    line_onMouse.AddStation(station);   // 포함되지 않은 역은 추가
+                    line_onMouse.AddStation(station); // 포함되지 않은 역은 추가
                 }
             }
         }
@@ -238,7 +243,8 @@ public class LineManager : MonoBehaviour
 
     public void FinishExtendLine()
     {
-        if (line_onMouse == null) return;
+        if (line_onMouse == null)
+            return;
 
         if (line_onMouse.stations.Count < 2)
             ClearLine(line_onMouse.lineId);
@@ -289,10 +295,11 @@ public class LineManager : MonoBehaviour
 
     public bool ToggleStationInEditLine(Station station)
     {
-        if (station == stationUnderMouse) return false;
+        if (station == stationUnderMouse)
+            return false;
         stationUnderMouse = station;
 
-        if (line_onMouse.stations.Contains(station) && line_onMouse.stations.Count > 1)    // 포함된 역
+        if (line_onMouse.stations.Contains(station) && line_onMouse.stations.Count > 1) // 포함된 역
         {
             int index = line_onMouse.stations.IndexOf(station);
             bool isEndStation = (index == 0 || index == line_onMouse.stations.Count - 1);
@@ -309,7 +316,8 @@ public class LineManager : MonoBehaviour
                 line_onMouse.handleEnd.gameObject.SetActive(true);
             }
 
-            if (index <= segmentIndex) segmentIndex--;
+            if (index <= segmentIndex)
+                segmentIndex--;
             segmentIndex = Mathf.Clamp(segmentIndex, 0, line_onMouse.stations.Count - 2);
 
             if (isEndStation)
@@ -329,7 +337,8 @@ public class LineManager : MonoBehaviour
 
     public void FinishEditLine()
     {
-        if (line_onMouse == null) return;
+        if (line_onMouse == null)
+            return;
 
         if (line_onMouse.stations.Count < 2)
             ClearLine(line_onMouse.lineId);
@@ -351,7 +360,7 @@ public class LineManager : MonoBehaviour
         {
             if (train.lineId == line_onMouse.lineId)
                 train.SetPath(line_onMouse.stations, line_onMouse.waypoints);
-        } 
+        }
 
         line_onMouse = null;
         stationUnderMouse = null;
@@ -365,21 +374,22 @@ public class LineManager : MonoBehaviour
         lines[line.lineId] = line;
         lineCount++;
         lineButtons[line.lineId].interactable = true;
-        
+
         var rt = lineButtons[line.lineId].GetComponent<RectTransform>();
         rt.sizeDelta = new Vector2(60, 60);
     }
 
     public void ClearLine(int index)
     {
-        if (lines[index] == null) return;   // 방어 코드
+        if (lines[index] == null)
+            return; // 방어 코드
 
         foreach (var station in lines[index].stations)
             station.lines.Remove(lines[index]);
 
         foreach (var train in lines[index].trains)
         {
-            for (int i = 0; i< train.CarriageCount; i++)
+            for (int i = 0; i < train.CarriageCount; i++)
             {
                 assetManager.CarriageReturned();
             }
@@ -387,12 +397,13 @@ public class LineManager : MonoBehaviour
             trainManager.RemoveTrain(train);
         }
 
-        assetManager.UpdateTrainUI(); 
-        assetManager.UpdateHighTrainUI(); 
-        Debug.Log($"[노선 제거] 노선 {index}이(가) 제거되었습니다. activeTrainCount: {trainManager.activeTrains.Count}, availableTrainCount: {trainManager.availableTrainCount}, activeHighSpeedTrainCount: {trainManager.activeHighSpeedTrainCount}, availableHighSpeedTrain: {trainManager.availableHighSpeedTrain}");
-        
+        assetManager.UpdateTrainUI();
+        assetManager.UpdateHighTrainUI();
+        Debug.Log(
+            $"[노선 제거] 노선 {index}이(가) 제거되었습니다. activeTrainCount: {trainManager.activeTrains.Count}, availableTrainCount: {trainManager.availableTrainCount}, activeHighSpeedTrainCount: {trainManager.activeHighSpeedTrainCount}, availableHighSpeedTrain: {trainManager.availableHighSpeedTrain}"
+        );
 
-        Destroy(lines[index].gameObject);       
+        Destroy(lines[index].gameObject);
         lines[index] = null;
         lineCount--;
         lineButtons[index].interactable = false;
@@ -413,14 +424,18 @@ public class LineManager : MonoBehaviour
 
     public void HideHandle(bool isStart)
     {
-        var handle = isStart ? line_onMouse.handleStart.gameObject : line_onMouse.handleEnd.gameObject;
+        var handle = isStart
+            ? line_onMouse.handleStart.gameObject
+            : line_onMouse.handleEnd.gameObject;
         touchingHandle = handle;
         touchingHandle.SetActive(false);
     }
 
     public void RevealHandle(bool isStart)
     {
-        var handle = isStart ? line_onMouse.handleStart.gameObject : line_onMouse.handleEnd.gameObject;
+        var handle = isStart
+            ? line_onMouse.handleStart.gameObject
+            : line_onMouse.handleEnd.gameObject;
         handle.SetActive(true);
     }
 
@@ -449,7 +464,7 @@ public class LineManager : MonoBehaviour
     public void UpdateEndPreviewPoint(Vector3 previewPoint)
     {
         previewPoint.z = 0f;
-        var lastStation = line_onMouse.stations[^1].transform.position;    // 마지막 역 위치
+        var lastStation = line_onMouse.stations[^1].transform.position; // 마지막 역 위치
 
         Vector3 bend = line_onMouse.GetBendPoint(lastStation, previewPoint);
         bend.z = 0f;
@@ -463,8 +478,9 @@ public class LineManager : MonoBehaviour
     {
         previewPoint.z = 0f;
 
-        Vector3 from, to;
-        if (line_onMouse.isCircular && segmentIndex >= line_onMouse.stations.Count -1)
+        Vector3 from,
+            to;
+        if (line_onMouse.isCircular && segmentIndex >= line_onMouse.stations.Count - 1)
         {
             from = line_onMouse.stations[segmentIndex].transform.position;
             to = line_onMouse.stations[0].transform.position;
@@ -494,7 +510,8 @@ public class LineManager : MonoBehaviour
             pos.z = 0f;
             tempWaypoints.Add(pos);
 
-            if (isLastNonCircular) break; // 순환 노선이 아니면 마지막 역 추가 후 종료
+            if (isLastNonCircular)
+                break; // 순환 노선이 아니면 마지막 역 추가 후 종료
 
             var nextPos = line_onMouse.stations[nextIndex].transform.position;
 
@@ -512,7 +529,7 @@ public class LineManager : MonoBehaviour
             }
         }
 
-        if (line_onMouse.isCircular)    // 순환 노선이면 첫번째 역 추가
+        if (line_onMouse.isCircular) // 순환 노선이면 첫번째 역 추가
         {
             var pos = line_onMouse.stations[0].transform.position;
             pos.z = 0f;

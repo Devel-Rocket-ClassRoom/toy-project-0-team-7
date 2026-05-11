@@ -8,7 +8,7 @@ public class Line : MonoBehaviour
     public int lineId;
     public bool isCircular = false;
 
-    public List<Station> stations = new();  // 순서 중요
+    public List<Station> stations = new(); // 순서 중요
     public List<Train> trains = new();
 
     public List<Vector3> waypoints = new();
@@ -72,18 +72,23 @@ public class Line : MonoBehaviour
     {
         this.color = color;
 
-        if (lr == null) lr = GetComponent<LineRenderer>();
+        if (lr == null)
+            lr = GetComponent<LineRenderer>();
         lr.startColor = color;
         lr.endColor = color;
 
-        if (handleStart != null) handleStart.SetColor(color);
-        if (handleEnd != null) handleEnd.SetColor(color);
+        if (handleStart != null)
+            handleStart.SetColor(color);
+        if (handleEnd != null)
+            handleEnd.SetColor(color);
     }
 
     public void UpdateHandles()
     {
-        if (handleStart == null || handleEnd == null) return;
-        if (stations.Count < 1 || waypoints.Count < 2) return;
+        if (handleStart == null || handleEnd == null)
+            return;
+        if (stations.Count < 1 || waypoints.Count < 2)
+            return;
 
         var dirStart = (waypoints[0] - waypoints[1]).normalized;
         handleStart.transform.position = stations[0].transform.position;
@@ -125,9 +130,13 @@ public class Line : MonoBehaviour
             pos.z = 0f;
             waypoints.Add(pos);
 
-            if (isLast && !isCircular) break;
+            if (isLast && !isCircular)
+                break;
 
-            var bendPoint = GetBendPoint(stations[i].transform.position, stations[nextIndex].transform.position);
+            var bendPoint = GetBendPoint(
+                stations[i].transform.position,
+                stations[nextIndex].transform.position
+            );
             bendPoint.z = 0f;
             waypoints.Add(bendPoint);
         }
@@ -163,7 +172,7 @@ public class Line : MonoBehaviour
 
     public Vector3 GetBendPoint(Vector3 from, Vector3 to)
     {
-        Vector3 diff = to - from;   // 방향
+        Vector3 diff = to - from; // 방향
         float ax = Mathf.Abs(diff.x);
         float ay = Mathf.Abs(diff.y);
 
@@ -173,15 +182,14 @@ public class Line : MonoBehaviour
             return new Vector3(from.x, to.y - Mathf.Sign(diff.y) * ax, 0);
     }
 
-    public int GetSegmentIndex(Vector3 clickPos)   // 클릭 지점으로 구간 인덱스 찾기
+    public int GetSegmentIndex(Vector3 clickPos) // 클릭 지점으로 구간 인덱스 찾기
     {
         float minDist = float.MaxValue;
         int waypointSegmentIndex = 0;
 
         for (int i = 0; i < waypoints.Count - 1; i++)
         {
-            float dist = DistancePointToSegment(
-                clickPos, waypoints[i], waypoints[i + 1]);
+            float dist = DistancePointToSegment(clickPos, waypoints[i], waypoints[i + 1]);
 
             if (dist < minDist)
             {
@@ -190,7 +198,7 @@ public class Line : MonoBehaviour
             }
         }
 
-        return waypointSegmentIndex / 2;    // 역은 짝수 인덱스에 위치함 (0, 2, 4...)
+        return waypointSegmentIndex / 2; // 역은 짝수 인덱스에 위치함 (0, 2, 4...)
     }
 
     private float DistancePointToSegment(Vector3 p, Vector3 a, Vector3 b)

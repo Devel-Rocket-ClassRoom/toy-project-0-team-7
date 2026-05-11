@@ -1,5 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;   
+using UnityEngine.UI;
+
 public class GameOverUI : MonoBehaviour
 {
     public GameObject menuPanel;
@@ -7,8 +8,9 @@ public class GameOverUI : MonoBehaviour
 
     private void Awake()
     {
-        menuPanel.SetActive(false);    
+        menuPanel.SetActive(false);
     }
+
     private void Start()
     {
         arrowButton.onClick.AddListener(OnClickMenu);
@@ -18,5 +20,5 @@ public class GameOverUI : MonoBehaviour
     {
         Time.timeScale = 1f; // 게임 오버 UI에서 메뉴로 돌아갈 때 시간 정지 해제
         menuPanel.SetActive(true);
-    }   
+    }
 }

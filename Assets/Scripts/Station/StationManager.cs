@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 // --- Station Prefab을 랜덤하게 생성하는 스포너 역할 클래스 ---
 public class StationManager : MonoBehaviour
@@ -7,16 +7,19 @@ public class StationManager : MonoBehaviour
     public Station[] prefabs;
 
     [Header("스폰 시간 조정")] // To Do: 추후 실제 게임에 맞게 느리게 조정해야함
-    [SerializeField] private float minRandomTime = 20f;
-    [SerializeField] private float maxRandomTime = 30f;
-    
+    [SerializeField]
+    private float minRandomTime = 20f;
+
+    [SerializeField]
+    private float maxRandomTime = 30f;
+
     [Header("역 오른쪽 공간 offset")]
     private float rightOffset = 2.2f;
     private float minRadius;
     private float timer = 0f;
     private float offset = 0.5f;
-    private int initialCount = 3; // 처음 시작할 때 생성할 역의 수 (각각 다른 모양으로 3개) 
-    private int spawnedCount = 0;   // 처음 역이 세 개 생성된 후, 랜덤 스폰되는 횟수
+    private int initialCount = 3; // 처음 시작할 때 생성할 역의 수 (각각 다른 모양으로 3개)
+    private int spawnedCount = 0; // 처음 역이 세 개 생성된 후, 랜덤 스폰되는 횟수
     private float initialSpawnTime = 15f;
     private List<Station> exisitingStations;
     public List<Station> ExisitingStations => exisitingStations;
@@ -30,13 +33,14 @@ public class StationManager : MonoBehaviour
         pm = GameObject.FindWithTag("PassengerManager").GetComponent<PassengerManager>();
         float screenHeight = cam.orthographicSize * 2f;
         minRadius = screenHeight * 0.15f;
-    } 
+    }
+
     private void Start()
     {
         InitialRandomSpawn(initialCount);
         timer = initialSpawnTime;
         //Debug.Log($"[시작] 초기 스폰 완료 | 다음 스폰 시간 타이머: {timer:F2}");
-        spawnedCount++;    
+        spawnedCount++;
     }
 
     private void Update()
@@ -59,17 +63,17 @@ public class StationManager : MonoBehaviour
         {
             return 27f;
         }
-
         else
         {
-            return Random.Range(minRandomTime, maxRandomTime);  
+            return Random.Range(minRandomTime, maxRandomTime);
         }
     }
 
     // --- 처음 시작할 때 각각 다른 모양으로 3개의 역 랜덤 스폰하는 메서드 ---
     private void InitialRandomSpawn(int count)
     {
-        if (prefabs == null || prefabs.Length == 0) return;
+        if (prefabs == null || prefabs.Length == 0)
+            return;
 
         var shuffeld = new List<Station>(prefabs);
         for (int i = shuffeld.Count - 1; i > 0; i--)
@@ -99,7 +103,8 @@ public class StationManager : MonoBehaviour
     // --- 한 번 실행될 때 승강장 하나만 랜덤 생성 ---
     private void RandomSpawn()
     {
-        if (prefabs == null || prefabs.Length == 0) return;
+        if (prefabs == null || prefabs.Length == 0)
+            return;
 
         int range = prefabs.Length;
         var station = Instantiate(prefabs[Random.Range(0, range)]);
@@ -114,7 +119,6 @@ public class StationManager : MonoBehaviour
         station.transform.position = stationPos;
         exisitingStations.Add(station);
         pm.allStations.Add(station);
-
     }
 
     // --- 승강장 위치 랜덤하게 생성 ---
@@ -146,8 +150,7 @@ public class StationManager : MonoBehaviour
                 return false;
             }
         }
-        
+
         return true;
     }
-
 }

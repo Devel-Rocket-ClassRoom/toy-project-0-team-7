@@ -1,12 +1,18 @@
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Collections.Generic;
 
 public class AssetManager : MonoBehaviour
 {
-    public enum Assets { Line, InterChangeStation, Carriage, HighTrain }
+    public enum Assets
+    {
+        Line,
+        InterChangeStation,
+        Carriage,
+        HighTrain,
+    }
 
     public GameManager gm;
 
@@ -55,10 +61,10 @@ public class AssetManager : MonoBehaviour
     private int rewardRemain = 0;
 
     private float savedTimeScale;
-    
+
     private List<Sprite> sprites = new();
 
-// --- 자산 개수 관리 관련 변수 ---
+    // --- 자산 개수 관리 관련 변수 ---
     private int interchangeCount = 0;
     private int carriageCount = 0;
     private int highTrainCount = 0;
@@ -93,7 +99,7 @@ public class AssetManager : MonoBehaviour
     {
         if (Time.timeScale != 0)
         {
-            if (dailyTimer > dayInterval)   // 1일 지나면
+            if (dailyTimer > dayInterval) // 1일 지나면
             {
                 if (dayCount % 7 == 0)
                 {
@@ -117,7 +123,8 @@ public class AssetManager : MonoBehaviour
 
     public void ShowNextReward()
     {
-        if (rewardRemain <= 0) return;
+        if (rewardRemain <= 0)
+            return;
 
         savedTimeScale = Time.timeScale; // 현재 속도 저장
         Time.timeScale = 0f;
@@ -138,9 +145,9 @@ public class AssetManager : MonoBehaviour
             asset1 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
             a++;
 
-            if (a == max) break;
-        }
-        while (asset1 == Assets.Line && lineManager.CantAddLine);
+            if (a == max)
+                break;
+        } while (asset1 == Assets.Line && lineManager.CantAddLine);
         Debug.Log(asset1);
         Debug.Log($"a = {a}");
 
@@ -151,9 +158,9 @@ public class AssetManager : MonoBehaviour
             asset2 = (Assets)assets.GetValue(UnityEngine.Random.Range(0, assets.Length));
             a++;
 
-            if (a == max) break;
-        }
-        while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.CantAddLine));
+            if (a == max)
+                break;
+        } while (asset2 == asset1 || (asset2 == Assets.Line && lineManager.CantAddLine));
         Debug.Log(asset2);
         Debug.Log($"a = {a}");
 
@@ -198,7 +205,7 @@ public class AssetManager : MonoBehaviour
 
     public void OnClickNewTrain()
     {
-        Debug.Log("[기관차 획득] 기관차 1대가 추가되었습니다.");    
+        Debug.Log("[기관차 획득] 기관차 1대가 추가되었습니다.");
         IncreaseTrain();
         newTrainButton.gameObject.SetActive(false);
 
@@ -231,7 +238,7 @@ public class AssetManager : MonoBehaviour
         displayWeek++;
 
         if (rewardRemain > 0 && inputManager.mode == MouseInput.Mode.None)
-        {            
+        {
             ActivePanel(); // 다음 리워드 표시
         }
         else
@@ -261,18 +268,24 @@ public class AssetManager : MonoBehaviour
     {
         highTrainCount++;
 
-        if (highTrainCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        if (highTrainCount == 1) // 처음 획득했을 때만 버튼 활성화
         {
             highTrainDragButton.SetActive(true);
         }
-        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount, highTrainCountText);
+        UpdateAssetUI(
+            highTrainAssetUI,
+            highTrainDragButton.GetComponent<Button>(),
+            remainingHighTrainCount,
+            highTrainCountText
+        );
 
         trainManager.AddHighSpeedTrain();
         UpdateHighTrainUI();
-        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
+        remainingHighTrainCount =
+            trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
     }
 
-    public void IncreaseLine()  // if문 검사 필요
+    public void IncreaseLine() // if문 검사 필요
     {
         lineManager.AddAvailableLine();
     }
@@ -280,11 +293,16 @@ public class AssetManager : MonoBehaviour
     public void IncreaseCarriage()
     {
         carriageCount++;
-        if (carriageCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        if (carriageCount == 1) // 처음 획득했을 때만 버튼 활성화
         {
             carriageDragButton.SetActive(true);
         }
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
+        UpdateAssetUI(
+            carriageAssetUI,
+            carriageDragButton.GetComponent<Button>(),
+            carriageCount,
+            carriageCountText
+        );
     }
 
     public void IncreaseInterchange()
@@ -292,33 +310,53 @@ public class AssetManager : MonoBehaviour
         // InterchangeDragButton 생성 + 활성화 + 리스너 추가
         interchangeCount++;
         Debug.Log($"[교차역 획득] 사용 가능한 교차역 수: {interchangeCount}");
-        if (interchangeCount == 1) // 처음 획득했을 때만 버튼 활성화    
+        if (interchangeCount == 1) // 처음 획득했을 때만 버튼 활성화
         {
             interchangeDragButton.SetActive(true);
         }
 
-        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount, interchangeCountText);
+        UpdateAssetUI(
+            interchangeAssetUI,
+            interchangeDragButton.GetComponent<Button>(),
+            interchangeCount,
+            interchangeCountText
+        );
     }
 
     public void CarriageUsed()
     {
         carriageCount--;
         Debug.Log($"[객차 사용] 객차 1대가 추가되었습니다.");
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
+        UpdateAssetUI(
+            carriageAssetUI,
+            carriageDragButton.GetComponent<Button>(),
+            carriageCount,
+            carriageCountText
+        );
     }
 
     public void CarriageReturned()
     {
         carriageCount++;
         Debug.Log($"[객차 반환] 객차 1대가 반환되었습니다.");
-        UpdateAssetUI(carriageAssetUI, carriageDragButton.GetComponent<Button>(), carriageCount, carriageCountText);
+        UpdateAssetUI(
+            carriageAssetUI,
+            carriageDragButton.GetComponent<Button>(),
+            carriageCount,
+            carriageCountText
+        );
     }
 
     public void InterchangeUsed()
     {
         interchangeCount--;
         Debug.Log($"[교차역 사용] 남은 교차역 수: {interchangeCount}");
-        UpdateAssetUI(interchangeAssetUI, interchangeDragButton.GetComponent<Button>(), interchangeCount, interchangeCountText);
+        UpdateAssetUI(
+            interchangeAssetUI,
+            interchangeDragButton.GetComponent<Button>(),
+            interchangeCount,
+            interchangeCountText
+        );
     }
 
     public void OnInputReleased()
@@ -328,23 +366,39 @@ public class AssetManager : MonoBehaviour
     }
 
     // --- 열차 UI 업데이트 ---
-    // 열차 개수 0개 -> 회색 처리 
+    // 열차 개수 0개 -> 회색 처리
     public void UpdateTrainUI()
     {
         remainingTrainCount = trainManager.availableTrainCount - trainManager.activeBasicTrainCount;
-        UpdateAssetUI(trainAssetUI, trainDragButton.GetComponent<Button>(), remainingTrainCount, trainCountText);
+        UpdateAssetUI(
+            trainAssetUI,
+            trainDragButton.GetComponent<Button>(),
+            remainingTrainCount,
+            trainCountText
+        );
         Debug.Log($"[UI 업데이트] 사용 가능한 기관차 수: {remainingTrainCount}");
     }
 
     public void UpdateHighTrainUI()
     {
-        remainingHighTrainCount = trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
-        UpdateAssetUI(highTrainAssetUI, highTrainDragButton.GetComponent<Button>(), remainingHighTrainCount, highTrainCountText);
+        remainingHighTrainCount =
+            trainManager.availableHighSpeedTrain - trainManager.activeHighSpeedTrainCount;
+        UpdateAssetUI(
+            highTrainAssetUI,
+            highTrainDragButton.GetComponent<Button>(),
+            remainingHighTrainCount,
+            highTrainCountText
+        );
         Debug.Log($"[UI 업데이트] 사용 가능한 고속 열차 수: {remainingHighTrainCount}");
     }
 
     // --- 자산 UI 업데이트 ---
-    private void UpdateAssetUI(Image image, Button button, int count, TextMeshProUGUI countText = null)
+    private void UpdateAssetUI(
+        Image image,
+        Button button,
+        int count,
+        TextMeshProUGUI countText = null
+    )
     {
         image.color = count > 0 ? Color.white : Color.gray;
         button.interactable = count > 0;

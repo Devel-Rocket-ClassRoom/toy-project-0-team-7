@@ -1,13 +1,14 @@
-using UnityEngine;
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine;
 
 // --- Station 데이터 클래스 ---
 public class Station : MonoBehaviour
 {
-    [SerializeField] private StationType shape;
+    [SerializeField]
+    private StationType shape;
     public StationType Shape => shape;
 
     public Passenger[] passengerPrefabs;
@@ -15,16 +16,21 @@ public class Station : MonoBehaviour
     public StationTimerUI timerUI;
     private bool isInterchange = false;
     public bool IsInterchange => isInterchange;
-    private PassengerManager pm; 
-    
-    [Header("역 수용인원 및 초과 타이머 설정")] 
-    [SerializeField] private int capacity = 6; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
-    [SerializeField] private float overflowTimer = 30f; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
+    private PassengerManager pm;
+
+    [Header("역 수용인원 및 초과 타이머 설정")]
+    [SerializeField]
+    private int capacity = 6; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
+
+    [SerializeField]
+    private float overflowTimer = 30f; // 조절하면서 게임 실행하다가 나중에 고정하든가 수정
 
     [Header("승객 스폰 시간 가격")]
-    [SerializeField] private float minSpawnTime = 5f;
-    [SerializeField] private float maxSpawnTime = 15f;
-   
+    [SerializeField]
+    private float minSpawnTime = 5f;
+
+    [SerializeField]
+    private float maxSpawnTime = 15f;
 
     public List<Passenger> waitingPassengers = new List<Passenger>();
     public List<Line> lines = new List<Line>(); // 승강장에 연결된 노선을 저장할 리스트
@@ -35,11 +41,13 @@ public class Station : MonoBehaviour
     private void Awake()
     {
         pm = GameObject.FindWithTag("PassengerManager").GetComponent<PassengerManager>();
-    }   
+    }
+
     private void Start()
     {
-        if (timerUI != null) timerUI.gameObject.SetActive(false);
-        StartCoroutine(CoSpawnPassengers(pm));  
+        if (timerUI != null)
+            timerUI.gameObject.SetActive(false);
+        StartCoroutine(CoSpawnPassengers(pm));
     }
 
     private void Update()
@@ -48,13 +56,15 @@ public class Station : MonoBehaviour
         {
             currentTimer -= Time.deltaTime;
 
-            if (timerUI != null) timerUI.UpdateFill(currentTimer, overflowTimer);
+            if (timerUI != null)
+                timerUI.UpdateFill(currentTimer, overflowTimer);
 
             if (currentTimer <= 0f)
             {
                 isOverflow = false;
 
-                if (timerUI != null) timerUI.SetFull();
+                if (timerUI != null)
+                    timerUI.SetFull();
                 TimeOver();
             }
         }
@@ -62,7 +72,8 @@ public class Station : MonoBehaviour
 
     public void SetAsInterchange()
     {
-        if (isInterchange) return;
+        if (isInterchange)
+            return;
         isInterchange = true;
         capacity = 10;
 
@@ -71,7 +82,8 @@ public class Station : MonoBehaviour
             isOverflow = false;
             currentTimer = overflowTimer;
 
-            if (timerUI != null) timerUI.gameObject.SetActive(false);
+            if (timerUI != null)
+                timerUI.gameObject.SetActive(false);
         }
 
         float scale = 1.5f;
@@ -88,16 +100,16 @@ public class Station : MonoBehaviour
     private IEnumerator CoSpawnPassengers(PassengerManager pm)
     {
         yield return new WaitForSeconds(UnityEngine.Random.Range(minSpawnTime, maxSpawnTime)); // 역이 생성되고 나서 잠깐 기다렸다가 승객 스폰 시작
-        
+
         while (true)
         {
             int spawnCount = UnityEngine.Random.value < 0.7f ? 1 : 2;
             for (int i = 0; i < spawnCount; i++)
             {
                 StationType dest = pm.GetRandomDestExcluding(this.shape);
-                AddPasssenger(dest);  
+                AddPasssenger(dest);
             }
-              
+
             float spawnInterval = UnityEngine.Random.Range(minSpawnTime, maxSpawnTime);
             yield return new WaitForSeconds(spawnInterval);
         }
@@ -115,7 +127,6 @@ public class Station : MonoBehaviour
 
         return new Vector3(index * 2.5f, 1f, 0f);
     }
-
 
     public Passenger AddPasssenger(StationType destination)
     {
@@ -139,7 +150,8 @@ public class Station : MonoBehaviour
             isOverflow = true;
             currentTimer = overflowTimer;
 
-            if (timerUI != null) timerUI.gameObject.SetActive(true);
+            if (timerUI != null)
+                timerUI.gameObject.SetActive(true);
         }
 
         return passenger;
@@ -159,7 +171,7 @@ public class Station : MonoBehaviour
         {
             isOverflow = false;
             currentTimer = overflowTimer;
-            
+
             timerUI.gameObject.SetActive(false);
         }
     }
@@ -170,8 +182,7 @@ public class Station : MonoBehaviour
         {
             station.sortingOrder = 20;
         }
-        
+
         OnTimeOver?.Invoke(transform.position);
     }
-
 }

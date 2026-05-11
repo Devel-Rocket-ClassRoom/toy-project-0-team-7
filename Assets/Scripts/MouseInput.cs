@@ -4,8 +4,19 @@ using UnityEngine;
 public class MouseInput : MonoBehaviour
 {
     public GameManager gm;
-    
-    public enum Mode { None, NewLine, ExtendLine, EditLine, NewTrain, HighTrain, InterchangeStation, Carriage }
+
+    public enum Mode
+    {
+        None,
+        NewLine,
+        ExtendLine,
+        EditLine,
+        NewTrain,
+        HighTrain,
+        InterchangeStation,
+        Carriage,
+    }
+
     public Mode mode;
 
     private Camera cam;
@@ -34,25 +45,28 @@ public class MouseInput : MonoBehaviour
 
         foreach (var h in hits)
         {
-            if (h.collider.CompareTag("Station")) stationHit = h;
-            else if (h.collider.CompareTag("Handle")) handleHit = h;
-            else if (h.collider.CompareTag("Line")) lineHit = h;
+            if (h.collider.CompareTag("Station"))
+                stationHit = h;
+            else if (h.collider.CompareTag("Handle"))
+                handleHit = h;
+            else if (h.collider.CompareTag("Line"))
+                lineHit = h;
         }
 
-        if (Input.GetMouseButtonDown(0))    // 클릭
+        if (Input.GetMouseButtonDown(0)) // 클릭
         {
-            if (assetManager.isWeekend || gm.isGameOver) return;
+            if (assetManager.isWeekend || gm.isGameOver)
+                return;
 
-            if (stationHit.collider != null && !lineManager.IsLinesFull)    // 새 선 만들기
+            if (stationHit.collider != null && !lineManager.IsLinesFull) // 새 선 만들기
             {
                 mode = Mode.NewLine;
                 var pos = stationHit.collider.gameObject.transform.position;
                 pos.z = 0f;
 
                 lineManager.StartNewLine(stationHit, pos);
-                return;                    
+                return;
             }
-
             else if (handleHit.collider != null) // 기존 선 연장하기
             {
                 mode = Mode.ExtendLine;
@@ -64,8 +78,7 @@ public class MouseInput : MonoBehaviour
 
                 return;
             }
-
-            else if (lineHit.collider != null)  // 기존 선 편집하기 (중간 선택)
+            else if (lineHit.collider != null) // 기존 선 편집하기 (중간 선택)
             {
                 mode = Mode.EditLine;
                 var pos = point;
@@ -78,7 +91,7 @@ public class MouseInput : MonoBehaviour
 
         if (mode != Mode.None)
         {
-            if (Input.GetMouseButton(0))    // 드래그
+            if (Input.GetMouseButton(0)) // 드래그
             {
                 if (gm.isGameOver)
                 {
@@ -106,12 +119,17 @@ public class MouseInput : MonoBehaviour
                         break;
 
                     case Mode.ExtendLine:
-                        if (isStartHandle)  lineManager.UpdateStartPreviewPoint(previewPoint);
-                        else                lineManager.UpdateEndPreviewPoint(previewPoint);
+                        if (isStartHandle)
+                            lineManager.UpdateStartPreviewPoint(previewPoint);
+                        else
+                            lineManager.UpdateEndPreviewPoint(previewPoint);
                         if (stationHit.collider != null)
                         {
                             var station = stationHit.collider.GetComponent<Station>();
-                            var isCircular = lineManager.ToggleStationInExtendLine(station, isStartHandle);
+                            var isCircular = lineManager.ToggleStationInExtendLine(
+                                station,
+                                isStartHandle
+                            );
                             if (isCircular)
                             {
                                 isStartHandle = lineManager.isStartHandle;
@@ -128,7 +146,9 @@ public class MouseInput : MonoBehaviour
                         lineManager.UpdateEditPreviewPoint(previewPoint);
                         if (stationHit.collider != null)
                         {
-                            bool goExtend = lineManager.ToggleStationInEditLine(stationHit.collider.GetComponent<Station>());
+                            bool goExtend = lineManager.ToggleStationInEditLine(
+                                stationHit.collider.GetComponent<Station>()
+                            );
                             if (goExtend)
                             {
                                 mode = Mode.ExtendLine;
@@ -142,41 +162,51 @@ public class MouseInput : MonoBehaviour
 
                     case Mode.NewTrain:
                     case Mode.HighTrain:
-                        trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        trainTarget =
+                            lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
 
                     case Mode.InterchangeStation:
-                        interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
+                        interchangeTarget =
+                            stationHit.collider != null
+                                ? stationHit.collider.GetComponent<Station>()
+                                : null;
                         break;
 
                     case Mode.Carriage:
-                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        carriageTarget =
+                            lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
             }
 
-            if (Input.GetMouseButtonUp(0))  // 릴리즈
+            if (Input.GetMouseButtonUp(0)) // 릴리즈
             {
                 switch (mode)
                 {
                     case Mode.InterchangeStation:
-                        interchangeTarget = stationHit.collider != null ? stationHit.collider.GetComponent<Station>() : null;
+                        interchangeTarget =
+                            stationHit.collider != null
+                                ? stationHit.collider.GetComponent<Station>()
+                                : null;
 
                         if (interchangeTarget != null && !interchangeTarget.IsInterchange)
                         {
                             assetManager.InterchangeUsed();
                         }
-                        
+
                         break;
                     case Mode.NewTrain:
-                    case Mode.HighTrain:                        
-                        trainTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                    case Mode.HighTrain:
+                        trainTarget =
+                            lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                     case Mode.Carriage:
-                        carriageTarget = lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
+                        carriageTarget =
+                            lineHit.collider != null ? lineHit.collider.GetComponent<Line>() : null;
                         break;
                 }
-                
+
                 StopDragging();
             }
         }
@@ -188,8 +218,8 @@ public class MouseInput : MonoBehaviour
         {
             case Mode.NewLine:
                 if (lineManager.IsValidLine)
-                    lineManager.FixNewLine();                
-                else 
+                    lineManager.FixNewLine();
+                else
                     lineManager.CancelNewLine();
                 break;
 
@@ -202,34 +232,59 @@ public class MouseInput : MonoBehaviour
                 break;
 
             case Mode.NewTrain:
-                if (trainTarget != null && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT && assetManager.RemainingTrainCount > 0)
+                if (
+                    trainTarget != null
+                    && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT
+                    && assetManager.RemainingTrainCount > 0
+                )
                 {
                     trainManager.Stations = trainTarget.stations;
-                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints, trainTarget));
+                    trainTarget.trains.Add(
+                        trainManager.SpawnTrain(
+                            trainTarget.lineId,
+                            trainTarget.waypoints,
+                            trainTarget
+                        )
+                    );
                     Debug.Log($"[열차 배치] 열차가 배치되었습니다. 라인 ID: {trainTarget.lineId}");
                     assetManager.UpdateTrainUI();
                 }
 
                 if (trainTarget != null && trainTarget.trains.Count >= Line.MAX_TRAIN_COUNT)
                 {
-                    Debug.Log($"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}");
+                    Debug.Log(
+                        $"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}"
+                    );
                 }
 
                 trainTarget = null;
                 break;
 
             case Mode.HighTrain:
-                if (trainTarget != null && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT && assetManager.RemainingHighTrainCount > 0)
+                if (
+                    trainTarget != null
+                    && trainTarget.trains.Count < Line.MAX_TRAIN_COUNT
+                    && assetManager.RemainingHighTrainCount > 0
+                )
                 {
                     trainManager.Stations = trainTarget.stations;
-                    trainTarget.trains.Add(trainManager.SpawnTrain(trainTarget.lineId, trainTarget.waypoints, trainTarget, true));
+                    trainTarget.trains.Add(
+                        trainManager.SpawnTrain(
+                            trainTarget.lineId,
+                            trainTarget.waypoints,
+                            trainTarget,
+                            true
+                        )
+                    );
                     Debug.Log($"[열차 배치] 열차가 배치되었습니다. 라인 ID: {trainTarget.lineId}");
                     assetManager.UpdateHighTrainUI();
                 }
 
                 if (trainTarget != null && trainTarget.trains.Count >= Line.MAX_TRAIN_COUNT)
                 {
-                    Debug.Log($"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}");
+                    Debug.Log(
+                        $"[열차 배치] 해당 라인에 이미 최대 열차 수가 배치되어 있습니다. 라인 ID: {trainTarget.lineId}"
+                    );
                 }
 
                 trainTarget = null;
@@ -243,11 +298,15 @@ public class MouseInput : MonoBehaviour
                 if (carriageTarget != null && carriageTarget.trains.Count > 0)
                 {
                     var point = cam.ScreenToWorldPoint(Input.mousePosition);
-                    Train closest = carriageTarget.trains.OrderBy(t => Vector3.Distance(t.transform.position, point)).First();
+                    Train closest = carriageTarget
+                        .trains.OrderBy(t => Vector3.Distance(t.transform.position, point))
+                        .First();
 
                     if (closest.CarriageCount < Train.MAX_CARRIAGE_COUNT)
                     {
-                        Debug.Log($"[객차] Train: {closest.GetInstanceID()}, CarriageCount: {closest.CarriageCount}, MAX: {Train.MAX_CARRIAGE_COUNT}");
+                        Debug.Log(
+                            $"[객차] Train: {closest.GetInstanceID()}, CarriageCount: {closest.CarriageCount}, MAX: {Train.MAX_CARRIAGE_COUNT}"
+                        );
 
                         trainManager.AddCarriage(closest);
                         assetManager.CarriageUsed();

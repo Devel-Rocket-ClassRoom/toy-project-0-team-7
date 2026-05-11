@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -8,16 +8,16 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public GameObject ghostImage;
 
     private RectTransform ghostRect;
-    private Canvas canvas;  
-    private Camera cam; 
+    private Canvas canvas;
+    private Camera cam;
 
     private void Awake()
     {
         ghostRect = ghostImage.GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         cam = Camera.main;
-        ghostImage.SetActive(false);    
-    }    
+        ghostImage.SetActive(false);
+    }
 
     private void OnDisable()
     {
@@ -26,9 +26,10 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
-        if (!GetComponent<Button>().interactable) return; 
+        if (!GetComponent<Button>().interactable)
+            return;
         mouseInput.ChangeToNewTrainMode();
-        ghostImage.SetActive(true); 
+        ghostImage.SetActive(true);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -38,7 +39,7 @@ public class TrainDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        ghostImage.SetActive(false);        
+        ghostImage.SetActive(false);
     }
 
     private void UpdateGhostPos(Vector2 screenPos)

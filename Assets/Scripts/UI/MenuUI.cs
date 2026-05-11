@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuUI : MonoBehaviour
 {
@@ -13,11 +13,12 @@ public class MenuUI : MonoBehaviour
         restartButton.onClick.AddListener(OnClickRestart);
         menuButton.onClick.AddListener(OnClickMenu);
     }
+
     public void OnClickRestart()
     {
         Time.timeScale = 1f;
         gameManager.gameResultText.text = "";
-        AssetManager.dayCount = 1;  
+        AssetManager.dayCount = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

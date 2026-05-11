@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PassengerManager : MonoBehaviour
 {
-
     //[수정 예정] 승객이 스폰될 역들의 리스트 > Station쪽에서 참조해야함
     public List<Station> allStations = new List<Station>();
 
@@ -23,5 +22,4 @@ public class PassengerManager : MonoBehaviour
         }
         return selectedDest;
     }
-
 }

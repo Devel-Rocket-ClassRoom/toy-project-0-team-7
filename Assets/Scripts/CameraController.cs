@@ -5,17 +5,29 @@ public class CameraController : MonoBehaviour
 {
     public GameManager gm;
     public StationManager sm;
-    
+
     // --- 역 스폰에 따라 카메라 조정하기 위한 필드들 ---
-    [SerializeField] private float padding = 3f;
-    [SerializeField] private float minOrthSize = 5f;
-    [SerializeField] private float positionSmoothTime = 0.6f;
-    [SerializeField] private float zoomSoothTime = 1.0f;
+    [SerializeField]
+    private float padding = 3f;
+
+    [SerializeField]
+    private float minOrthSize = 5f;
+
+    [SerializeField]
+    private float positionSmoothTime = 0.6f;
+
+    [SerializeField]
+    private float zoomSoothTime = 1.0f;
 
     // --- 게임오버될 때 게임 오버된 역 줌인할 때 사용할 필드들 ---
-    [SerializeField] private float gameOverSize = 3f;
-    [SerializeField] private float gameOverSmoothTime = 0.6f;
-    [SerializeField] public float transitionDelay = 1.5f;
+    [SerializeField]
+    private float gameOverSize = 3f;
+
+    [SerializeField]
+    private float gameOverSmoothTime = 0.6f;
+
+    [SerializeField]
+    public float transitionDelay = 1.5f;
 
     private Camera cam;
     private Vector3 positionVelocity;
@@ -33,15 +45,30 @@ public class CameraController : MonoBehaviour
     {
         if (IsGameOver)
         {
-            Vector3 gameOverPos = new Vector3(targetStation.x, targetStation.y, transform.position.z);
-            transform.position = Vector3.SmoothDamp(transform.position, gameOverPos, ref positionVelocity, gameOverSmoothTime);
-            cam.orthographicSize = Mathf.SmoothDamp(cam.orthographicSize, gameOverSize, ref zoomVelocity, gameOverSmoothTime);
+            Vector3 gameOverPos = new Vector3(
+                targetStation.x,
+                targetStation.y,
+                transform.position.z
+            );
+            transform.position = Vector3.SmoothDamp(
+                transform.position,
+                gameOverPos,
+                ref positionVelocity,
+                gameOverSmoothTime
+            );
+            cam.orthographicSize = Mathf.SmoothDamp(
+                cam.orthographicSize,
+                gameOverSize,
+                ref zoomVelocity,
+                gameOverSmoothTime
+            );
 
             return;
         }
 
         var stations = sm.ExisitingStations;
-        if (stations == null || stations.Count == 0) return;
+        if (stations == null || stations.Count == 0)
+            return;
 
         Bounds bounds = new Bounds(stations[0].transform.position, Vector3.zero);
         foreach (var station in stations)
@@ -56,15 +83,17 @@ public class CameraController : MonoBehaviour
         Vector3 targetPos = new Vector3(bounds.center.x, bounds.center.y, transform.position.z);
 
         transform.position = Vector3.SmoothDamp(
-            transform.position, 
-            targetPos, 
-            ref positionVelocity, 
-            positionSmoothTime);
+            transform.position,
+            targetPos,
+            ref positionVelocity,
+            positionSmoothTime
+        );
 
         cam.orthographicSize = Mathf.SmoothDamp(
-            cam.orthographicSize, 
-            targetSize, 
-            ref zoomVelocity, 
-            zoomSoothTime);
+            cam.orthographicSize,
+            targetSize,
+            ref zoomVelocity,
+            zoomSoothTime
+        );
     }
 }

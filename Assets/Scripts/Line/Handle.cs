@@ -32,8 +32,10 @@ public class Handle : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        if (lrSero == null) lrSero = sero.GetComponent<LineRenderer>(); // 방어 코드
-        if (lrGaro == null) lrGaro = garo.GetComponent<LineRenderer>();
+        if (lrSero == null)
+            lrSero = sero.GetComponent<LineRenderer>(); // 방어 코드
+        if (lrGaro == null)
+            lrGaro = garo.GetComponent<LineRenderer>();
 
         lrSero.startColor = color;
         lrSero.endColor = color;

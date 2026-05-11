@@ -26,7 +26,6 @@ public class StartMenuManager : MonoBehaviour
     private void OnClickCredit()
     {
         creditPanel.SetActive(true);
-
     }
 
     private void OnClickBack()

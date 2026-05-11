@@ -1,4 +1,4 @@
-public enum StationType   
+public enum StationType
 {
     Circle,
     Square,

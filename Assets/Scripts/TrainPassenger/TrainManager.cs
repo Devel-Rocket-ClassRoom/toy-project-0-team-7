@@ -21,20 +21,33 @@ public class TrainManager : MonoBehaviour
         if (activeTrains.Count != 0)
             foreach (var train in activeTrains)
                 train.Move();
-        
     }
-    public Train SpawnTrain(int lineId, List<Vector3> waypoints, Line line, bool isHighTrain = false)
+
+    public Train SpawnTrain(
+        int lineId,
+        List<Vector3> waypoints,
+        Line line,
+        bool isHighTrain = false
+    )
     {
         GameObject trainObject;
 
         if (!isHighTrain)
         {
-            trainObject = Instantiate(trainPrefab, Stations[0].transform.position, Quaternion.identity);
+            trainObject = Instantiate(
+                trainPrefab,
+                Stations[0].transform.position,
+                Quaternion.identity
+            );
             activeBasicTrainCount++;
         }
         else
         {
-            trainObject = Instantiate(highTrainPrefab, Stations[0].transform.position, Quaternion.identity);
+            trainObject = Instantiate(
+                highTrainPrefab,
+                Stations[0].transform.position,
+                Quaternion.identity
+            );
             activeHighSpeedTrainCount++;
         }
 
@@ -75,21 +88,29 @@ public class TrainManager : MonoBehaviour
         if (train.isHighSpeedTrain)
         {
             activeHighSpeedTrainCount--;
-            Debug.Log($"[열차 반환] 고속 열차 1대가 제거되었습니다. activeHighSpeedTrainCount: {activeHighSpeedTrainCount}");
+            Debug.Log(
+                $"[열차 반환] 고속 열차 1대가 제거되었습니다. activeHighSpeedTrainCount: {activeHighSpeedTrainCount}"
+            );
         }
         else
         {
             activeBasicTrainCount--;
-            Debug.Log($"[열차 반환] 일반 열차 1대가 제거되었습니다. activeBasicTrainCount: {activeBasicTrainCount}");
+            Debug.Log(
+                $"[열차 반환] 일반 열차 1대가 제거되었습니다. activeBasicTrainCount: {activeBasicTrainCount}"
+            );
         }
-        
+
         Destroy(train.gameObject);
         activeTrains.Remove(train);
     }
 
     public void AddCarriage(Train train)
     {
-        GameObject carriage = Instantiate(carriagePrefab, train.transform.position, train.transform.rotation);
+        GameObject carriage = Instantiate(
+            carriagePrefab,
+            train.transform.position,
+            train.transform.rotation
+        );
         Train carriageTrain = carriage.GetComponent<Train>();
         Transform[] carriageSlots = carriageTrain?.passengerSlots;
 
@@ -98,7 +119,7 @@ public class TrainManager : MonoBehaviour
             Destroy(carriageTrain);
         }
 
-        Destroy(carriage.GetComponent<Collider2D>()); 
+        Destroy(carriage.GetComponent<Collider2D>());
 
         carriage.GetComponentInChildren<SpriteRenderer>().color = Colors.colors[train.lineId];
         train.AttachCarriage(carriage, carriageSlots);

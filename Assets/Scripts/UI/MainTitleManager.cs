@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class MainTitleManager : MonoBehaviour
 {
     public RectTransform rt;
-    [SerializeField] private float speed = 400f;
-    [SerializeField] private float limitXPos = 2000f;
+
+    [SerializeField]
+    private float speed = 400f;
+
+    [SerializeField]
+    private float limitXPos = 2000f;
 
     private bool isMoved = false;
     private Vector2 originPos;
@@ -13,14 +18,16 @@ public class MainTitleManager : MonoBehaviour
     {
         originPos = rt.anchoredPosition;
     }
+
     private void Update()
     {
         if (Input.anyKeyDown)
         {
-            SceneManager.LoadScene("MenuScene"); 
+            SceneManager.LoadScene("MenuScene");
         }
 
-        if (isMoved) return;
+        if (isMoved)
+            return;
 
         rt.anchoredPosition += Vector2.right * speed * Time.deltaTime;
 

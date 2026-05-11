@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CarriageDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -25,9 +25,10 @@ public class CarriageDragButton : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!GetComponent<Button>().interactable) return; 
+        if (!GetComponent<Button>().interactable)
+            return;
         mouseInput.ChangeToCarriageMode();
-        ghostImage.SetActive(true);    
+        ghostImage.SetActive(true);
     }
 
     public void OnDrag(PointerEventData eventData)
