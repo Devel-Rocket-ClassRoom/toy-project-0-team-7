@@ -238,8 +238,8 @@ public class Train : MonoBehaviour
         if (dir != Vector3.zero)
             lastDirection = dir;
 
-        float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
-        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+        float newAngle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, newAngle);
 
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
@@ -278,6 +278,59 @@ public class Train : MonoBehaviour
                     targetStationIndex = waypointTargetIndex / 2;
 
                     //lr.positionCount = 0; // 잔상 제거
+                    return;
+                }
+
+                // 겹치는 waypoint 없음 + 승객 전원 하차 완료 - 새 경로의 가장 가까운 waypoint로 이동
+                if (passengers.Count == 0)
+                {
+                    isShorteningPending = false;
+                    path = pendingStations;
+                    routeWaypoints = pendingWaypoints;
+
+                    int nearestIdx = 0;
+                    float nearestDist = float.MaxValue;
+                    for (int i = 0; i < routeWaypoints.Count; i++)
+                    {
+                        float d = Vector3.Distance(transform.position, routeWaypoints[i]);
+                        if (d < nearestDist)
+                        {
+                            nearestDist = d;
+                            nearestIdx = i;
+                        }
+                    }
+
+                    transform.position = routeWaypoints[nearestIdx];
+
+                    bool isNewCircular = myLine != null && myLine.isCircular;
+                    if (!isNewCircular && nearestIdx >= routeWaypoints.Count - 1)
+                    {
+                        direction = TrainDirection.Backward;
+                        waypointTargetIndex = nearestIdx - 1;
+                    }
+                    else if (!isNewCircular && nearestIdx == 0)
+                    {
+                        direction = TrainDirection.Forward;
+                        waypointTargetIndex = 1;
+                    }
+                    else
+                    {
+                        direction = TrainDirection.Forward;
+                        waypointTargetIndex = (nearestIdx + 1) % routeWaypoints.Count;
+                    }
+
+                    targetStationIndex = waypointTargetIndex / 2;
+                    startPos = transform.position;
+                    positionHistory.Clear();
+
+                    if (routeWaypoints.Count > 1)
+                    {
+                        Vector3 nextPos = routeWaypoints[waypointTargetIndex];
+                        lastDirection = (nextPos - transform.position).normalized;
+                        float lastAngle =
+                            Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+                        transform.rotation = Quaternion.Euler(0f, 0f, lastAngle);
+                    }
                     return;
                 }
             }
@@ -355,8 +408,8 @@ public class Train : MonoBehaviour
 
                 //정차 중에 미리 반대 방향으로 lastDirection 설정
                 lastDirection = -lastDirection;
-                float angle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(0f, 0f, angle);
+                float newAngle = Mathf.Atan2(lastDirection.y, lastDirection.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, newAngle);
             }
 
             Debug.Log(
