@@ -211,11 +211,14 @@ public class Train : MonoBehaviour
 
         bool isNextAStation = isStationWaypoint(waypointTargetIndex);
         Station nextStation = isNextAStation ? GetStationAtWaypoint(waypointTargetIndex) : null;
+        int nextStationIndex = isNextAStation ? waypointTargetIndex / 2 : -1;
         //감속 판정 - 이번 역이 종점 이거나 정차해야 하는 역이면 감속 준비
         bool shouldStopHere =
             isNextAStation
             && nextStation != null
-            && (IsTerminalStation(nextStation) || ShouldStopAtStation(nextStation));
+            && (
+                IsTerminalStation(nextStation) || ShouldStopAtStation(nextStation, nextStationIndex)
+            );
 
         float currentSpeed = maxSpeed;
         //속도 조절 로직. 느리게 출발해서 중간부분은 최고속도 유지하고 도착할때쯤에는 다시 느리게 이동
@@ -342,7 +345,7 @@ public class Train : MonoBehaviour
             }
             else
             {
-                AdvanceWaypoint();
+                AdvanceWaypoint(resetStartPos: false);
             }
         }
 
@@ -354,9 +357,10 @@ public class Train : MonoBehaviour
     }
 
     // waypoint 인덱스 진행 (방향 포함)
-    public void AdvanceWaypoint()
+    public void AdvanceWaypoint(bool resetStartPos = true)
     {
-        startPos = transform.position;
+        if (resetStartPos)
+            startPos = transform.position;
         bool isCircularLine = (myLine != null) && myLine.isCircular;
         // 방향에 따라 다음 타겟 waypoint 결정
         if (direction == TrainDirection.Forward)
@@ -597,18 +601,23 @@ public class Train : MonoBehaviour
         return int.MaxValue;
     }
 
-    public bool CanBoard(Passenger p)
+    public bool CanBoard(Passenger p, int boardingIndex = -1)
     {
         if (p.blockedLineId == lineId)
             return false;
 
+        int idx = boardingIndex >= 0 ? boardingIndex : targetStationIndex;
+
         if (myLine != null && myLine.isCircular)
         {
-            return BFSDistance(p.destination, targetStationIndex, 1) != int.MaxValue;
+            int nextIdx = (idx + 1) % path.Count;
+            return BFSDistance(p.destination, nextIdx, 1) != int.MaxValue;
         }
 
         var dir = direction == TrainDirection.Forward ? 1 : -1;
-        int nextIndex = Mathf.Clamp(targetStationIndex + dir, 0, path.Count - 1);
+        int nextIndex = idx + dir;
+        if (nextIndex < 0 || nextIndex >= path.Count)
+            return false;
         int myDist = BFSDistance(p.destination, nextIndex, dir);
 
         return myDist != int.MaxValue;
@@ -672,17 +681,20 @@ public class Train : MonoBehaviour
     }
 
     // 현재 역에 정차 해야하는지 검사
-    private bool ShouldStopAtStation(Station station)
+    private bool ShouldStopAtStation(Station station, int stationIndex)
     {
         foreach (var p in passengers)
         {
-            if (p.destination == station.Shape)
+            if (p.destination == station.Shape || p.transferStation == station)
                 return true;
         }
-        foreach (var p in station.waitingPassengers)
+        if (passengers.Count < capacity)
         {
-            if (CanBoard(p))
-                return true;
+            foreach (var p in station.waitingPassengers)
+            {
+                if (CanBoard(p, stationIndex))
+                    return true;
+            }
         }
         return false;
     }
