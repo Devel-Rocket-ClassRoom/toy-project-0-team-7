@@ -1,4 +1,19 @@
 {
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$data = [Console]::In.ReadToEnd() | ConvertFrom-Json; $f = $data.tool_input.file_path; if ($f -and $f -match \"\\.cs$\") { dotnet csharpier format $f } 2>$null",
+            "shell": "powershell",
+            "statusMessage": "CSharpier 포매팅 중..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Read",
