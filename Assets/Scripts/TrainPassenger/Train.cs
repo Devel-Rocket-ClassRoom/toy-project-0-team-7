@@ -150,7 +150,8 @@ public class Train : MonoBehaviour
                 if (myDist == int.MaxValue) // 현재 방향으로 갈 수 없으면
                 {
                     // 다음 정차역에서 내림
-                    p.transferStation = path[targetStationIndex];
+                    int safeIndex = Mathf.Clamp(targetStationIndex, 0, path.Count - 1);
+                    p.transferStation = path[safeIndex];
                 }
                 else
                 {
@@ -178,7 +179,8 @@ public class Train : MonoBehaviour
             if (myDist == int.MaxValue) // 현재 방향으로 갈 수 없으면
             {
                 // 다음 정차역에서 내림
-                p.transferStation = path[targetStationIndex];
+                int safeIndex = Mathf.Clamp(targetStationIndex, 0, path.Count - 1);
+                p.transferStation = path[safeIndex];
             }
             else
             {
